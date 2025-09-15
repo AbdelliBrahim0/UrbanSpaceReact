@@ -1,0 +1,227 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Header from '../../components/ui/Header';
+import Breadcrumb from '../../components/uii/Breadcrumb';
+import Icon from '../../components/AppIcon';
+import Button from '../../components/uii/Button';
+
+// Import all components
+import ProfileSection from './components/ProfileSection';
+import OrderHistory from './components/OrderHistory';
+import WishlistSection from './components/WishlistSection';
+import AddressBook from './components/AddressBook';
+import PaymentMethods from './components/PaymentMethods';
+import AccountSettings from './components/AccountSettings';
+import ActivityFeed from './components/ActivityFeed';
+
+const UserAccount = () => {
+  const [activeTab, setActiveTab] = useState('profile');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const tabs = [
+    {
+      id: 'profile',
+      label: 'Profile',
+      icon: 'User',
+      component: ProfileSection
+    },
+    {
+      id: 'orders',
+      label: 'Orders',
+      icon: 'Package',
+      component: OrderHistory
+    },
+    {
+      id: 'wishlist',
+      label: 'Wishlist',
+      icon: 'Heart',
+      component: WishlistSection
+    },
+    {
+      id: 'addresses',
+      label: 'Addresses',
+      icon: 'MapPin',
+      component: AddressBook
+    },
+    {
+      id: 'payments',
+      label: 'Payment',
+      icon: 'CreditCard',
+      component: PaymentMethods
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: 'Settings',
+      component: AccountSettings
+    },
+    {
+      id: 'activity',
+      label: 'Activity',
+      icon: 'Activity',
+      component: ActivityFeed
+    }
+  ];
+
+  const ActiveComponent = tabs?.find(tab => tab?.id === activeTab)?.component || ProfileSection;
+
+  const breadcrumbItems = [
+    { label: 'Home', path: '/homepage' },
+    { label: 'Account', path: '/user-account', isActive: true }
+  ];
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+        <Breadcrumb customItems={breadcrumbItems} />
+        
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-8"
+        >
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                My Account
+              </h1>
+              <p className="text-muted-foreground font-mono">
+                Manage your profile, orders, and preferences
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                iconName="Download"
+                iconPosition="left"
+                className="animate-scale-hover"
+              >
+                Export Data
+              </Button>
+              <Button
+                variant="outline"
+                iconName="HelpCircle"
+                iconPosition="left"
+                className="animate-scale-hover"
+              >
+                Help
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar Navigation */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="lg:col-span-1"
+          >
+            <div className="bg-card rounded-xl border border-border p-6 sticky top-28">
+              <h2 className="text-lg font-semibold text-foreground mb-6">
+                Account Menu
+              </h2>
+              
+              {/* Desktop Navigation */}
+              <nav className={`space-y-2 ${isMobile ? 'hidden' : 'block'}`}>
+                {tabs?.map((tab) => (
+                  <button
+                    key={tab?.id}
+                    onClick={() => setActiveTab(tab?.id)}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-150 animate-scale-hover ${
+                      activeTab === tab?.id
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-foreground hover:bg-surface hover:text-foreground'
+                    }`}
+                  >
+                    <Icon name={tab?.icon} size={18} />
+                    <span className="font-medium">{tab?.label}</span>
+                  </button>
+                ))}
+              </nav>
+
+              {/* Mobile Navigation */}
+              {isMobile && (
+                <div className="flex overflow-x-auto space-x-2 pb-2">
+                  {tabs?.map((tab) => (
+                    <button
+                      key={tab?.id}
+                      onClick={() => setActiveTab(tab?.id)}
+                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg whitespace-nowrap transition-all duration-150 ${
+                        activeTab === tab?.id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-foreground hover:bg-surface'
+                      }`}
+                    >
+                      <Icon name={tab?.icon} size={16} />
+                      <span className="text-sm font-medium">{tab?.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Account Summary */}
+              <div className="mt-8 pt-6 border-t border-border">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Member Since</span>
+                    <span className="text-sm font-medium text-foreground font-mono">
+                      Jan 2023
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Total Orders</span>
+                    <span className="text-sm font-medium text-foreground">47</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Status</span>
+                    <span className="text-sm font-medium text-primary">Gold Member</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Main Content */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="lg:col-span-3"
+          >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ActiveComponent />
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
+        </div>
+      </main>
+      {/* Footer Spacer */}
+      <div className="h-20" />
+    </div>
+  );
+};
+
+export default UserAccount;

@@ -52,11 +52,13 @@ const Header = () => {
       <nav className="flex items-center justify-between h-16 px-4 lg:px-6">
         {/* Logo */}
         <Link to="/homepage" className="flex items-center space-x-2 group">
-          <div className="w-8 h-8 bg-accent rounded-sm flex items-center justify-center transition-street group-hover:scale-110">
-            <span className="text-accent-foreground font-heading font-bold text-lg">S</span>
-          </div>
+          <img
+            src="/logo.png"
+            alt="UrbanSpace Logo"
+            className="w-28 h-28 object-contain transition-street group-hover:scale-110"
+          />
           <span className="font-heading font-bold text-xl text-foreground group-hover:text-accent transition-street">
-            StreetVault
+            UrbanSpace
           </span>
         </Link>
 

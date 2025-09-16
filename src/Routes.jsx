@@ -10,6 +10,7 @@ import BlackFridayPage from './pages/black-friday';
 import BlackHourPage from './pages/black-hour';
 import Homepage from './pages/homepage';
 import UserAccount from './pages/user-account';
+import UserAuthentication from './pages/user-authentication';
 
 const Routes = () => {
   return (
@@ -26,6 +27,7 @@ const Routes = () => {
         <Route path="/black-hour" element={<BlackHourPage />} />
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/user-account" element={<UserAccount />} />
+        <Route path="/user-authentication" element={<UserAuthentication />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
       </ErrorBoundary>

@@ -24,10 +24,9 @@ const NewsletterSection = () => {
   };
 
   const socialLinks = [
-    { name: 'Instagram', icon: 'Instagram', url: '#', followers: '125K' },
-    { name: 'Twitter', icon: 'Twitter', url: '#', followers: '89K' },
+    { name: 'Instagram', icon: 'Instagram', url: '#', followers: '1K' },
+    { name: 'Facebook', icon: 'Facebook', url: '#', followers: '2K' },
     { name: 'TikTok', icon: 'Music', url: '#', followers: '203K' },
-    { name: 'YouTube', icon: 'Youtube', url: '#', followers: '67K' }
   ];
 
   const benefits = [
@@ -106,27 +105,7 @@ const NewsletterSection = () => {
               {!isSubscribed ? (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="flex-1">
-                      <Input
-                        type="email"
-                        placeholder="Enter your email to join the gang..."
-                        value={email}
-                        onChange={(e) => setEmail(e?.target?.value)}
-                        required
-                        className="bg-surface border-border focus:border-primary"
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      variant="default"
-                      size="default"
-                      loading={isLoading}
-                      iconName="ArrowRight"
-                      iconPosition="right"
-                      className="w-full sm:w-auto animate-scale-hover"
-                    >
-                      Join Gang
-                    </Button>
+                    
                   </div>
                   <p className="text-sm text-muted-foreground">
                     By joining, you agree to our terms and privacy policy. Unsubscribe anytime.

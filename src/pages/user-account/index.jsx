@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Breadcrumb from '../../components/uii/Breadcrumb';
 import Icon from '../../components/AppIcon';
@@ -17,6 +18,7 @@ import ActivityFeed from './components/ActivityFeed';
 const UserAccount = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -29,56 +31,27 @@ const UserAccount = () => {
   }, []);
 
   const tabs = [
-    {
-      id: 'profile',
-      label: 'Profile',
-      icon: 'User',
-      component: ProfileSection
-    },
-    {
-      id: 'orders',
-      label: 'Orders',
-      icon: 'Package',
-      component: OrderHistory
-    },
-    {
-      id: 'wishlist',
-      label: 'Wishlist',
-      icon: 'Heart',
-      component: WishlistSection
-    },
-    {
-      id: 'addresses',
-      label: 'Addresses',
-      icon: 'MapPin',
-      component: AddressBook
-    },
-    {
-      id: 'payments',
-      label: 'Payment',
-      icon: 'CreditCard',
-      component: PaymentMethods
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: 'Settings',
-      component: AccountSettings
-    },
-    {
-      id: 'activity',
-      label: 'Activity',
-      icon: 'Activity',
-      component: ActivityFeed
-    }
+    { id: 'profile', label: 'Profile', icon: 'User', component: ProfileSection },
+    { id: 'orders', label: 'Orders', icon: 'Package', component: OrderHistory },
+    { id: 'wishlist', label: 'Wishlist', icon: 'Heart', component: WishlistSection },
+    { id: 'addresses', label: 'Addresses', icon: 'MapPin', component: AddressBook },
+    { id: 'payments', label: 'Payment', icon: 'CreditCard', component: PaymentMethods },
+    { id: 'settings', label: 'Settings', icon: 'Settings', component: AccountSettings },
+    { id: 'activity', label: 'Activity', icon: 'Activity', component: ActivityFeed }
   ];
 
-  const ActiveComponent = tabs?.find(tab => tab?.id === activeTab)?.component || ProfileSection;
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || ProfileSection;
 
   const breadcrumbItems = [
     { label: 'Home', path: '/homepage' },
     { label: 'Account', path: '/user-account', isActive: true }
   ];
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');  // Remove token from localStorage
+    navigate('/user-authentication');  // Redirect to login page
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -155,44 +128,16 @@ const UserAccount = () => {
                 ))}
               </nav>
 
-              {/* Mobile Navigation */}
-              {isMobile && (
-                <div className="flex overflow-x-auto space-x-2 pb-2">
-                  {tabs?.map((tab) => (
-                    <button
-                      key={tab?.id}
-                      onClick={() => setActiveTab(tab?.id)}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg whitespace-nowrap transition-all duration-150 ${
-                        activeTab === tab?.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-foreground hover:bg-surface'
-                      }`}
-                    >
-                      <Icon name={tab?.icon} size={16} />
-                      <span className="text-sm font-medium">{tab?.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Account Summary */}
+              {/* Logout Button */}
               <div className="mt-8 pt-6 border-t border-border">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Member Since</span>
-                    <span className="text-sm font-medium text-foreground font-mono">
-                      Jan 2023
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Total Orders</span>
-                    <span className="text-sm font-medium text-foreground">47</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Status</span>
-                    <span className="text-sm font-medium text-primary">Gold Member</span>
-                  </div>
-                </div>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full mt-4"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </Button>
               </div>
             </div>
           </motion.div>

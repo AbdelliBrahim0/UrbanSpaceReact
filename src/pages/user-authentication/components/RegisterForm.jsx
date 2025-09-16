@@ -3,32 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/uiiii/Button';
 import Input from '../../../components/uiiii/Input';
-import { Checkbox } from '../../../components/ui/Checkbox';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const RegisterForm = ({ onSuccess }) => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    nom: '',       
     email: '',
-    password: '',
-    confirmPassword: '',
-    agreeToTerms: false,
-    subscribeNewsletter: true
+    telephone: '',
+    adresse: '',
+    password: ''
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  // Fonction pour gérer les changements dans les champs du formulaire
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e?.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
-    
-    // Clear error when user starts typing
+
+    // Réinitialiser les erreurs du champ
     if (errors?.[name]) {
       setErrors(prev => ({
         ...prev,
@@ -37,109 +36,136 @@ const RegisterForm = ({ onSuccess }) => {
     }
   };
 
+  // Fonction de validation du formulaire
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData?.firstName?.trim()) {
-      newErrors.firstName = 'First name is required';
-    }
-
-    if (!formData?.lastName?.trim()) {
-      newErrors.lastName = 'Last name is required';
+    if (!formData?.nom?.trim()) {
+      newErrors.nom = 'Le nom complet est requis';
     }
 
     if (!formData?.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/?.test(formData?.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = 'L\'email est requis';
+    } else if (!/\S+@\S+\.\S+/.test(formData?.email)) {
+      newErrors.email = 'Veuillez entrer un email valide';
+    }
+
+    if (!formData?.telephone) {
+      newErrors.telephone = 'Le numéro de téléphone est requis';
+    } else if (!/^(\+216)?[0-9]{8}$/.test(formData?.telephone)) {
+      newErrors.telephone = 'Veuillez entrer un numéro de téléphone valide (+216)';
+    }
+
+    if (!formData?.adresse) {
+      newErrors.adresse = 'L\'adresse est requise';
     }
 
     if (!formData?.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData?.password?.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/?.test(formData?.password)) {
-      newErrors.password = 'Password must contain uppercase, lowercase, and number';
-    }
-
-    if (!formData?.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-    } else if (formData?.password !== formData?.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    if (!formData?.agreeToTerms) {
-      newErrors.agreeToTerms = 'You must agree to the terms and conditions';
+      newErrors.password = 'Le mot de passe est requis';
+    } else if (formData?.password?.length < 6) {
+      newErrors.password = 'Le mot de passe doit comporter au moins 6 caractères';
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
+  // Fonction pour gérer l'envoi du formulaire
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      onSuccess();
-      navigate('/3d-homepage');
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate successful registration
+      const userData = {
+        email: formData.email,
+        name: formData.nom,
+        phone: formData.telephone,
+        address: formData.adresse
+      };
+      
+      // Call the login function from our auth context
+      login(userData);
+      onSuccess?.(userData);
+      
+      // Redirect to account page
+      navigate('/user-account');
+    } catch (error) {
+      console.error('Registration error:', error);
+      setErrors(prev => ({
+        ...prev,
+        general: 'Une erreur est survenue lors de l\'inscription. Veuillez réessayer.'
+      }));
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Name Fields */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in">
-        <Input
-          label="First Name"
-          type="text"
-          name="firstName"
-          placeholder="Enter first name"
-          value={formData?.firstName}
-          onChange={handleInputChange}
-          error={errors?.firstName}
-          required
-        />
-        <Input
-          label="Last Name"
-          type="text"
-          name="lastName"
-          placeholder="Enter last name"
-          value={formData?.lastName}
-          onChange={handleInputChange}
-          error={errors?.lastName}
-          required
-        />
-      </div>
-      {/* Email Field */}
+      {errors.general && (
+        <div className="p-4 bg-error/10 border border-error/20 rounded-lg animate-fade-in">
+          <div className="flex items-center space-x-2">
+            <Icon name="AlertCircle" size={16} className="text-error" />
+            <p className="text-sm text-error">{errors.general}</p>
+          </div>
+        </div>
+      )}
+
       <Input
-        label="Email Address"
+        label="Nom complet"
+        type="text"
+        name="nom"  // 'fullName' changé en 'nom'
+        placeholder="Entrez votre nom complet"
+        value={formData?.nom}  // 'fullName' changé en 'nom'
+        onChange={handleInputChange}
+        error={errors?.nom}  // 'fullName' changé en 'nom'
+        required
+      />
+      <Input
+        label="Adresse Email"
         type="email"
         name="email"
-        placeholder="Enter your email"
+        placeholder="Entrez votre email"
         value={formData?.email}
         onChange={handleInputChange}
         error={errors?.email}
         required
-        className="animate-fade-in"
       />
-      {/* Password Field */}
-      <div className="relative animate-fade-in">
+      <Input
+        label="Numéro de téléphone (+216)"
+        type="text"
+        name="telephone"
+        placeholder="Entrez votre numéro de téléphone"
+        value={formData?.telephone}
+        onChange={handleInputChange}
+        error={errors?.telephone}
+        required
+      />
+      <Input
+        label="Adresse"
+        type="text"
+        name="adresse"
+        placeholder="Entrez votre adresse"
+        value={formData?.adresse}
+        onChange={handleInputChange}
+        error={errors?.adresse}
+        required
+      />
+      <div className="relative">
         <Input
-          label="Password"
+          label="Mot de passe"
           type={showPassword ? 'text' : 'password'}
           name="password"
-          placeholder="Create a strong password"
+          placeholder="Créez un mot de passe sécurisé"
           value={formData?.password}
           onChange={handleInputChange}
           error={errors?.password}
           required
-          description="Must contain uppercase, lowercase, and number"
         />
         <button
           type="button"
@@ -149,46 +175,7 @@ const RegisterForm = ({ onSuccess }) => {
           <Icon name={showPassword ? 'EyeOff' : 'Eye'} size={18} />
         </button>
       </div>
-      {/* Confirm Password Field */}
-      <div className="relative animate-fade-in">
-        <Input
-          label="Confirm Password"
-          type={showConfirmPassword ? 'text' : 'password'}
-          name="confirmPassword"
-          placeholder="Confirm your password"
-          value={formData?.confirmPassword}
-          onChange={handleInputChange}
-          error={errors?.confirmPassword}
-          required
-        />
-        <button
-          type="button"
-          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="absolute right-3 top-9 text-muted-foreground hover:text-text-primary transition-colors"
-        >
-          <Icon name={showConfirmPassword ? 'EyeOff' : 'Eye'} size={18} />
-        </button>
-      </div>
-      {/* Terms Agreement */}
-      <div className="space-y-4 animate-fade-in">
-        <Checkbox
-          label="I agree to the Terms of Service and Privacy Policy"
-          checked={formData?.agreeToTerms}
-          onChange={handleInputChange}
-          name="agreeToTerms"
-          error={errors?.agreeToTerms}
-          required
-        />
-        
-        <Checkbox
-          label="Subscribe to newsletter for exclusive streetwear drops"
-          description="Get notified about new collections and special offers"
-          checked={formData?.subscribeNewsletter}
-          onChange={handleInputChange}
-          name="subscribeNewsletter"
-        />
-      </div>
-      {/* Submit Button */}
+
       <Button
         type="submit"
         variant="default"
@@ -199,21 +186,8 @@ const RegisterForm = ({ onSuccess }) => {
         iconPosition="right"
         className="animate-fade-in"
       >
-        {isLoading ? 'Creating Account...' : 'Create Account'}
+        {isLoading ? 'Création du compte...' : 'Créer un compte'}
       </Button>
-      {/* Additional Info */}
-      <div className="text-center animate-fade-in">
-        <p className="text-xs text-muted-foreground">
-          By creating an account, you agree to our{' '}
-          <button type="button" className="text-accent hover:text-accent/80 underline">
-            Terms of Service
-          </button>{' '}
-          and{' '}
-          <button type="button" className="text-accent hover:text-accent/80 underline">
-            Privacy Policy
-          </button>
-        </p>
-      </div>
     </form>
   );
 };

@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/uiiii/Button';
 import Input from '../../../components/uiiii/Input';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const LoginForm = ({ onSuccess }) => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -14,20 +16,14 @@ const LoginForm = ({ onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Mock credentials for demo
-  const mockCredentials = {
-    email: 'exemple@gmail.com',
-    password: '*************'
-  };
-
   const handleInputChange = (e) => {
-    const { name, value } = e?.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    
-    // Clear error when user starts typing
+
+    // Réinitialiser les erreurs du champ
     if (errors?.[name]) {
       setErrors(prev => ({
         ...prev,
@@ -40,50 +36,53 @@ const LoginForm = ({ onSuccess }) => {
     const newErrors = {};
 
     if (!formData?.email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/?.test(formData?.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = 'Email est requis';
+    } else if (!/\S+@\S+\.\S+/.test(formData?.email)) {  // Correction de l'expression régulière
+      newErrors.email = 'Veuillez entrer une adresse email valide';
     }
 
     if (!formData?.password) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'Le mot de passe est requis';
     } else if (formData?.password?.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = 'Le mot de passe doit comporter au moins 6 caractères';
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    
     if (!validateForm()) return;
 
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      if (formData?.email === mockCredentials?.email && formData?.password === mockCredentials?.password) {
-        onSuccess();
-        navigate('/3d-homepage');
-      } else {
-        setErrors({
-          general: `Invalid credentials. Use: ${mockCredentials?.email} / ${mockCredentials?.password}`
-        });
-      }
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Simulate successful login
+      const userData = {
+        email: formData.email,
+        name: formData.email.split('@')[0] // Simple way to generate a username from email
+      };
+      
+      // Call the login function from our auth context
+      login(userData);
+      onSuccess?.(userData);
+      navigate('/user-account');
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrors(prev => ({
+        ...prev,
+        form: 'Une erreur est survenue lors de la connexion. Veuillez réessayer.'
+      }));
+    } finally {
       setIsLoading(false);
-    }, 1500);
-  };
-
-  const handleForgotPassword = () => {
-    // Mock forgot password flow
-    alert('Password reset link sent to your email!');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* General Error */}
       {errors?.general && (
         <div className="p-4 bg-error/10 border border-error/20 rounded-lg animate-fade-in">
           <div className="flex items-center space-x-2">
@@ -92,25 +91,23 @@ const LoginForm = ({ onSuccess }) => {
           </div>
         </div>
       )}
-      {/* Email Field */}
       <Input
-        label="Email Address"
+        label="Adresse Email"
         type="email"
         name="email"
-        placeholder="Enter your email"
+        placeholder="Entrez votre email"
         value={formData?.email}
         onChange={handleInputChange}
         error={errors?.email}
         required
         className="animate-fade-in"
       />
-      {/* Password Field */}
       <div className="relative animate-fade-in">
         <Input
-          label="Password"
+          label="Mot de passe"
           type={showPassword ? 'text' : 'password'}
           name="password"
-          placeholder="Enter your password"
+          placeholder="Entrez votre mot de passe"
           value={formData?.password}
           onChange={handleInputChange}
           error={errors?.password}
@@ -124,25 +121,21 @@ const LoginForm = ({ onSuccess }) => {
           <Icon name={showPassword ? 'EyeOff' : 'Eye'} size={18} />
         </button>
       </div>
-      {/* Remember Me & Forgot Password */}
       <div className="flex items-center justify-between animate-fade-in">
         <label className="flex items-center space-x-2 cursor-pointer">
           <input
             type="checkbox"
             className="w-4 h-4 text-accent bg-background border-border rounded focus:ring-accent focus:ring-2"
           />
-          <span className="text-sm text-text-secondary">Remember me</span>
+          <span className="text-sm text-text-secondary">Se souvenir de moi</span>
         </label>
-        
         <button
           type="button"
-          onClick={handleForgotPassword}
           className="text-sm text-accent hover:text-accent/80 transition-colors"
         >
-          Forgot password?
+          Mot de passe oublié ?
         </button>
       </div>
-      {/* Submit Button */}
       <Button
         type="submit"
         variant="default"
@@ -153,19 +146,8 @@ const LoginForm = ({ onSuccess }) => {
         iconPosition="right"
         className="animate-fade-in"
       >
-        {isLoading ? 'Signing In...' : 'Sign In'}
+        {isLoading ? 'Connexion en cours...' : 'Se connecter'}
       </Button>
-      {/* Demo Credentials Info */}
-      <div className="p-3 bg-accent/10 border border-accent/20 rounded-lg animate-fade-in">
-        <div className="flex items-start space-x-2">
-          <Icon name="Info" size={16} className="text-accent mt-0.5" />
-          <div className="text-xs text-accent">
-            <p className="font-medium mb-1">Demo Credentials:</p>
-            <p>Email: {mockCredentials?.email}</p>
-            <p>Password: {mockCredentials?.password}</p>
-          </div>
-        </div>
-      </div>
     </form>
   );
 };

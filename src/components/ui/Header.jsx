@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
@@ -10,6 +11,8 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(3);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const navigationItems = [
     { label: 'Home', path: '/homepage', icon: 'Home' },
@@ -134,15 +137,37 @@ const Header = () => {
           </Button>
 
           {/* Account */}
-          <Link to="/user-account">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-surface hover:text-accent transition-street"
+          <button
+            onClick={() => {
+              if (user) {
+                navigate('/user-account');
+              } else {
+                navigate('/user-authentication');
+              }
+            }}
+            className="relative p-2 text-foreground hover:text-accent transition-street group"
+          >
+            <Icon name="User" size={20} className="group-hover:scale-110 transition-transform" />
+            {user && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </button>
+          
+          {/* Logout Button (only shown when user is logged in) */}
+          {user && (
+            <button
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              className="p-2 text-foreground hover:text-error transition-street"
+              title="Déconnexion"
             >
-              <Icon name="User" size={20} />
-            </Button>
-          </Link>
+              <Icon name="LogOut" size={20} />
+            </button>
+          )}
         </div>
 
         {/* Mobile Menu Button */}

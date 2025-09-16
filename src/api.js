@@ -9,11 +9,17 @@ async function fetchApi(endpoint, options = {}) {
     ...options.headers,
   };
 
+  // Ajouter le token JWT à l'en-tête Authorization si l'utilisateur est connecté
+  const token = localStorage.getItem('jwt_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   try {
     const response = await fetch(url, {
       ...options,
       headers,
-      credentials: "include",
+      credentials: "include",  // Assure-toi que les cookies sont envoyés si nécessaire
     });
 
     if (!response.ok) {
@@ -51,7 +57,119 @@ function createEmptyPaginatedResponse(limit = 12) {
   };
 }
 
-// ---------- Public API ----------
+// ---------- Private API ----------
+// Ajouter des méthodes pour la gestion du login et signup
+const privateApi = {
+  auth: {
+    // Fonction pour l'inscription
+    signup: async (userData) => {
+      try {
+        const response = await fetchApi("/api/signup", {
+          method: "POST",
+          body: JSON.stringify(userData),
+        });
+
+        if (response.success) {
+          // Sauvegarder le token JWT dans le localStorage
+          localStorage.setItem("jwt_token", response.token);
+          return {
+            success: true,
+            message: "Inscription réussie",
+            user: response.user,
+          };
+        } else {
+          return {
+            success: false,
+            message: response.message || "Erreur lors de l'inscription",
+          };
+        }
+      } catch (error) {
+        console.error("Erreur d'inscription:", error);
+        return {
+          success: false,
+          message: error.message || "Erreur inconnue",
+        };
+      }
+    },
+
+    // Fonction pour la connexion
+    login: async (credentials) => {
+      try {
+        const response = await fetchApi("/api/login", {
+          method: "POST",
+          body: JSON.stringify(credentials),
+        });
+
+        if (response.success) {
+          // Sauvegarder le token JWT dans le localStorage
+          localStorage.setItem("jwt_token", response.token);
+          return {
+            success: true,
+            message: "Connexion réussie",
+            token: response.token,
+            user: response.user,
+          };
+        } else {
+          return {
+            success: false,
+            message: response.message || "Identifiants invalides",
+          };
+        }
+      } catch (error) {
+        console.error("Erreur de connexion:", error);
+        return {
+          success: false,
+          message: error.message || "Erreur inconnue",
+        };
+      }
+    },
+
+    // Fonction pour vérifier si l'utilisateur est connecté (via le token JWT)
+    checkAuth: async () => {
+      const token = localStorage.getItem("jwt_token");
+
+      if (!token) {
+        return {
+          success: false,
+          message: "Non authentifié",
+        };
+      }
+
+      try {
+        const response = await fetchApi("/api/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        return response.success
+          ? {
+              success: true,
+              user: response.user,
+            }
+          : {
+              success: false,
+              message: "Session expirée",
+            };
+      } catch (error) {
+        console.error("Erreur de vérification d'authentification:", error);
+        return {
+          success: false,
+          message: "Erreur inconnue",
+        };
+      }
+    },
+
+    // Fonction pour la déconnexion
+    logout: () => {
+      // Supprimer le token JWT du localStorage
+      localStorage.removeItem("jwt_token");
+      return { success: true, message: "Déconnexion réussie" };
+    },
+  },
+};
+
+// ---------- Public API (inchangé) ----------
 const publicApi = {
   categories: {
     list: async () => {
@@ -132,9 +250,10 @@ const publicApi = {
   },
 };
 
-export default publicApi;
+export default { ...publicApi, privateApi };
 
 // Export alias (compatibilité avec ton ancien code)
 export const categoriesApi = publicApi.categories;
 export const subcategoriesApi = publicApi.subcategories;
 export const productsApi = publicApi.products;
+export const authApi = privateApi.auth;

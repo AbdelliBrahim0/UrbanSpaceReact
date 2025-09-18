@@ -52,7 +52,7 @@ const TrustSignals = () => {
       id: 2,
       name: "Sofia Rodriguez",
       rating: 5,
-      comment: "StreetVault never disappoints. Got my Black Friday order in 2 days!",
+      comment: "UrbanSpace never disappoints. Got my Black Friday order in 2 days!",
       verified: true,
       purchase: "Jordan Retro Sneakers"
     },

@@ -12,6 +12,7 @@ import Homepage from './pages/homepage';
 import UserAccount from './pages/user-account';
 import UserAuthentication from './pages/user-authentication';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import NewMemberWelcome from './pages/new-member-welcome';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -37,6 +38,9 @@ const Routes = () => {
             <Route path="/black-friday" element={<BlackFridayPage />} />
             <Route path="/black-hour" element={<BlackHourPage />} />
             <Route path="/homepage" element={<Homepage />} />
+            <Route path="/new-member-welcome" element={<NewMemberWelcome />} />
+
+
             <Route 
               path="/user-account" 
               element={

@@ -13,12 +13,12 @@ const BlackFridayPage = () => {
 
   useEffect(() => {
     // Set page title
-    document.title = 'Black Friday Mega Sale - StreetVault | Up to 80% Off';
+    document.title = 'Black Friday Mega Sale - UrbanSpace | Up to 80% Off';
     
     // Add special Black Friday meta tags
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription?.setAttribute('content', 'Black Friday mega sale at StreetVault! Up to 80% off premium streetwear, limited time deals, and exclusive collections. Shop now before deals expire!');
+      metaDescription?.setAttribute('content', 'Black Friday mega sale at UrbanSpace! Up to 80% off premium streetwear, limited time deals, and exclusive collections. Shop now before deals expire!');
     }
 
     // Scroll to top on page load
@@ -112,7 +112,7 @@ const BlackFridayPage = () => {
                   <span className="text-accent-foreground font-heading font-bold text-lg">S</span>
                 </div>
                 <span className="font-heading font-bold text-xl text-foreground">
-                  StreetVault
+                 UrbanSpace 
                 </span>
               </div>
               <p className="text-muted-foreground text-sm">
@@ -162,7 +162,7 @@ const BlackFridayPage = () => {
           </div>
 
           <div className="border-t border-street mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date()?.getFullYear()} StreetVault. All rights reserved. | Black Friday Sale - Limited Time Only</p>
+            <p>&copy; {new Date()?.getFullYear()} UrbanSpace. All rights reserved. | Black Friday Sale - Limited Time Only</p>
           </div>
         </div>
       </footer>

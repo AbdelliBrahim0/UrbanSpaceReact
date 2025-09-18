@@ -273,7 +273,7 @@ const NewsletterSignup = () => {
                 </Button>
 
                 <p className="text-text-secondary text-xs text-center">
-                  By subscribing, you agree to receive marketing emails from StreetVault. 
+                  By subscribing, you agree to receive marketing emails from UrbanSpace. 
                   You can unsubscribe at any time. Privacy policy applies.
                 </p>
               </form>

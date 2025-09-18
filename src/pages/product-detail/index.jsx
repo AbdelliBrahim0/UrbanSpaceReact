@@ -23,7 +23,7 @@ const ProductDetail = () => {
     id: productId,
     name: "Urban Rebellion Oversized Hoodie",
     subtitle: "Premium streetwear with attitude",
-    brand: "StreetVault",
+    brand: "UrbanSpace",
     price: 89.99,
     originalPrice: 129.99,
     rating: 4.8,
@@ -88,7 +88,7 @@ const ProductDetail = () => {
         description: "Do not use bleach or harsh chemicals"
       }
     ],
-    authenticityInfo: "Every StreetVault product comes with our authenticity guarantee. We source directly from authorized suppliers and conduct rigorous quality checks.",
+    authenticityInfo: "Every UrbanSpace product comes with our authenticity guarantee. We source directly from authorized suppliers and conduct rigorous quality checks.",
     authenticityFeatures: [
       "Holographic authenticity tag",
       "Unique serial number",
@@ -137,7 +137,7 @@ const ProductDetail = () => {
         rating: 5,
         date: "2024-01-08",
         verified: true,
-        comment: "This is my third purchase from StreetVault and they never disappoint. The attention to detail is amazing and the streetwear aesthetic is on point. Highly recommend!",
+        comment: "This is my third purchase from UrbanSpace and they never disappoint. The attention to detail is amazing and the streetwear aesthetic is on point. Highly recommend!",
         helpful: 15,
         purchaseDetails: { size: "XL", color: "Electric Blue" }
       },
@@ -173,7 +173,7 @@ const ProductDetail = () => {
     {
       id: "2",
       name: "Street Warrior Cargo Pants",
-      brand: "StreetVault",
+      brand: "UrbanSpace",
       price: 79.99,
       originalPrice: 99.99,
       image: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop",
@@ -189,7 +189,7 @@ const ProductDetail = () => {
     {
       id: "3",
       name: "Underground Graphic Tee",
-      brand: "StreetVault",
+      brand: "UrbanSpace",
       price: 34.99,
       originalPrice: 49.99,
       image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
@@ -205,7 +205,7 @@ const ProductDetail = () => {
     {
       id: "4",
       name: "Rebel Denim Jacket",
-      brand: "StreetVault",
+      brand: "UrbanSpace",
       price: 129.99,
       image: "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=400&fit=crop",
       hoverImage: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=400&h=400&fit=crop",
@@ -220,7 +220,7 @@ const ProductDetail = () => {
     {
       id: "5",
       name: "Urban Explorer Backpack",
-      brand: "StreetVault",
+      brand: "UrbanSpace",
       price: 89.99,
       image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
       hoverImage: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=400&h=400&fit=crop",

@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import { formatPrice } from '../../../utils/formatters';
 
-const UltraLimitedProduct = ({ product, index }) => {
-  const [quantity, setQuantity] = useState(product?.initialStock);
+const UltraLimitedProduct = ({ product, index, onSelect }) => {
+  const [quantity, setQuantity] = useState(product?.initialStock || 0);
   const [recentPurchases, setRecentPurchases] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]);
@@ -15,28 +16,38 @@ const UltraLimitedProduct = ({ product, index }) => {
       if (quantity > 0 && Math.random() < 0.3) {
         setQuantity(prev => Math.max(0, prev - 1));
         
-        const purchaseLocations = ['New York', 'Los Angeles', 'Chicago', 'Miami', 'Atlanta', 'Houston'];
+        const purchaseLocations = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Lille', 'Bordeaux'];
         const newPurchase = {
           id: Date.now(),
-          location: purchaseLocations?.[Math.floor(Math.random() * purchaseLocations?.length)],
-          timeAgo: 'Just now'
+          location: purchaseLocations[Math.floor(Math.random() * purchaseLocations.length)],
+          timeAgo: 'à l\'instant'
         };
         
-        setRecentPurchases(prev => [newPurchase, ...prev?.slice(0, 2)]);
+        setRecentPurchases(prev => [newPurchase, ...(prev || []).slice(0, 2)]);
       }
     }, Math.random() * 8000 + 2000);
 
     return () => clearInterval(interval);
   }, [quantity]);
 
-  const stockPercentage = (quantity / product?.initialStock) * 100;
-  const isLowStock = stockPercentage < 30;
-  const isCriticalStock = stockPercentage < 10;
+  const stockPercentage = (product.initialStock > 0) 
+    ? (quantity / product.initialStock) * 100 
+    : 0;
+  const isLowStock = stockPercentage < 30 && stockPercentage > 0;
+  const isCriticalStock = stockPercentage < 10 && stockPercentage > 0;
   const isSoldOut = quantity === 0;
+
+  const originalPrice = product.originalPrice || 0;
+  const salePrice = product.salePrice || originalPrice;
+  const discountPercentage = product.promotion?.discountPercentage 
+    ? Math.round(product.promotion.discountPercentage) 
+    : originalPrice > salePrice 
+      ? Math.round(((originalPrice - salePrice) / originalPrice) * 100) 
+      : 0;
 
   const handleQuickPurchase = () => {
     if (!isSoldOut) {
-      console.log(`Quick purchase: ${product?.name} - Size: ${selectedSize}`);
+      onSelect?.(product);
     }
   };
 
@@ -50,30 +61,36 @@ const UltraLimitedProduct = ({ product, index }) => {
       onHoverEnd={() => setIsHovered(false)}
       whileHover={{ scale: 1.02 }}
     >
-      {/* Exclusive Badge */}
-      <div className="absolute top-4 left-4 z-20">
-        <motion.div
-          className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          Ultra Exclusive
-        </motion.div>
-      </div>
-      {/* Stock Status Badge */}
+      {discountPercentage > 0 && (
+        <div className="absolute top-4 left-4 z-20">
+          <motion.div
+            className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            -{discountPercentage}%
+          </motion.div>
+        </div>
+      )}
+      
       <div className="absolute top-4 right-4 z-20">
         <motion.div
           className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-            isSoldOut ? 'bg-error text-error-foreground' :
-            isCriticalStock ? 'bg-error text-error-foreground animate-pulse': isLowStock ?'bg-warning text-warning-foreground': 'bg-success text-success-foreground'
+            isSoldOut 
+              ? 'bg-error text-error-foreground' 
+              : isCriticalStock 
+                ? 'bg-error text-error-foreground animate-pulse' 
+                : isLowStock 
+                  ? 'bg-warning text-warning-foreground' 
+                  : 'bg-success text-success-foreground'
           }`}
           animate={isCriticalStock ? { scale: [1, 1.1, 1] } : {}}
           transition={{ duration: 1, repeat: Infinity }}
         >
-          {isSoldOut ? 'Sold Out' : `${quantity} Left`}
+          {isSoldOut ? 'Épuisé' : `${quantity} restant${quantity > 1 ? 's' : ''}`}
         </motion.div>
       </div>
-      {/* Product Image */}
+
       <div className="relative aspect-square overflow-hidden">
         <Image
           src={product?.image}
@@ -81,7 +98,6 @@ const UltraLimitedProduct = ({ product, index }) => {
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         
-        {/* Overlay Effects */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"
           initial={{ opacity: 0 }}
@@ -89,7 +105,6 @@ const UltraLimitedProduct = ({ product, index }) => {
           transition={{ duration: 0.3 }}
         />
 
-        {/* Quick Actions Overlay */}
         <AnimatePresence>
           {isHovered && !isSoldOut && (
             <motion.div
@@ -105,114 +120,127 @@ const UltraLimitedProduct = ({ product, index }) => {
                 iconName="Zap"
                 iconPosition="left"
               >
-                Quick Buy
+                Acheter maintenant
               </Button>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Sold Out Overlay */}
         {isSoldOut && (
           <div className="absolute inset-0 bg-background/90 flex items-center justify-center">
             <div className="text-center">
               <Icon name="X" size={48} className="text-error mx-auto mb-2" />
-              <p className="text-error font-bold text-lg">SOLD OUT</p>
+              <p className="text-error font-bold text-lg">RUPTURE DE STOCK</p>
               <Button
                 variant="outline"
                 size="sm"
                 className="mt-2 border-accent text-accent hover:bg-accent hover:text-accent-foreground"
               >
-                Join Waitlist
+                Être averti
               </Button>
             </div>
           </div>
         )}
       </div>
-      {/* Product Info */}
+
       <div className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <div>
-            <h3 className="font-heading font-bold text-lg text-foreground mb-1">
-              {product?.name}
-            </h3>
-            <p className="text-muted-foreground text-sm">{product?.brand}</p>
+        <div className="flex justify-between items-start">
+          <div className="flex-1 min-w-0 mr-2">
+            <h3 className="text-lg font-bold text-foreground truncate">{product.name}</h3>
+            <p className="text-muted-foreground text-sm">
+              {product.categories?.[0]?.name || product.brand || 'Streetwear'}
+            </p>
+            {product.promotion?.timeRemaining?.isActive && (
+              <div className="mt-1">
+                <div className="text-xs text-warning font-medium">
+                  <Icon name="Clock" size={12} className="inline mr-1" />
+                  {product.promotion.timeRemaining.hours}h {product.promotion.timeRemaining.minutes}m
+                </div>
+              </div>
+            )}
           </div>
+          
           <div className="text-right">
             <div className="text-2xl font-black text-accent">
-              ${product?.salePrice}
+              {formatPrice(salePrice)} TND
             </div>
-            <div className="text-sm text-muted-foreground line-through">
-              ${product?.originalPrice}
-            </div>
+            {originalPrice > salePrice && (
+              <div className="text-sm text-muted-foreground line-through">
+                {formatPrice(originalPrice)} TND
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Stock Progress Bar */}
-        <div className="mb-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-muted-foreground">Stock Level</span>
-            <span className={`text-xs font-bold ${
-              isCriticalStock ? 'text-error' : isLowStock ? 'text-warning' : 'text-success'
-            }`}>
-              {stockPercentage?.toFixed(0)}%
-            </span>
+        {product.description && (
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {product.description}
+            </p>
           </div>
-          <div className="w-full bg-muted rounded-full h-2">
+        )}
+
+        <div className="mt-4">
+          {product.sizes?.length > 0 && (
+            <div className="flex items-center justify-between text-sm mb-1">
+              <span className="text-muted-foreground">Tailles disponibles:</span>
+              <div className="flex space-x-1">
+                {product.sizes.map(size => (
+                  <span 
+                    key={size} 
+                    className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-medium ${
+                      selectedSize === size 
+                        ? 'bg-accent text-accent-foreground' 
+                        : 'bg-muted hover:bg-muted/80'
+                    }`}
+                    onClick={() => setSelectedSize(size)}
+                  >
+                    {size}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="w-full bg-muted rounded-full h-2 overflow-hidden mt-3">
             <motion.div
-              className={`h-2 rounded-full ${
-                isCriticalStock ? 'bg-error' : isLowStock ? 'bg-warning' : 'bg-success'
-              }`}
-              initial={{ width: '100%' }}
+              className={`h-full ${
+                isCriticalStock 
+                  ? 'bg-error' 
+                  : isLowStock 
+                    ? 'bg-warning' 
+                    : 'bg-success'
+              } rounded-full`}
+              initial={{ width: 0 }}
               animate={{ width: `${stockPercentage}%` }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 1 }}
             />
           </div>
-        </div>
 
-        {/* Size Selection */}
-        <div className="mb-4">
-          <p className="text-xs text-muted-foreground mb-2">Size</p>
-          <div className="flex space-x-2">
-            {product?.sizes?.map((size) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`px-3 py-1 text-xs font-bold rounded border transition-street ${
-                  selectedSize === size
-                    ? 'bg-accent text-accent-foreground border-accent'
-                    : 'bg-surface text-foreground border-street hover:border-accent'
-                }`}
-              >
-                {size}
-              </button>
-            ))}
+          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+            <span>{quantity} restant{quantity > 1 ? 's' : ''}</span>
+            {product.initialStock > 0 && (
+              <span>Vendu: {product.initialStock - quantity} sur {product.initialStock}</span>
+            )}
           </div>
         </div>
 
-        {/* Purchase Velocity */}
-        <div className="mb-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <Icon name="TrendingUp" size={16} className="text-accent" />
-            <span className="text-xs text-muted-foreground">Purchase Activity</span>
-          </div>
-          <AnimatePresence>
-            {recentPurchases?.map((purchase) => (
-              <motion.div
-                key={purchase?.id}
-                className="text-xs text-accent mb-1"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-              >
-                Someone in {purchase?.location} bought this {purchase?.timeAgo}
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+        <AnimatePresence>
+          {recentPurchases?.map((purchase) => (
+            <motion.div
+              key={purchase.id}
+              className="text-xs text-accent mb-1"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              Achat récent à {purchase.location} {purchase.timeAgo}
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
-        {/* Action Buttons */}
-        <div className="space-y-2">
+        <div className="mt-4 space-y-2">
           {!isSoldOut ? (
             <>
               <Button
@@ -223,16 +251,18 @@ const UltraLimitedProduct = ({ product, index }) => {
                 iconName="ShoppingCart"
                 iconPosition="left"
               >
-                Add to Cart
+                Ajouter au panier
               </Button>
+              
               <Button
                 variant="outline"
                 fullWidth
                 className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                 iconName="Zap"
                 iconPosition="left"
+                onClick={handleQuickPurchase}
               >
-                Buy Now
+                Acheter maintenant
               </Button>
             </>
           ) : (
@@ -243,7 +273,7 @@ const UltraLimitedProduct = ({ product, index }) => {
               iconName="Bell"
               iconPosition="left"
             >
-              Notify When Available
+              M'avertir quand disponible
             </Button>
           )}
         </div>

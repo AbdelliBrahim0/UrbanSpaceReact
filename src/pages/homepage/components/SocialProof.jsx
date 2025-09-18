@@ -14,7 +14,7 @@ const SocialProof = () => {
       username: "@streetking_marcus",
       role: "Street Style Influencer",
       avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      content: `StreetVault isn't just clothing, it's a lifestyle. Every piece I've copped from them has been fire. The quality is unmatched and the designs speak to the culture.`,
+      content: `UrbanSpace isn't just clothing, it's a lifestyle. Every piece I've copped from them has been fire. The quality is unmatched and the designs speak to the culture.`,
       rating: 5,
       verified: true,
       followers: "125K",
@@ -26,7 +26,7 @@ const SocialProof = () => {
       username: "@urban_zara",
       role: "Fashion Blogger",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-      content: `The Underground Kings collection is absolutely insane! Got so many compliments wearing their pieces. StreetVault understands what real streetwear should be.`,
+      content: `The Underground Kings collection is absolutely insane! Got so many compliments wearing their pieces. UrbanSpace understands what real streetwear should be.`,
       rating: 5,
       verified: true,
       followers: "89K",
@@ -38,7 +38,7 @@ const SocialProof = () => {
       username: "@jamal_fresh",
       role: "Hip-Hop Artist",
       avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      content: `Been wearing StreetVault since day one. Their pieces are in my music videos because they represent authenticity. This is what the streets need.`,
+      content: `Been wearing UrbanSpace since day one. Their pieces are in my music videos because they represent authenticity. This is what the streets need.`,
       rating: 5,
       verified: true,
       followers: "234K",
@@ -50,7 +50,7 @@ const SocialProof = () => {
       username: "@sofia_street",
       role: "Style Creator",
       avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      content: `StreetVault's Vault Classics collection is everything! The attention to detail and the way they capture street culture is phenomenal. Obsessed!`,
+      content: `UrbanSpace's Vault Classics collection is everything! The attention to detail and the way they capture street culture is phenomenal. Obsessed!`,
       rating: 5,
       verified: true,
       followers: "67K",
@@ -150,7 +150,7 @@ const SocialProof = () => {
             STREET <span className="text-accent">APPROVED</span>
           </h2>
           <p className="text-text-secondary text-lg md:text-xl max-w-2xl mx-auto">
-            Trusted by influencers, worn by legends. See what the culture is saying about StreetVault.
+            Trusted by influencers, worn by legends. See what the culture is saying about UrbanSpace.
           </p>
         </motion.div>
 

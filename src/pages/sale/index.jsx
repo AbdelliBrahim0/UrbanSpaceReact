@@ -8,6 +8,9 @@ import SaleProductCard from './components/SaleProductCard';
 import FeaturedDeals from './components/FeaturedDeals';
 import TrustSignals from './components/TrustSignals';
 import Icon from '../../components/AppIcon';
+import Button from '../../components/ui/Button';
+import { salesApi } from '../../api';
+import { formatPrice } from '../../utils/formatters';
 
 const Sale = () => {
   const [activeFilters, setActiveFilters] = useState({
@@ -18,180 +21,55 @@ const Sale = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState('grid');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [saleProducts, setSaleProducts] = useState([]);
   const productsPerPage = 12;
 
-  // Mock sale products data
-  const saleProducts = [
-    {
-      id: 1,
-      name: "Urban Legends Hoodie",
-      brand: "STREET KINGS",
-      originalPrice: 129.99,
-      salePrice: 38.99,
-      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop",
-      rating: 4.8,
-      reviews: 234,
-      stock: 3,
-      availableSizes: ["S", "M", "L", "XL"],
-      isFlashSale: true,
-      flashSaleEnds: "2h 15m",
-      isWishlisted: false
-    },
-    {
-      id: 2,
-      name: "Graffiti Bomber Jacket",
-      brand: "CITY REBELS",
-      originalPrice: 199.99,
-      salePrice: 79.99,
-      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop",
-      rating: 4.9,
-      reviews: 156,
-      stock: 8,
-      availableSizes: ["M", "L", "XL", "XXL"],
-      isLimitedEdition: true,
-      isWishlisted: true
-    },
-    {
-      id: 3,
-      name: "Neon Dreams T-Shirt",
-      brand: "UNDERGROUND",
-      originalPrice: 49.99,
-      salePrice: 14.99,
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-      rating: 4.6,
-      reviews: 89,
-      stock: 15,
-      availableSizes: ["XS", "S", "M", "L"],
-      isClearance: true,
-      isWishlisted: false
-    },
-    {
-      id: 4,
-      name: "Street Art Cargo Pants",
-      brand: "REBEL WEAR",
-      originalPrice: 149.99,
-      salePrice: 59.99,
-      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=500&fit=crop",
-      rating: 4.7,
-      reviews: 203,
-      stock: 12,
-      availableSizes: ["S", "M", "L", "XL", "XXL"],
-      isWishlisted: false
-    },
-    {
-      id: 5,
-      name: "Hypebeast Snapback",
-      brand: "STREET KINGS",
-      originalPrice: 79.99,
-      salePrice: 23.99,
-      image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&h=500&fit=crop",
-      rating: 4.5,
-      reviews: 67,
-      stock: 25,
-      availableSizes: ["One Size"],
-      isFlashSale: true,
-      flashSaleEnds: "1h 45m",
-      isWishlisted: false
-    },
-    {
-      id: 6,
-      name: "Urban Warrior Sneakers",
-      brand: "CITY REBELS",
-      originalPrice: 249.99,
-      salePrice: 124.99,
-      image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop",
-      rating: 4.9,
-      reviews: 445,
-      stock: 6,
-      availableSizes: ["7", "8", "9", "10", "11", "12"],
-      isLimitedEdition: true,
-      isWishlisted: true
-    },
-    {
-      id: 7,
-      name: "Midnight Vibes Sweatshirt",
-      brand: "UNDERGROUND",
-      originalPrice: 99.99,
-      salePrice: 29.99,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop",
-      rating: 4.4,
-      reviews: 112,
-      stock: 18,
-      availableSizes: ["S", "M", "L", "XL"],
-      isClearance: true,
-      isWishlisted: false
-    },
-    {
-      id: 8,
-      name: "Street Culture Backpack",
-      brand: "REBEL WEAR",
-      originalPrice: 129.99,
-      salePrice: 64.99,
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop",
-      rating: 4.6,
-      reviews: 178,
-      stock: 22,
-      availableSizes: ["One Size"],
-      isWishlisted: false
-    },
-    {
-      id: 9,
-      name: "Neon Nights Tank Top",
-      brand: "STREET KINGS",
-      originalPrice: 39.99,
-      salePrice: 11.99,
-      image: "https://images.unsplash.com/photo-1583743814966-8936f37f8302?w=500&h=500&fit=crop",
-      rating: 4.3,
-      reviews: 56,
-      stock: 30,
-      availableSizes: ["XS", "S", "M", "L", "XL"],
-      isFlashSale: true,
-      flashSaleEnds: "3h 22m",
-      isWishlisted: false
-    },
-    {
-      id: 10,
-      name: "Urban Legend Denim Jacket",
-      brand: "CITY REBELS",
-      originalPrice: 179.99,
-      salePrice: 89.99,
-      image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=500&h=500&fit=crop",
-      rating: 4.8,
-      reviews: 267,
-      stock: 9,
-      availableSizes: ["S", "M", "L", "XL"],
-      isLimitedEdition: true,
-      isWishlisted: true
-    },
-    {
-      id: 11,
-      name: "Street Art Beanie",
-      brand: "UNDERGROUND",
-      originalPrice: 29.99,
-      salePrice: 8.99,
-      image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=500&h=500&fit=crop",
-      rating: 4.2,
-      reviews: 34,
-      stock: 45,
-      availableSizes: ["One Size"],
-      isClearance: true,
-      isWishlisted: false
-    },
-    {
-      id: 12,
-      name: "Hypebeast Joggers",
-      brand: "REBEL WEAR",
-      originalPrice: 89.99,
-      salePrice: 44.99,
-      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=500&fit=crop",
-      rating: 4.7,
-      reviews: 189,
-      stock: 16,
-      availableSizes: ["S", "M", "L", "XL", "XXL"],
-      isWishlisted: false
-    }
-  ];
+  // Fetch sale products from API
+  useEffect(() => {
+    const fetchSaleProducts = async () => {
+      try {
+        setIsLoading(true);
+        const response = await salesApi.list();
+        
+        if (response.success && Array.isArray(response.data)) {
+          // Format products data to match component props
+          const formattedProducts = response.data.map(product => ({
+            id: product.id,
+            name: product.name,
+            brand: product.brand || 'Urban Space',
+            originalPrice: product.sale?.originalPrice || product.price,
+            salePrice: product.sale?.discountedPrice || product.price,
+            image: product.urlImage,
+            imageHover: product.urlImageHover || product.urlImage,
+            rating: 4.5, // Default rating
+            reviews: Math.floor(Math.random() * 100), // Random reviews for demo
+            stock: product.stock,
+            availableSizes: product.size ? product.size.split(',').map(s => s.trim()) : ['S', 'M', 'L', 'XL'],
+            isFlashSale: true, // All sale items are considered flash sales
+            flashSaleEnds: product.sale?.timeRemaining?.isActive 
+              ? `${product.sale.timeRemaining.hours}h ${product.sale.timeRemaining.minutes}m`
+              : '24h',
+            isWishlisted: false,
+            categories: product.categories,
+            promotion: product.sale
+          }));
+          
+          setSaleProducts(formattedProducts);
+        } else {
+          setError(response.message || 'Erreur lors du chargement des soldes');
+        }
+      } catch (err) {
+        console.error('Erreur API:', err);
+        setError('Impossible de charger les produits en solde. Veuillez réessayer plus tard.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSaleProducts();
+  }, []);
 
   const handleFilterChange = (sectionId, optionId) => {
     if (sectionId === 'clear-all') {
@@ -217,7 +95,41 @@ const Sale = () => {
     });
   };
 
-  const filteredProducts = saleProducts; // In real app, apply filters here
+  // Filter products based on active filters
+  const filteredProducts = saleProducts.filter(product => {
+    if (!product) return false;
+    
+    // Filter by discount
+    if (activeFilters.discount.length > 0) {
+      const discount = product.promotion?.discountPercentage || 
+        Math.round(((product.originalPrice - product.salePrice) / product.originalPrice) * 100);
+      
+      if (activeFilters.discount.includes('50+') && discount < 50) return false;
+      if (activeFilters.discount.includes('40-50') && (discount < 40 || discount > 50)) return false;
+      if (activeFilters.discount.includes('30-40') && (discount < 30 || discount > 40)) return false;
+      if (activeFilters.discount.includes('20-30') && (discount < 20 || discount > 30)) return false;
+      if (activeFilters.discount.includes('10-20') && (discount < 10 || discount > 20)) return false;
+    }
+
+    // Filter by category
+    if (activeFilters.category.length > 0) {
+      if (!activeFilters.category.includes(product.categories[0])) return false;
+    }
+
+    // Filter by size
+    if (activeFilters.size.length > 0) {
+      if (!activeFilters.size.some(size => product.availableSizes.includes(size))) return false;
+    }
+
+    // Filter by price
+    if (activeFilters.price.length > 0) {
+      const priceRange = activeFilters.price[0].split('-');
+      if (product.salePrice < priceRange[0] || product.salePrice > priceRange[1]) return false;
+    }
+
+    return true;
+  });
+
   const totalPages = Math.ceil(filteredProducts?.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
   const currentProducts = filteredProducts?.slice(startIndex, startIndex + productsPerPage);
@@ -240,7 +152,7 @@ const Sale = () => {
   return (
     <>
       <Helmet>
-        <title>Sale - Up to 70% Off Streetwear | StreetVault</title>
+        <title>Sale - Up to 70% Off Streetwear | UrbanSpace</title>
         <meta name="description" content="Massive streetwear sale with up to 70% off premium urban fashion. Limited time deals on hoodies, jackets, sneakers and more. Shop now!" />
         <meta name="keywords" content="streetwear sale, urban fashion deals, discount clothing, hypebeast sale, street style clearance" />
       </Helmet>
@@ -307,22 +219,28 @@ const Sale = () => {
                   </div>
                 </div>
               ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className={`grid gap-6 ${
-                    viewMode === 'grid' ?'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' :'grid-cols-1'
-                  }`}
-                >
-                  {currentProducts?.map((product, index) => (
-                    <SaleProductCard 
-                      key={product?.id} 
-                      product={product} 
-                      index={index}
-                    />
+                <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'space-y-6'} gap-6`}>
+                  {currentProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={viewMode === 'grid' ? '' : 'flex'}
+                    >
+                      <SaleProductCard
+                        product={{
+                          ...product,
+                          // Ensure all required props are passed
+                          discountPercentage: product.promotion?.discountPercentage || 
+                            Math.round(((product.originalPrice - product.salePrice) / product.originalPrice) * 100),
+                          timeRemaining: product.promotion?.timeRemaining
+                        }}
+                        viewMode={viewMode}
+                      />
+                    </motion.div>
                   ))}
-                </motion.div>
+                </div>
               )}
 
               {/* Pagination */}
@@ -408,7 +326,7 @@ const Sale = () => {
         <footer className="bg-background border-t border-street py-8">
           <div className="container mx-auto px-4 text-center">
             <p className="text-muted-foreground">
-              © {new Date()?.getFullYear()} StreetVault. All rights reserved.
+              © {new Date()?.getFullYear()} UrbanSpace. All rights reserved.
             </p>
           </div>
         </footer>

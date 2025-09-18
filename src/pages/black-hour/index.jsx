@@ -10,87 +10,70 @@ import QuickCheckout from './components/QuickCheckout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import FlashSaleBanner from './components/FlashSaleBanner';
-
+import { blackhour } from '../../api';
 
 const BlackHourPage = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [ultraLimitedProducts, setUltraLimitedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [endTime, setEndTime] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    const fetchBlackHourProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await blackhour.list();
+        
+        if (response.success && Array.isArray(response.data)) {
+          const formattedProducts = response.data.map(product => ({
+            id: product.id,
+            name: product.name,
+            brand: product.categories?.[0]?.name || 'Brand',
+            originalPrice: product.price,
+            salePrice: product.promotion?.discountedPrice || product.price,
+            initialStock: product.stock,
+            image: product.urlImage,
+            imageHover: product.urlImageHover || product.urlImage,
+            sizes: product.size ? product.size.split(',') : ['S', 'M', 'L', 'XL'],
+            isExclusive: true,
+            description: product.description,
+            promotion: product.promotion
+          }));
+          
+          setUltraLimitedProducts(formattedProducts);
+          
+          // Trouver la date de fin de promotion la plus proche
+          const activePromotions = response.data
+            .filter(p => p.promotion?.endTime)
+            .map(p => new Date(p.promotion.endTime).getTime());
+            
+          if (activePromotions.length > 0) {
+            const nearestEndTime = new Date(Math.min(...activePromotions));
+            setEndTime(nearestEndTime);
+          }
+        } else {
+          setError(response.message || 'Erreur lors du chargement des produits');
+        }
+      } catch (err) {
+        console.error('Erreur API:', err);
+        setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchBlackHourProducts();
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
-
-  const ultraLimitedProducts = [
-    {
-      id: 1,
-      name: "Supreme Box Logo Hoodie",
-      brand: "Supreme",
-      originalPrice: 299,
-      salePrice: 199,
-      initialStock: 15,
-      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop",
-      sizes: ["S", "M", "L", "XL"],
-      isExclusive: true
-    },
-    {
-      id: 2,
-      name: "Off-White Jordan 1 Chicago",
-      brand: "Off-White x Nike",
-      originalPrice: 2199,
-      salePrice: 1899,
-      initialStock: 8,
-      image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500&h=500&fit=crop",
-      sizes: ["8", "9", "10", "11", "12"],
-      isExclusive: true
-    },
-    {
-      id: 3,
-      name: "Travis Scott Cactus Jack Tee",
-      brand: "Cactus Jack",
-      originalPrice: 89,
-      salePrice: 59,
-      initialStock: 23,
-      image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop",
-      sizes: ["S", "M", "L", "XL", "XXL"],
-      isExclusive: true
-    },
-    {
-      id: 4,
-      name: "Fear of God Essentials Hoodie",
-      brand: "Fear of God",
-      originalPrice: 149,
-      salePrice: 99,
-      initialStock: 12,
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop",
-      sizes: ["S", "M", "L", "XL"],
-      isExclusive: true
-    },
-    {
-      id: 5,
-      name: "Yeezy Boost 350 V2",
-      brand: "Adidas x Yeezy",
-      originalPrice: 399,
-      salePrice: 299,
-      initialStock: 6,
-      image: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=500&h=500&fit=crop",
-      sizes: ["7", "8", "9", "10", "11", "12"],
-      isExclusive: true
-    },
-    {
-      id: 6,
-      name: "Stone Island Jacket",
-      brand: "Stone Island",
-      originalPrice: 799,
-      salePrice: 599,
-      initialStock: 4,
-      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop",
-      sizes: ["S", "M", "L", "XL"],
-      isExclusive: true
-    }
-  ];
 
   const handleProductSelect = (product) => {
     setSelectedProduct(product);
@@ -100,7 +83,7 @@ const BlackHourPage = () => {
   return (
     <>
       <Helmet>
-        <title>Black Hour - Ultra Exclusive Deals | StreetVault</title>
+        <title>Black Hour - Ultra Exclusive Deals | UrbanSpace</title>
         <meta name="description" content="Ultra-exclusive streetwear deals with real-time availability. Limited time offers ending soon!" />
       </Helmet>
       <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -154,7 +137,7 @@ const BlackHourPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
               >
-                <CountdownTimer />
+                {endTime && <CountdownTimer endDate={new Date(endTime)} />}
                 
                 <motion.div
                   className="mt-12 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
@@ -197,15 +180,47 @@ const BlackHourPage = () => {
                 </p>
               </motion.div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {ultraLimitedProducts?.map((product, index) => (
-                  <UltraLimitedProduct
-                    key={product?.id}
-                    product={product}
-                    index={index}
-                    onQuickPurchase={() => handleProductSelect(product)}
-                  />
-                ))}
+              <div className="px-4 sm:px-6 lg:px-8 py-12">
+                {loading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {[...Array(6)].map((_, index) => (
+                      <div key={index} className="bg-card border border-street rounded-lg overflow-hidden h-[500px] animate-pulse">
+                        <div className="bg-muted h-3/4 w-full"></div>
+                        <div className="p-4 space-y-4">
+                          <div className="h-4 bg-muted rounded w-3/4"></div>
+                          <div className="h-4 bg-muted rounded w-1/2"></div>
+                          <div className="h-6 bg-muted rounded w-1/3"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : error ? (
+                  <div className="text-center py-12">
+                    <div className="text-error text-lg mb-4">{error}</div>
+                    <Button 
+                      onClick={() => window.location.reload()}
+                      variant="outline"
+                      iconName="RefreshCw"
+                    >
+                      Réessayer
+                    </Button>
+                  </div>
+                ) : ultraLimitedProducts.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-muted-foreground text-lg">Aucun produit disponible pour le moment</div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {ultraLimitedProducts.map((product, index) => (
+                      <UltraLimitedProduct
+                        key={product.id}
+                        product={product}
+                        index={index}
+                        onSelect={() => handleProductSelect(product)}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -359,7 +374,7 @@ const BlackHourPage = () => {
         <footer className="bg-surface border-t border-street py-8">
           <div className="container mx-auto px-4 text-center">
             <p className="text-muted-foreground text-sm">
-              © {new Date()?.getFullYear()} StreetVault. All rights reserved. | Black Hour - Ultra Exclusive Deals
+              © {new Date()?.getFullYear()} UrbanSpace. All rights reserved. | Black Hour - Ultra Exclusive Deals
             </p>
           </div>
         </footer>

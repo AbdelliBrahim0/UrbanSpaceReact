@@ -93,7 +93,7 @@ const RegisterForm = ({ onSuccess }) => {
       onSuccess?.(userData);
       
       // Redirect to account page
-      navigate('/user-account');
+      navigate('/new-member-welcome');
     } catch (error) {
       console.error('Registration error:', error);
       setErrors(prev => ({

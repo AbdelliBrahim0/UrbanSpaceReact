@@ -22,7 +22,7 @@ const Homepage = () => {
     // Add meta description
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription?.setAttribute('content', 'Discover exclusive streetwear collections at StreetVault. Premium urban fashion, limited drops, and authentic street culture. Join the movement.');
+      metaDescription?.setAttribute('content', 'Discover exclusive streetwear collections at UrbanSpace. Premium urban fashion, limited drops, and authentic street culture. Join the movement.');
     }
 
     return () => {
@@ -92,7 +92,7 @@ const Homepage = () => {
                   <span className="text-accent-foreground font-heading font-bold text-lg">S</span>
                 </div>
                 <span className="font-heading font-bold text-xl text-foreground">
-                  StreetVault
+                  UrbanSpace
                 </span>
               </div>
               <p className="text-text-secondary text-sm leading-relaxed mb-4">
@@ -158,7 +158,7 @@ const Homepage = () => {
           {/* Bottom Bar */}
           <div className="border-t border-street pt-8 flex flex-col md:flex-row justify-between items-center">
             <p className="text-text-secondary text-sm mb-4 md:mb-0">
-              © {new Date()?.getFullYear()} StreetVault. All rights reserved. Built for the culture.
+              © {new Date()?.getFullYear()} UrbanSpace. All rights reserved. Built for the culture.
             </p>
             <div className="flex items-center space-x-6 text-sm">
               <span className="text-text-secondary">Secure payments</span>

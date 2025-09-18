@@ -1,131 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
+import { blackfriday } from '../../../api';
 
 const DealGrid = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [hoveredProduct, setHoveredProduct] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBlackFridayProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await blackfriday.list();
+        if (response.success && Array.isArray(response.data)) {
+          const formattedProducts = response.data.map(product => ({
+            id: product.id,
+            title: product.name,
+            category: product.categories?.[0]?.name?.toLowerCase() || 'all',
+            originalPrice: product.price,
+            salePrice: product.promotion?.newPrice || product.price,
+            discount: product.promotion ? Math.round(((product.price - product.promotion.newPrice) / product.price) * 100) : 0,
+            image: product.urlImage,
+            imageHover: product.urlImageHover || product.urlImage,
+            badge: product.promotion ? 'SALE' : 'NEW',
+            stock: product.stock,
+            description: product.description,
+            promotion: product.promotion
+          }));
+          setProducts(formattedProducts);
+        } else {
+          setError('Erreur lors du chargement des produits Black Friday');
+        }
+      } catch (err) {
+        console.error('Erreur API:', err);
+        setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlackFridayProducts();
+  }, []);
 
   const categories = [
-    { id: 'all', label: 'All Deals', icon: 'Grid3X3' },
-    { id: 'hoodies', label: 'Hoodies', icon: 'Shirt' },
-    { id: 'sneakers', label: 'Sneakers', icon: 'Footprints' },
-    { id: 'accessories', label: 'Accessories', icon: 'Watch' },
-    { id: 'jackets', label: 'Jackets', icon: 'Coat' }
-  ];
-
-  const products = [
-    {
-      id: 1,
-      title: "Street Gang Hoodie",
-      category: 'hoodies',
-      originalPrice: 199,
-      salePrice: 79,
-      discount: 60,
-      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop",
-      badge: "BESTSELLER",
-      stock: 15,
-      rating: 4.8,
-      reviews: 234
-    },
-    {
-      id: 2,
-      title: "Urban Runner Sneakers",
-      category: 'sneakers',
-      originalPrice: 299,
-      salePrice: 149,
-      discount: 50,
-      image: "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?w=400&h=400&fit=crop",
-      badge: "LIMITED",
-      stock: 8,
-      rating: 4.9,
-      reviews: 156
-    },
-    {
-      id: 3,
-      title: "Graffiti Bomber Jacket",
-      category: 'jackets',
-      originalPrice: 349,
-      salePrice: 139,
-      discount: 60,
-      image: "https://images.pixabay.com/photo/2016/12/06/09/31/blank-1886008_1280.jpg?w=400&h=400&fit=crop",
-      badge: "NEW",
-      stock: 12,
-      rating: 4.7,
-      reviews: 89
-    },
-    {
-      id: 4,
-      title: "Street Chain Necklace",
-      category: 'accessories',
-      originalPrice: 89,
-      salePrice: 35,
-      discount: 61,
-      image: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=400&fit=crop",
-      badge: "HOT",
-      stock: 25,
-      rating: 4.6,
-      reviews: 67
-    },
-    {
-      id: 5,
-      title: "Oversized Streetwear Tee",
-      category: 'hoodies',
-      originalPrice: 79,
-      salePrice: 29,
-      discount: 63,
-      image: "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?w=400&h=400&fit=crop",
-      badge: "FLASH",
-      stock: 30,
-      rating: 4.5,
-      reviews: 123
-    },
-    {
-      id: 6,
-      title: "High-Top Street Boots",
-      category: 'sneakers',
-      originalPrice: 259,
-      salePrice: 129,
-      discount: 50,
-      image: "https://images.pixabay.com/photo/2017/07/02/12/18/boot-2468404_1280.jpg?w=400&h=400&fit=crop",
-      badge: "EXCLUSIVE",
-      stock: 18,
-      rating: 4.8,
-      reviews: 91
-    },
-    {
-      id: 7,
-      title: "Urban Crossbody Bag",
-      category: 'accessories',
-      originalPrice: 129,
-      salePrice: 49,
-      discount: 62,
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-      badge: "TRENDING",
-      stock: 22,
-      rating: 4.7,
-      reviews: 78
-    },
-    {
-      id: 8,
-      title: "Leather Street Jacket",
-      category: 'jackets',
-      originalPrice: 449,
-      salePrice: 179,
-      discount: 60,
-      image: "https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?w=400&h=400&fit=crop",
-      badge: "PREMIUM",
-      stock: 6,
-      rating: 4.9,
-      reviews: 145
-    }
+    { id: 'all', label: 'Tous les produits', icon: 'Grid3X3' },
+    ...Array.from(
+      new Set(products.flatMap(product => 
+        product.categories?.map(cat => cat.name) || []
+      ))
+    ).map((category, index) => ({
+      id: category.toLowerCase(),
+      label: category,
+      icon: index % 4 === 0 ? 'Shirt' : 
+            index % 4 === 1 ? 'Footprints' : 
+            index % 4 === 2 ? 'Watch' : 'Coat'
+    }))
   ];
 
   const filteredProducts = selectedCategory === 'all' 
     ? products 
-    : products?.filter(product => product?.category === selectedCategory);
+    : products.filter(product => 
+        product.categories?.some(cat => cat.name.toLowerCase() === selectedCategory)
+      );
 
   const getBadgeColor = (badge) => {
     const colors = {
@@ -136,7 +77,8 @@ const DealGrid = () => {
       'FLASH': 'bg-error text-white animate-pulse',
       'EXCLUSIVE': 'bg-primary text-primary-foreground',
       'TRENDING': 'bg-accent text-accent-foreground',
-      'PREMIUM': 'bg-warning text-warning-foreground'
+      'PREMIUM': 'bg-warning text-warning-foreground',
+      'SALE': 'bg-accent text-accent-foreground'
     };
     return colors?.[badge] || 'bg-muted text-muted-foreground';
   };
@@ -189,123 +131,127 @@ const DealGrid = () => {
           layout
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
-          {filteredProducts?.map((product, index) => (
-            <motion.div
-              key={product?.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative bg-surface border border-street rounded-xl overflow-hidden hover:border-accent/50 transition-all duration-300"
-              onMouseEnter={() => setHoveredProduct(product?.id)}
-              onMouseLeave={() => setHoveredProduct(null)}
-            >
-              {/* Product Image */}
-              <div className="relative overflow-hidden">
-                <Image
-                  src={product?.image}
-                  alt={product?.title}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                
-                {/* Badges */}
-                <div className="absolute top-3 left-3">
-                  <div className={`${getBadgeColor(product?.badge)} px-2 py-1 rounded-full text-xs font-bold`}>
+          {loading ? (
+            // Afficher un indicateur de chargement
+            Array(4).fill(0).map((_, index) => (
+              <div key={index} className="bg-surface border border-street rounded-xl overflow-hidden animate-pulse h-96">
+                <div className="bg-muted h-64 w-full"></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-4 bg-muted rounded w-1/2"></div>
+                </div>
+              </div>
+            ))
+          ) : error ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-error">{error}</p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="mt-4"
+                variant="outline"
+                iconName="RefreshCw"
+              >
+                Réessayer
+              </Button>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground">Aucun produit trouvé pour cette catégorie</p>
+            </div>
+          ) : (
+            filteredProducts?.map((product, index) => (
+              <motion.div
+                key={product?.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative bg-surface border border-street rounded-xl overflow-hidden hover:border-accent/50 transition-all duration-300"
+                onMouseEnter={() => setHoveredProduct(product?.id)}
+                onMouseLeave={() => setHoveredProduct(null)}
+              >
+                {/* Badge de promotion */}
+                {product?.badge && (
+                  <div className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-bold ${getBadgeColor(product?.badge)} z-10`}>
                     {product?.badge}
                   </div>
-                </div>
+                )}
                 
-                <div className="absolute top-3 right-3">
-                  <div className="bg-error text-white px-2 py-1 rounded-full text-sm font-bold">
-                    -{product?.discount}%
-                  </div>
-                </div>
-
-                {/* Stock Indicator */}
-                {product?.stock <= 10 && (
-                  <div className="absolute bottom-3 left-3 bg-warning text-warning-foreground px-2 py-1 rounded-full text-xs font-bold">
-                    Only {product?.stock} left!
+                {/* Badge de stock limité */}
+                {product?.stock < 10 && (
+                  <div className="absolute top-3 right-3 bg-error text-error-foreground px-2 py-1 rounded-full text-xs font-bold z-10">
+                    {product?.stock} restant{product?.stock > 1 ? 's' : ''}
                   </div>
                 )}
 
-                {/* Hover Actions */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ 
-                    opacity: hoveredProduct === product?.id ? 1 : 0,
-                    y: hoveredProduct === product?.id ? 0 : 20
-                  }}
-                  className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center space-x-2"
-                >
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold"
-                  >
-                    Quick Add
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                  >
-                    <Icon name="Heart" size={16} />
-                  </Button>
-                </motion.div>
-              </div>
-
-              {/* Product Info */}
-              <div className="p-4">
-                <h3 className="font-heading font-bold text-foreground mb-2 line-clamp-2">
-                  {product?.title}
-                </h3>
-                
-                {/* Rating */}
-                <div className="flex items-center space-x-2 mb-3">
-                  <div className="flex items-center">
-                    {[...Array(5)]?.map((_, i) => (
-                      <Icon
-                        key={i}
-                        name="Star"
-                        size={14}
-                        className={`${
-                          i < Math.floor(product?.rating) 
-                            ? 'text-warning fill-current' :'text-muted'
-                        }`}
-                      />
-                    ))}
+                {/* Image du produit */}
+                <div className="relative overflow-hidden aspect-square">
+                  <Image
+                    src={hoveredProduct === product?.id && product?.imageHover ? product?.imageHover : product?.image}
+                    alt={product?.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  
+                  {/* Boutons d'action au survol */}
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                    <Button variant="secondary" size="icon" className="rounded-full">
+                      <Icon name="Heart" size={20} />
+                    </Button>
+                    <Button variant="secondary" size="icon" className="rounded-full">
+                      <Icon name="Eye" size={20} />
+                    </Button>
+                    <Button variant="secondary" size="icon" className="rounded-full">
+                      <Icon name="ShoppingCart" size={20} />
+                    </Button>
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    {product?.rating} ({product?.reviews})
-                  </span>
                 </div>
 
-                {/* Price */}
-                <div className="flex items-center space-x-2 mb-4">
-                  <span className="text-xl font-bold text-accent">
-                    ${product?.salePrice}
-                  </span>
-                  <span className="text-sm text-muted-foreground line-through">
-                    ${product?.originalPrice}
-                  </span>
-                  <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full font-bold">
-                    SAVE ${product?.originalPrice - product?.salePrice}
-                  </span>
-                </div>
+                {/* Détails du produit */}
+                <div className="p-4">
+                  <h3 className="font-heading font-bold text-foreground group-hover:text-accent transition-colors line-clamp-2 h-14">
+                    {product?.title}
+                  </h3>
+                  
+                  <div className="mt-2 flex items-center gap-2">
+                    {product?.promotion ? (
+                      <>
+                        <span className="text-lg font-bold text-foreground">
+                          {product.promotion.newPrice.toFixed(2)} TND
+                        </span>
+                        <span className="text-muted-foreground line-through text-sm">
+                          {product.promotion.originalPrice.toFixed(2)} TND
+                        </span>
+                        <span className="bg-accent/10 text-accent text-xs font-bold px-2 py-0.5 rounded-full">
+                          -{product.promotion.discountPercentage}%
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-lg font-bold text-foreground">
+                        {product?.originalPrice?.toFixed(2)} TND
+                      </span>
+                    )}
+                  </div>
 
-                {/* Add to Cart Button */}
-                <Button
-                  variant="outline"
-                  fullWidth
-                  className="border-accent text-accent hover:bg-accent hover:text-accent-foreground font-bold"
-                  iconName="ShoppingCart"
-                  iconPosition="left"
-                >
-                  Add to Cart
-                </Button>
-              </div>
-            </motion.div>
-          ))}
+                  {/* Description du produit */}
+                  {product?.description && (
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      {product.description}
+                    </p>
+                  )}
+
+                  {/* Bouton d'ajout au panier */}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full mt-3 group-hover:bg-accent group-hover:text-accent-foreground transition-colors"
+                  >
+                    <Icon name="ShoppingCart" size={16} className="mr-2" />
+                    Ajouter au panier
+                  </Button>
+                </div>
+              </motion.div>
+            ))
+          )}
         </motion.div>
 
         {/* Load More Button */}

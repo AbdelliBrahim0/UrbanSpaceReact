@@ -171,6 +171,25 @@ const privateApi = {
 
 // ---------- Public API (inchangé) ----------
 const publicApi = {
+  blackfriday: {
+    list: async () => {
+      const response = await fetchApi("/api/black-friday");
+
+      if (response.success && Array.isArray(response.data)) {
+        return {
+          success: true,
+          items: response.data,
+          count: response.count,
+        };
+      }
+
+      return { success: false, message: "Erreur lors de la récupération des produits Black Friday" };
+    },
+  },
+
+
+
+
   categories: {
     list: async () => {
       const response = await fetchApi("/public/categories");
@@ -250,10 +269,60 @@ const publicApi = {
   },
 };
 
-export default { ...publicApi, privateApi };
-
-// Export alias (compatibilité avec ton ancien code)
+// Export des APIs individuelles
 export const categoriesApi = publicApi.categories;
 export const subcategoriesApi = publicApi.subcategories;
 export const productsApi = publicApi.products;
 export const authApi = privateApi.auth;
+
+// Export de l'API Black Friday
+export const blackfriday = {
+  list: async () => {
+    const response = await fetchApi("/black-friday");
+    if (response.success && Array.isArray(response.data)) {
+      return {
+        success: true,
+        data: response.data,
+        count: response.count
+      };
+    }
+    return { success: false, message: "Erreur lors du chargement des produits Black Friday" };
+  }
+};
+
+export const blackhour = {
+  list: async () => {
+    const response = await fetchApi("/black-hour");
+    if (response.success && Array.isArray(response.data)) {
+      return {
+        success: true,
+        data: response.data,
+        count: response.count,
+        currentTime: response.currentTime
+      };
+    }
+    return { success: false, message: "Erreur lors du chargement des produits Black Hour" };
+  }
+};
+
+export const salesApi = {
+  list: async () => {
+    const response = await fetchApi("/sales");
+    if (response.success && Array.isArray(response.data)) {
+      return {
+        success: true,
+        data: response.data,
+        count: response.count,
+        currentTime: response.currentTime
+      };
+    }
+    return { success: false, message: "Erreur lors du chargement des produits en solde" };
+  }
+};
+
+export default { 
+  ...publicApi, 
+  privateApi,
+  blackhour,
+  sales: salesApi
+};

@@ -1,53 +1,104 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
+import { salesApi } from '../../../api';
+
+// Fonction utilitaire pour sélectionner des éléments aléatoires d'un tableau
+const getRandomItems = (array, count) => {
+  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
 
 const AnimatedPromo = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [promoSlides, setPromoSlides] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const promoSlides = [
-    {
-      id: 1,
-      title: "HOODIES GANG",
-      subtitle: "Collection Exclusive",
-      discount: "70%",
-      originalPrice: "299€",
-      newPrice: "89€",
-      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop",
-      gradient: "from-accent to-error"
-    },
-    {
-      id: 2,
-      title: "SNEAKERS STREET",
-      subtitle: "Édition Limitée",
-      discount: "60%",
-      originalPrice: "199€",
-      newPrice: "79€",
-      image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop",
-      gradient: "from-error to-warning"
-    },
-    {
-      id: 3,
-      title: "ACCESSOIRES URBAN",
-      subtitle: "Style Authentique",
-      discount: "50%",
-      originalPrice: "99€",
-      newPrice: "49€",
-      image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop",
-      gradient: "from-warning to-success"
-    }
-  ];
-
+  // Récupérer les produits en solde
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % promoSlides?.length);
-    }, 4000);
+    const fetchSaleProducts = async () => {
+      try {
+        const response = await salesApi.list();
+        
+        if (response.success && Array.isArray(response.data)) {
+          // Sélectionner 3 produits aléatoires
+          const randomProducts = getRandomItems(response.data, 3);
+          
+          // Formater les produits pour le carrousel
+          const formattedSlides = randomProducts.map((product, index) => {
+            const discount = Math.round(
+              ((product.sale?.originalPrice - product.sale?.discountedPrice) / 
+              product.sale?.originalPrice) * 100
+            );
+            
+            // Définir un dégradé en fonction de l'index
+            const gradients = [
+              'from-accent to-error',
+              'from-error to-warning',
+              'from-warning to-success'
+            ];
+            
+            return {
+              id: product.id,
+              title: product.name.toUpperCase(),
+              subtitle: product.brand || 'COLLECTION EXCLUSIVE',
+              discount: `${discount}%`,
+              originalPrice: `${product.sale?.originalPrice || product.price}€`,
+              newPrice: `${product.sale?.discountedPrice || product.price}€`,
+              image: product.urlImage || 'https://via.placeholder.com/400x400?text=Produit+non+disponible',
+              gradient: gradients[index % gradients.length]
+            };
+          });
+          
+          setPromoSlides(formattedSlides);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des produits en solde:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearInterval(interval);
-  }, [promoSlides?.length]);
+    fetchSaleProducts();
+  }, []);
 
-  const currentPromo = promoSlides?.[currentSlide];
+  // Démarrer l'animation uniquement si on a des slides
+  useEffect(() => {
+    if (promoSlides.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % promoSlides.length);
+      }, 4000);
+
+      return () => clearInterval(interval);
+    }
+  }, [promoSlides]);
+
+  const currentPromo = promoSlides?.[currentSlide] || {};
+  
+  // Afficher un chargement si nécessaire
+  if (isLoading) {
+    return (
+      <div className="bg-surface/90 backdrop-blur-lg border border-border rounded-3xl p-8 flex items-center justify-center h-96">
+        <div className="animate-pulse text-center">
+          <Icon name="Loader" size={32} className="animate-spin mx-auto mb-4 text-accent" />
+          <p className="text-foreground/70">Chargement des offres spéciales...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Si pas de produits
+  if (promoSlides.length === 0) {
+    return (
+      <div className="bg-surface/90 backdrop-blur-lg border border-border rounded-3xl p-8 flex items-center justify-center h-96">
+        <div className="text-center">
+          <Icon name="AlertCircle" size={32} className="mx-auto mb-4 text-warning" />
+          <p className="text-foreground/70">Aucune offre spéciale disponible pour le moment</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative overflow-hidden">

@@ -15,7 +15,7 @@ const HeroSection = () => {
       subtitle: "BORN FROM THE CONCRETE",
       description: "Exclusive drops that define the culture. Limited quantities, unlimited attitude.",
       cta: "SHOP THE DROP",
-      videoUrl: "https://player.vimeo.com/video/76979871?autoplay=1&loop=1&muted=1&background=1",
+      videoUrl: "/assets/videos/1.webm",
       overlayColor: "from-black/80 via-black/60 to-transparent"
     },
     {
@@ -24,7 +24,7 @@ const HeroSection = () => {
       subtitle: "UNITY THROUGH STYLE",
       description: "Join the movement. Wear the rebellion. Express your truth through authentic streetwear.",
       cta: "JOIN THE CREW",
-      videoUrl: "https://player.vimeo.com/video/158284739?autoplay=1&loop=1&muted=1&background=1",
+      videoUrl: "/assets/videos/2.webm",
       overlayColor: "from-error/80 via-error/40 to-transparent"
     },
     {
@@ -33,7 +33,7 @@ const HeroSection = () => {
       subtitle: "UNDERGROUND COLLECTION",
       description: "Rare pieces for the real ones. When you know, you know.",
       cta: "ACCESS VAULT",
-      videoUrl: "https://player.vimeo.com/video/169599296?autoplay=1&loop=1&muted=1&background=1",
+      videoUrl: "/assets/videos/3.webm",
       overlayColor: "from-accent/80 via-accent/40 to-transparent"
     }
   ];
@@ -84,14 +84,23 @@ const HeroSection = () => {
   return (
     <section className="relative h-screen w-full overflow-hidden bg-background">
       {/* Video Background */}
-      <div className="absolute inset-0 z-0">
-        <iframe
-          src={heroSlides?.[currentSlide]?.videoUrl}
-          className="w-full h-full object-cover scale-110"
-          frameBorder="0"
-          allow="autoplay; fullscreen"
-          onLoad={() => setIsVideoLoaded(true)}
-        />
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <div className="absolute inset-0 bg-gray-900/50 z-10 mix-blend-multiply"></div>
+        {heroSlides?.map((slide, index) => (
+          <video
+            key={slide.id}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+            autoPlay
+            loop
+            muted
+            playsInline
+            onLoadedData={index === 0 ? () => setIsVideoLoaded(true) : undefined}
+            style={{ filter: 'grayscale(30%) brightness(0.7) contrast(1.1)' }}
+          >
+            <source src={slide.videoUrl} type="video/webm" />
+            Votre navigateur ne supporte pas la lecture de vidéos.
+          </video>
+        ))}
         <div className={`absolute inset-0 bg-gradient-to-r ${heroSlides?.[currentSlide]?.overlayColor}`} />
       </div>
       {/* Animated Particles */}

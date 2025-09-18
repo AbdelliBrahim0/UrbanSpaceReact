@@ -44,8 +44,8 @@ const AnimatedPromo = () => {
               title: product.name.toUpperCase(),
               subtitle: product.brand || 'COLLECTION EXCLUSIVE',
               discount: `${discount}%`,
-              originalPrice: `${product.sale?.originalPrice || product.price}€`,
-              newPrice: `${product.sale?.discountedPrice || product.price}€`,
+              originalPrice: `${product.sale?.originalPrice || product.price}TND`,
+              newPrice: `${product.sale?.discountedPrice || product.price}TND`,
               image: product.urlImage || 'https://via.placeholder.com/400x400?text=Produit+non+disponible',
               gradient: gradients[index % gradients.length]
             };

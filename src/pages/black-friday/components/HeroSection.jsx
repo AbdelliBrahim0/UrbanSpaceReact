@@ -5,9 +5,9 @@ import Image from '../../../components/AppImage';
 
 const HeroSection = () => {
   const heroImages = [
-    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
-    "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?w=800&h=600&fit=crop",
-    "https://images.pixabay.com/photo/2016/11/19/18/06/feet-1840619_1280.jpg?w=800&h=600&fit=crop"
+    "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/illustrative-winter-sale-instagram-story-design-template-439c8316293ba1771bebcda6e9d94c58.jpg?ts=1732554290",
+    "https://www.aetrex.com/cdn/shop/files/difference_Dahlia4.jpg?v=1757442342&width=1024",
+    "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/16397378751551_Daily_1_jigar_watch_171221_square.jpg"
   ];
 
   return (

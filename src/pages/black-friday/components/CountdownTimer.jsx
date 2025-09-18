@@ -1,43 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const CountdownTimer = ({ targetDate, onExpire }) => {
+const CountdownTimer = ({ onExpire }) => {
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
+    hours: 23,
+    minutes: 59,
+    seconds: 59
   });
   const [isExpired, setIsExpired] = useState(false);
+  const [startTime] = useState(() => new Date());
+  const [endTime] = useState(() => {
+    const end = new Date();
+    end.setHours(23, 59, 59, 0); // Fin de la journée à 23:59:59
+    return end;
+  });
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const difference = +new Date(targetDate) - +new Date();
+      const now = new Date();
+      const difference = endTime - now;
       
       if (difference > 0) {
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        
         setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60)
+          hours: hours,
+          minutes: minutes,
+          seconds: seconds
         });
       } else {
-        setIsExpired(true);
+        // Si le temps est écoulé, réinitialiser pour le jour suivant
+        endTime.setDate(endTime.getDate() + 1);
+        setTimeLeft({
+          hours: 23,
+          minutes: 59,
+          seconds: 59
+        });
         if (onExpire) onExpire();
       }
     };
 
+    // Mettre à jour immédiatement
     calculateTimeLeft();
+    
+    // Puis toutes les secondes
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, onExpire]);
+  }, [endTime, onExpire]);
 
   const timeUnits = [
-    { label: 'Days', value: timeLeft?.days },
-    { label: 'Hours', value: timeLeft?.hours },
+    { label: 'Heures', value: timeLeft?.hours },
     { label: 'Minutes', value: timeLeft?.minutes },
-    { label: 'Seconds', value: timeLeft?.seconds }
+    { label: 'Secondes', value: timeLeft?.seconds }
   ];
 
   if (isExpired) {
@@ -88,13 +105,13 @@ const CountdownTimer = ({ targetDate, onExpire }) => {
           animate={{ y: 0, opacity: 1 }}
           className="text-2xl md:text-3xl font-heading font-bold text-warning mb-2"
         >
-          BLACK FRIDAY ENDS IN
+          OFFRE SPÉCIALE SE TERMINE DANS
         </motion.div>
         <div className="text-sm text-muted-foreground">
-          Don't miss out on these exclusive deals!
+          Profitez de nos offres exceptionnelles avant la fin du compte à rebours !
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
+      <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
         {timeUnits?.map((unit, index) => (
           <motion.div
             key={unit?.label}

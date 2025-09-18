@@ -1,27 +1,66 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import { format, addDays, isAfter, nextFriday, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const PromotionalBanner = () => {
-  const [blackFridayTime, setBlackFridayTime] = useState({ days: 5, hours: 12, minutes: 30 });
+  // Calculer la date du prochain vendredi à 00:00:00
+  const getNextFriday = () => {
+    const now = new Date();
+    const nextFridayDate = nextFriday(now);
+    nextFridayDate.setHours(0, 0, 0, 0); // Réinitialiser à minuit
+    return nextFridayDate;
+  };
+
+  const [nextFridayDate] = useState(getNextFriday());
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+  // Fonction pour calculer le temps restant jusqu'au prochain vendredi
+  function calculateTimeLeft() {
+    const now = new Date();
+    const difference = nextFridayDate - now;
+    
+    if (difference <= 0) {
+      // Si le vendredi est passé, on passe au vendredi suivant
+      nextFridayDate.setDate(nextFridayDate.getDate() + 7);
+      return calculateTimeLeft();
+    }
+    
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((difference / 1000 / 60) % 60),
+      seconds: Math.floor((difference / 1000) % 60)
+    };
+  }
+
+  // Mettre à jour le compte à rebours toutes les secondes
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Formatage de la date du prochain vendredi pour l'affichage
+  const formattedNextFriday = useMemo(() => {
+    return format(nextFridayDate, "EEEE d MMMM yyyy", { locale: fr });
+  }, [nextFridayDate]);
+
+  // Pour le Black Hour, on garde un compte à rebours simple
   const [blackHourTime, setBlackHourTime] = useState({ hours: 2, minutes: 45, seconds: 30 });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setBlackFridayTime(prev => {
-        if (prev?.minutes > 0) return { ...prev, minutes: prev?.minutes - 1 };
-        if (prev?.hours > 0) return { ...prev, hours: prev?.hours - 1, minutes: 59 };
-        if (prev?.days > 0) return { ...prev, days: prev?.days - 1, hours: 23, minutes: 59 };
-        return prev;
-      });
-
       setBlackHourTime(prev => {
         if (prev?.seconds > 0) return { ...prev, seconds: prev?.seconds - 1 };
         if (prev?.minutes > 0) return { ...prev, minutes: prev?.minutes - 1, seconds: 59 };
         if (prev?.hours > 0) return { ...prev, hours: prev?.hours - 1, minutes: 59, seconds: 59 };
-        return prev;
+        return { hours: 0, minutes: 0, seconds: 0 };
       });
     }, 1000);
 
@@ -31,11 +70,11 @@ const PromotionalBanner = () => {
   const promotions = [
     {
       id: 'black-friday',
-      title: 'BLACK FRIDAY',
-      subtitle: 'MEGA DEALS',
-      description: 'Jusqu\'à 70% de réduction sur toute la collection streetwear',
+      title: 'VENDREDI FOU',
+      subtitle: 'MEGA SOLDES',
+      description: `Jusqu'à 70% de réduction sur toute la collection streetwear - Prochaine édition le ${formattedNextFriday}`,
       discount: '70%',
-      countdown: blackFridayTime,
+      countdown: timeLeft,
       bgGradient: 'from-red-900/90 via-black to-red-900/90',
       accentColor: 'text-red-400',
       borderColor: 'border-red-500/30',

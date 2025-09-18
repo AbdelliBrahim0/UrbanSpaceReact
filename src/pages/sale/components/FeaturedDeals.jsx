@@ -2,84 +2,134 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
+import { blackhour } from '../../../api';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+// Fonction utilitaire pour sélectionner des éléments aléatoires d'un tableau
+const getRandomItems = (array, count) => {
+  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
+// Fonction pour formater la date en français
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return format(date, 'HH:mm', { locale: fr });
+};
+
+// Fonction pour calculer le temps restant
+const calculateTimeLeft = (endTime) => {
+  if (!endTime) return { hours: 0, minutes: 0, seconds: 0 };
+  
+  const now = new Date();
+  const end = new Date(endTime);
+  const difference = end - now;
+  
+  if (difference <= 0) return { hours: 0, minutes: 0, seconds: 0 };
+  
+  return {
+    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+    minutes: Math.floor((difference / 1000 / 60) % 60),
+    seconds: Math.floor((difference / 1000) % 60)
+  };
+};
 
 const FeaturedDeals = () => {
   const [currentDeal, setCurrentDeal] = useState(0);
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 5,
-    minutes: 23,
-    seconds: 45
-  });
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [featuredDeals, setFeaturedDeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const featuredDeals = [
-    {
-      id: 1,
-      title: "HYPEBEAST HOODIE",
-      brand: "STREET KINGS",
-      originalPrice: 149.99,
-      salePrice: 44.99,
-      image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=500&fit=crop",
-      discount: 70,
-      description: "Premium streetwear hoodie with embroidered logo",
-      stock: 3,
-      isFlashSale: true,
-      socialProof: "127 people bought this today"
-    },
-    {
-      id: 2,
-      title: "URBAN BOMBER JACKET",
-      brand: "CITY REBELS",
-      originalPrice: 199.99,
-      salePrice: 79.99,
-      image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&h=500&fit=crop",
-      discount: 60,
-      description: "Limited edition bomber with street art design",
-      stock: 8,
-      isLimitedEdition: true,
-      socialProof: "Featured in Hypebeast Magazine"
-    },
-    {
-      id: 3,
-      title: "GRAFFITI CARGO PANTS",
-      brand: "UNDERGROUND",
-      originalPrice: 129.99,
-      salePrice: 38.99,
-      image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=500&h=500&fit=crop",
-      discount: 70,
-      description: "Hand-painted cargo pants with utility pockets",
-      stock: 12,
-      isClearance: true,
-      socialProof: "Last chance - Final markdowns"
-    }
-  ];
+  // Fonction pour formater les données des produits
+  const formatProductData = (products) => {
+    return products.map(product => {
+      const discount = Math.round(
+        ((product.sale?.originalPrice - product.sale?.discountedPrice) / 
+        product.sale?.originalPrice) * 100
+      );
+      
+      return {
+        id: product.id,
+        title: product.name.toUpperCase(),
+        brand: product.brand || 'URBANSPACE',
+        originalPrice: product.sale?.originalPrice || product.price,
+        salePrice: product.sale?.discountedPrice || product.price,
+        image: product.urlImage || 'https://via.placeholder.com/500x500?text=Produit+non+disponible',
+        discount: discount,
+        description: product.description || 'Produit exclusif en édition limitée',
+        stock: product.stock || 0,
+        isFlashSale: true,
+        socialProof: `${Math.floor(Math.random() * 100) + 50} personnes ont acheté aujourd'hui`,
+        startTime: product.sale?.startTime,
+        endTime: product.sale?.endTime
+      };
+    });
+  };
 
+  // Récupérer les produits de la Black Hour
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev?.seconds > 0) {
-          return { ...prev, seconds: prev?.seconds - 1 };
-        } else if (prev?.minutes > 0) {
-          return { ...prev, minutes: prev?.minutes - 1, seconds: 59 };
-        } else if (prev?.hours > 0) {
-          return { hours: prev?.hours - 1, minutes: 59, seconds: 59 };
+    const fetchBlackHourProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await blackhour.list();
+        
+        if (response.success && Array.isArray(response.data)) {
+          // Sélectionner 3 produits aléatoires
+          const randomProducts = getRandomItems(response.data, 3);
+          const formattedProducts = formatProductData(randomProducts);
+          setFeaturedDeals(formattedProducts);
+          
+          // Mettre à jour le temps restant pour le premier produit
+          if (formattedProducts.length > 0 && formattedProducts[0].endTime) {
+            setTimeLeft(calculateTimeLeft(formattedProducts[0].endTime));
+          }
+        } else {
+          setError(response.message || 'Erreur lors du chargement des produits');
         }
-        return prev;
-      });
-    }, 1000);
+      } catch (err) {
+        console.error('Erreur lors de la récupération des produits:', err);
+        setError('Impossible de charger les produits. Veuillez réessayer plus tard.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearInterval(timer);
+    fetchBlackHourProducts();
   }, []);
 
+  // Mettre à jour le temps restant pour le produit actuel
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDeal((prev) => (prev + 1) % featuredDeals?.length);
-    }, 5000);
+    if (featuredDeals.length > 0 && featuredDeals[currentDeal]?.endTime) {
+      const timer = setInterval(() => {
+        const newTimeLeft = calculateTimeLeft(featuredDeals[currentDeal].endTime);
+        setTimeLeft(newTimeLeft);
 
-    return () => clearInterval(interval);
-  }, [featuredDeals?.length]);
+        // Si le temps est écoulé, passer au produit suivant
+        if (newTimeLeft.hours === 0 && newTimeLeft.minutes === 0 && newTimeLeft.seconds === 0) {
+          setCurrentDeal((prev) => (prev + 1) % featuredDeals.length);
+        }
+      }, 1000);
 
-  const currentDealData = featuredDeals?.[currentDeal];
-  const savings = currentDealData?.originalPrice - currentDealData?.salePrice;
+      return () => clearInterval(timer);
+    }
+  }, [currentDeal, featuredDeals]);
+
+  // Gérer le défilement automatique des offres
+  useEffect(() => {
+    if (featuredDeals.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentDeal((prev) => (prev + 1) % featuredDeals.length);
+      }, 8000); // Changement toutes les 8 secondes
+
+      return () => clearInterval(interval);
+    }
+  }, [featuredDeals]);
+
+  const currentDealData = featuredDeals?.[currentDeal] || {};
+  const savings = currentDealData?.originalPrice - currentDealData?.salePrice || 0;
 
   return (
     <div className="bg-surface border border-street rounded-lg overflow-hidden mb-8">
@@ -95,9 +145,9 @@ const FeaturedDeals = () => {
           <div className="flex items-center space-x-2 bg-accent-foreground/20 rounded-lg px-3 py-1">
             <Icon name="Clock" size={16} className="text-accent-foreground" />
             <span className="text-sm font-medium text-accent-foreground">
-              {timeLeft?.hours?.toString()?.padStart(2, '0')}:
-              {timeLeft?.minutes?.toString()?.padStart(2, '0')}:
-              {timeLeft?.seconds?.toString()?.padStart(2, '0')}
+              {timeLeft.hours.toString().padStart(2, '0')}:
+              {timeLeft.minutes.toString().padStart(2, '0')}:
+              {timeLeft.seconds.toString().padStart(2, '0')}
             </span>
           </div>
         </div>
@@ -196,6 +246,17 @@ const FeaturedDeals = () => {
                   {currentDealData?.socialProof}
                 </span>
               </div>
+              
+              {/* Affichage des horaires de début et de fin */}
+              {(currentDealData?.startTime || currentDealData?.endTime) && (
+                <div className="flex items-center space-x-2 mt-2">
+                  <Icon name="Clock" size={16} className="text-warning" />
+                  <span className="text-sm text-warning font-medium">
+                    {currentDealData.startTime ? `De ${formatDate(currentDealData.startTime)}` : ''}
+                    {currentDealData.endTime ? ` à ${formatDate(currentDealData.endTime)}` : ''}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
@@ -227,17 +288,36 @@ const FeaturedDeals = () => {
         </div>
 
         {/* Deal Navigation */}
-        <div className="flex justify-center space-x-2 mt-6">
-          {featuredDeals?.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentDeal(index)}
-              className={`w-3 h-3 rounded-full transition-street ${
-                index === currentDeal ? 'bg-accent' : 'bg-muted-foreground opacity-50'
-              }`}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center space-x-2 mt-6">
+            {[1, 2, 3].map((_, index) => (
+              <div key={index} className="w-3 h-3 rounded-full bg-muted-foreground/30 animate-pulse" />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-4 text-error">
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm text-accent hover:underline"
+            >
+              Réessayer
+            </button>
+          </div>
+        ) : (
+          <div className="flex justify-center space-x-2 mt-6">
+            {featuredDeals?.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentDeal(index)}
+                className={`w-3 h-3 rounded-full transition-street ${
+                  index === currentDeal ? 'bg-accent' : 'bg-muted-foreground opacity-50'
+                }`}
+                aria-label={`Aller à l'offre ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

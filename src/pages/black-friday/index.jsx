@@ -8,9 +8,6 @@ import DealGrid from './components/DealGrid';
 import LiveNotifications from './components/LiveNotifications';
 
 const BlackFridayPage = () => {
-  // Black Friday end date - November 24, 2025 at 11:59 PM
-  const blackFridayEndDate = new Date('2025-11-24T23:59:59');
-
   useEffect(() => {
     // Set page title
     document.title = 'Black Friday Mega Sale - UrbanSpace | Up to 80% Off';
@@ -50,20 +47,19 @@ const BlackFridayPage = () => {
               className="bg-surface/50 backdrop-blur-sm border border-accent/30 rounded-2xl p-8 md:p-12"
             >
               <CountdownTimer 
-                targetDate={blackFridayEndDate}
                 onExpire={handleCountdownExpire}
               />
             </motion.div>
           </div>
         </section>
 
-        {/* Flash Sale Carousel */}
-        <FlashSaleCarousel />
-
         {/* Deal Grid */}
         <DealGrid />
 
-        
+        {/* Flash Sale Carousel */}
+        <FlashSaleCarousel />
+
+
         {/* Final CTA Section */}
         <section className="py-16 bg-gradient-to-br from-surface via-background to-surface">
           <div className="max-w-4xl mx-auto px-4 text-center">

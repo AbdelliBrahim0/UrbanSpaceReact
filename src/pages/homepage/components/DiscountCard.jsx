@@ -58,10 +58,10 @@ const DiscountCard = ({
         {/* Pricing */}
         <div className="flex items-center space-x-4 mb-6">
           <span className="text-2xl font-bold text-success">
-            {discountedPrice}€
+            {discountedPrice}TND
           </span>
           <span className="text-lg text-text-secondary line-through">
-            {originalPrice}€
+            {originalPrice}TND
           </span>
           <div className="flex-1 h-px bg-gradient-to-r from-accent to-transparent"></div>
         </div>

@@ -4,11 +4,14 @@ import Header from '../../components/ui/Header';
 import HeroSection from './components/HeroSection';
 import FeaturedCollections from './components/FeaturedCollections';
 import PromotionalBanner from './components/PromotionalBanner';
-import SocialProof from './components/SocialProof';
 import NewsletterSignup from './components/NewsletterSignup';
 import NewsletterSection from './components/NewsletterSection';
 import LiveNotifications from './components/LiveNotifications';
 import TrustSignals from './components/TrustSignals';
+import AnimatedPromo from './components/AnimatedPromo';
+import DiscountCard from './components/DiscountCard';
+import GangStyleStrip from './components/GangStyleStrip';
+import UrgencyBanner from './components/UrgencyBanner';
 
 
 const Homepage = () => {
@@ -47,6 +50,18 @@ const Homepage = () => {
     }
   };
 
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
     <motion.div
       variants={pageVariants}
@@ -68,8 +83,90 @@ const Homepage = () => {
         {/* Promotional Banner */}
         <PromotionalBanner />
 
+        {/* Animated Promo Showcase */}
+        <motion.section variants={sectionVariants} className="px-4 md:px-8 lg:px-12">
+          <div className="max-w-7xl mx-auto">
+            <AnimatedPromo />
+          </div>
+        </motion.section>
+
+        {/* Gang Style Strip 2 */}
+        <GangStyleStrip 
+          text="URBAN STREETWEAR"
+          iconName="Crown"
+          direction="right"
+        />
+
+
+        {/* Discount Cards Section */}
+        <section className="py-20 bg-gradient-to-b from-black via-surface to-black">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl md:text-5xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-success via-white to-accent mb-6">
+                CATÉGORIES EN PROMO
+              </h2>
+              <p className="text-xl text-text-secondary font-body max-w-3xl mx-auto">
+                Chaque catégorie de notre collection bénéficie de réductions massives pendant le Black Friday.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <DiscountCard 
+                discount="70"
+                category="Vêtements"
+                originalPrice="199"
+                discountedPrice="59"
+                description="T-shirts, pulls et vestes à prix cassés"
+                isLimited={true}
+                onActionClick={() => console.log('Voir les vêtements')}
+              />
+              <DiscountCard 
+                discount="60"
+                category="Chaussures"
+                originalPrice="249"
+                discountedPrice="99"
+                description="Les meilleures paires aux meilleurs prix"
+                isLimited={true}
+                onActionClick={() => console.log('Voir les chaussures')}
+              />
+              <DiscountCard 
+                discount="50"
+                category="Accessoires"
+                originalPrice="149"
+                discountedPrice="74"
+                description="Sacs, casquettes et plus encore"
+                isLimited={true}
+                onActionClick={() => console.log('Voir les accessoires')}
+              />
+            </div>
+          </div>
+        </section>
+      {/* Gang Style Strip 3 */}
+        <GangStyleStrip 
+          text="EXCLUSIVE ACCESS"
+          iconName="Star"
+          direction="left"
+        />
+
      {/* Trust Signals */}
         <TrustSignals />
+
+      <GangStyleStrip 
+          text="LAST CHANCE"
+          iconName="AlertTriangle"
+          direction="right"
+        />
+
+        {/* Urgency Banner */}
+          <motion.section variants={sectionVariants}>
+            <UrgencyBanner />
+          </motion.section>
 
 
         {/* Newsletter Signup */}

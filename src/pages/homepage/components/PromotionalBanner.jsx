@@ -1,289 +1,270 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import Button from '../../../components/ui/Button';
+import { motion } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
+import Button from '../../../components/ui/Button';
 
 const PromotionalBanner = () => {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
+  const [blackFridayTime, setBlackFridayTime] = useState({ days: 5, hours: 12, minutes: 30 });
+  const [blackHourTime, setBlackHourTime] = useState({ hours: 2, minutes: 45, seconds: 30 });
 
-  const [currentPromo, setCurrentPromo] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBlackFridayTime(prev => {
+        if (prev?.minutes > 0) return { ...prev, minutes: prev?.minutes - 1 };
+        if (prev?.hours > 0) return { ...prev, hours: prev?.hours - 1, minutes: 59 };
+        if (prev?.days > 0) return { ...prev, days: prev?.days - 1, hours: 23, minutes: 59 };
+        return prev;
+      });
+
+      setBlackHourTime(prev => {
+        if (prev?.seconds > 0) return { ...prev, seconds: prev?.seconds - 1 };
+        if (prev?.minutes > 0) return { ...prev, minutes: prev?.minutes - 1, seconds: 59 };
+        if (prev?.hours > 0) return { ...prev, hours: prev?.hours - 1, minutes: 59, seconds: 59 };
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const promotions = [
     {
-      id: 1,
-      title: "BLACK FRIDAY MADNESS",
-      subtitle: "UP TO 70% OFF",
-      description: "The biggest sale of the year is here. Limited time, unlimited savings.",
-      endDate: new Date('2024-11-29T23:59:59'),
-      bgColor: "from-error via-error/80 to-error/60",
-      textColor: "text-white",
-      ctaText: "SHOP BLACK FRIDAY",
-      ctaLink: "/black-friday",
-      icon: "Zap",
-      particles: true
+      id: 'black-friday',
+      title: 'BLACK FRIDAY',
+      subtitle: 'MEGA DEALS',
+      description: 'Jusqu\'à 70% de réduction sur toute la collection streetwear',
+      discount: '70%',
+      countdown: blackFridayTime,
+      bgGradient: 'from-red-900/90 via-black to-red-900/90',
+      accentColor: 'text-red-400',
+      borderColor: 'border-red-500/30',
+      link: '/black-friday-event',
+      icon: 'Zap',
+      badge: 'ÉVÉNEMENT SPÉCIAL'
     },
     {
-      id: 2,
-      title: "BLACK HOUR EXCLUSIVE",
-      subtitle: "FLASH SALE - 1 HOUR ONLY",
-      description: "Ultra-limited drops at unbeatable prices. When it's gone, it's gone.",
-      endDate: new Date(Date.now() + 3600000), // 1 hour from now
-      bgColor: "from-background via-surface to-background",
-      textColor: "text-accent",
-      ctaText: "ACCESS BLACK HOUR",
-      ctaLink: "/black-hour",
-      icon: "Clock",
-      particles: false
-    },
-    {
-      id: 3,
-      title: "VAULT MEMBERS ONLY",
-      subtitle: "EXCLUSIVE ACCESS",
-      description: "Join the inner circle. Get early access to drops and member-only prices.",
-      endDate: new Date('2024-12-31T23:59:59'),
-      bgColor: "from-accent via-accent/80 to-accent/60",
-      textColor: "text-accent-foreground",
-      ctaText: "JOIN THE VAULT",
-      ctaLink: "/collections",
-      icon: "Crown",
-      particles: true
+      id: 'black-hour',
+      title: 'BLACK HOUR',
+      subtitle: 'FLASH SALE',
+      description: 'Offres limitées dans le temps - Dépêchez-vous !',
+      discount: '50%',
+      countdown: blackHourTime,
+      bgGradient: 'from-purple-900/90 via-black to-purple-900/90',
+      accentColor: 'text-purple-400',
+      borderColor: 'border-purple-500/30',
+      link: '/black-hour-limited-event',
+      icon: 'Clock',
+      badge: 'TEMPS LIMITÉ'
     }
   ];
 
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date()?.getTime();
-      const endTime = promotions?.[currentPromo]?.endDate?.getTime();
-      const difference = endTime - now;
-
-      if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((difference % (1000 * 60)) / 1000)
-        });
-      } else {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      }
-    };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
-
-    return () => clearInterval(timer);
-  }, [currentPromo, promotions]);
-
-  useEffect(() => {
-    const promoInterval = setInterval(() => {
-      setCurrentPromo((prev) => (prev + 1) % promotions?.length);
-    }, 10000);
-
-    return () => clearInterval(promoInterval);
-  }, [promotions?.length]);
-
-  const containerVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const pulseVariants = {
-    animate: {
-      scale: [1, 1.05, 1],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const currentPromotion = promotions?.[currentPromo];
-
   return (
-    <section className="py-16 lg:py-24 px-4 lg:px-6 bg-background">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-20 px-6 bg-black">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className={`relative rounded-2xl overflow-hidden bg-gradient-to-r ${currentPromotion?.bgColor} p-8 lg:p-12`}
+          className="text-center mb-16"
         >
-          {/* Animated Background Particles */}
-          {currentPromotion?.particles && (
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(15)]?.map((_, i) => (
+          <div className="inline-flex items-center space-x-2 bg-accent/20 border border-accent/30 rounded-full px-6 py-3 mb-6">
+            <Icon name="Flame" size={20} className="text-accent" />
+            <span className="text-accent font-caption font-bold">OFFRES EXCEPTIONNELLES</span>
+          </div>
+          <h2 className="text-4xl lg:text-6xl font-heading font-black text-foreground mb-4">
+            ÉVÉNEMENTS
+            <span className="text-accent ml-4">EXCLUSIFS</span>
+          </h2>
+          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+            Ne manquez pas nos événements promotionnels exceptionnels avec des réductions incroyables sur toute la collection UrbanSpace
+          </p>
+        </motion.div>
+
+        {/* Promotional Cards */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {promotions?.map((promo, index) => (
+            <motion.div
+              key={promo?.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: index * 0.2 }}
+              viewport={{ once: true }}
+              className="group relative"
+            >
+              <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${promo?.bgGradient} border ${promo?.borderColor} p-8 lg:p-12 hover:scale-105 transition-all duration-500`}>
+                {/* Animated Background Pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  {[...Array(15)]?.map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className={`absolute w-1 h-1 ${promo?.accentColor?.replace('text-', 'bg-')} rounded-full`}
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        top: `${Math.random() * 100}%`,
+                      }}
+                      animate={{
+                        scale: [0, 1, 0],
+                        opacity: [0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        delay: i * 0.1,
+                      }}
+                    />
+                  ))}
+                </div>
+
+                {/* Badge */}
                 <motion.div
-                  key={i}
-                  className="absolute w-2 h-2 bg-white/20 rounded-full"
-                  initial={{
-                    x: Math.random() * 100 + '%',
-                    y: Math.random() * 100 + '%',
-                  }}
-                  animate={{
-                    x: [null, Math.random() * 100 + '%'],
-                    y: [null, Math.random() * 100 + '%'],
-                    opacity: [0.2, 0.8, 0.2]
-                  }}
-                  transition={{
-                    duration: Math.random() * 4 + 3,
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                />
-              ))}
-            </div>
-          )}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="absolute top-4 right-4"
+                >
+                  <div className={`bg-gradient-to-r ${promo?.bgGradient} border ${promo?.borderColor} rounded-full px-3 py-1`}>
+                    <span className={`text-xs font-bold ${promo?.accentColor}`}>
+                      {promo?.badge}
+                    </span>
+                  </div>
+                </motion.div>
 
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            {/* Content */}
-            <div className="text-center lg:text-left">
-              <motion.div
-                initial={{ x: -50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="flex items-center justify-center lg:justify-start mb-4"
-              >
-                <Icon 
-                  name={currentPromotion?.icon} 
-                  size={32} 
-                  className={`${currentPromotion?.textColor} mr-3`} 
-                />
-                <span className={`${currentPromotion?.textColor} font-caption text-lg tracking-wider`}>
-                  LIMITED TIME
-                </span>
-              </motion.div>
+                {/* Content */}
+                <div className="relative z-10">
+                  {/* Icon */}
+                  <motion.div
+                    initial={{ opacity: 0, rotate: -180 }}
+                    whileInView={{ opacity: 1, rotate: 0 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="mb-6"
+                  >
+                    <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${promo?.bgGradient} border ${promo?.borderColor} flex items-center justify-center`}>
+                      <Icon name={promo?.icon} size={28} className={promo?.accentColor} />
+                    </div>
+                  </motion.div>
 
-              <motion.h2
-                initial={{ x: -50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className={`font-heading font-black text-3xl md:text-4xl lg:text-5xl ${currentPromotion?.textColor} mb-2`}
-              >
-                {currentPromotion?.title}
-              </motion.h2>
+                  {/* Title & Discount */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-2xl lg:text-3xl font-heading font-black text-foreground">
+                        {promo?.title}
+                      </h3>
+                      <p className={`text-lg font-heading font-bold ${promo?.accentColor}`}>
+                        {promo?.subtitle}
+                      </p>
+                    </div>
+                    <motion.div
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className={`text-4xl lg:text-5xl font-heading font-black ${promo?.accentColor}`}
+                    >
+                      -{promo?.discount}
+                    </motion.div>
+                  </div>
 
-              <motion.p
-                initial={{ x: -50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className={`${currentPromotion?.textColor} text-2xl md:text-3xl font-bold mb-4`}
-              >
-                {currentPromotion?.subtitle}
-              </motion.p>
+                  {/* Description */}
+                  <p className="text-text-secondary mb-8 text-lg">
+                    {promo?.description}
+                  </p>
 
-              <motion.p
-                initial={{ x: -50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className={`${currentPromotion?.textColor} text-lg mb-8 opacity-90`}
-              >
-                {currentPromotion?.description}
-              </motion.p>
+                  {/* Countdown Timer */}
+                  <div className="mb-8">
+                    <p className="text-sm text-text-secondary mb-4 font-caption">
+                      Temps restant :
+                    </p>
+                    <div className="flex space-x-4">
+                      {promo?.id === 'black-friday' ? (
+                        <>
+                          <div className={`text-center bg-surface/50 rounded-lg p-3 border ${promo?.borderColor}`}>
+                            <div className={`text-2xl font-heading font-bold ${promo?.accentColor}`}>
+                              {promo?.countdown?.days}
+                            </div>
+                            <div className="text-xs text-text-secondary">JOURS</div>
+                          </div>
+                          <div className={`text-center bg-surface/50 rounded-lg p-3 border ${promo?.borderColor}`}>
+                            <div className={`text-2xl font-heading font-bold ${promo?.accentColor}`}>
+                              {promo?.countdown?.hours}
+                            </div>
+                            <div className="text-xs text-text-secondary">HEURES</div>
+                          </div>
+                          <div className={`text-center bg-surface/50 rounded-lg p-3 border ${promo?.borderColor}`}>
+                            <div className={`text-2xl font-heading font-bold ${promo?.accentColor}`}>
+                              {promo?.countdown?.minutes}
+                            </div>
+                            <div className="text-xs text-text-secondary">MIN</div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className={`text-center bg-surface/50 rounded-lg p-3 border ${promo?.borderColor}`}>
+                            <div className={`text-2xl font-heading font-bold ${promo?.accentColor}`}>
+                              {promo?.countdown?.hours}
+                            </div>
+                            <div className="text-xs text-text-secondary">H</div>
+                          </div>
+                          <div className={`text-center bg-surface/50 rounded-lg p-3 border ${promo?.borderColor}`}>
+                            <div className={`text-2xl font-heading font-bold ${promo?.accentColor}`}>
+                              {promo?.countdown?.minutes}
+                            </div>
+                            <div className="text-xs text-text-secondary">M</div>
+                          </div>
+                          <div className={`text-center bg-surface/50 rounded-lg p-3 border ${promo?.borderColor}`}>
+                            <div className={`text-2xl font-heading font-bold ${promo?.accentColor}`}>
+                              {promo?.countdown?.seconds}
+                            </div>
+                            <div className="text-xs text-text-secondary">S</div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
 
-              <motion.div
-                initial={{ x: -50, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                <Link to={currentPromotion?.ctaLink}>
-                  <motion.div variants={pulseVariants} animate="animate">
+                  {/* CTA Button */}
+                  <Link to={promo?.link}>
                     <Button
-                      variant="default"
+                      variant="outline"
                       size="lg"
-                      className="bg-background text-foreground hover:bg-surface px-8 py-4 text-lg font-bold tracking-wide transition-street hover-lift"
                       iconName="ArrowRight"
                       iconPosition="right"
+                      className={`w-full border-2 ${promo?.borderColor} ${promo?.accentColor} hover:bg-gradient-to-r ${promo?.bgGradient} hover:text-foreground font-bold text-lg group-hover:scale-105 transition-all duration-300`}
                     >
-                      {currentPromotion?.ctaText}
+                      Découvrir l'Événement
                     </Button>
-                  </motion.div>
-                </Link>
-              </motion.div>
-            </div>
+                  </Link>
+                </div>
 
-            {/* Countdown Timer */}
-            <motion.div
-              initial={{ x: 50, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-center"
-            >
-              <h3 className={`${currentPromotion?.textColor} font-heading font-bold text-xl mb-6`}>
-                TIME REMAINING
-              </h3>
-              
-              <div className="grid grid-cols-4 gap-4 max-w-md mx-auto">
-                {[
-                  { label: 'DAYS', value: timeLeft?.days },
-                  { label: 'HOURS', value: timeLeft?.hours },
-                  { label: 'MINS', value: timeLeft?.minutes },
-                  { label: 'SECS', value: timeLeft?.seconds }
-                ]?.map((item, index) => (
-                  <motion.div
-                    key={item?.label}
-                    initial={{ y: 30, opacity: 0 }}
-                    whileInView={{ y: 0, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                    className="bg-background/20 backdrop-blur-sm rounded-lg p-4 border border-white/20"
-                  >
-                    <div className={`${currentPromotion?.textColor} font-heading font-black text-2xl md:text-3xl`}>
-                      {item?.value?.toString()?.padStart(2, '0')}
-                    </div>
-                    <div className={`${currentPromotion?.textColor} font-caption text-sm opacity-80`}>
-                      {item?.label}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Progress Indicators */}
-              <div className="flex justify-center space-x-2 mt-8">
-                {promotions?.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentPromo(index)}
-                    className={`w-3 h-3 rounded-full transition-street ${
-                      index === currentPromo 
-                        ? 'bg-white' :'bg-white/30 hover:bg-white/50'
-                    }`}
-                  />
-                ))}
+                {/* Glow Effect */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${promo?.bgGradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-2xl blur-xl`}></div>
               </div>
             </motion.div>
-          </div>
+          ))}
+        </div>
 
-          {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              <polygon 
-                points="50,10 90,90 10,90" 
-                fill="currentColor" 
-                className={currentPromotion?.textColor}
-              />
-            </svg>
-          </div>
+        {/* Bottom CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+          className="text-center mt-16"
+        >
+          <p className="text-text-secondary mb-6">
+            Rejoignez notre communauté pour être informé en premier des événements exclusifs
+          </p>
+          <Link to="/new-member-welcome">
+            <Button
+              variant="default"
+              size="lg"
+              iconName="Users"
+              iconPosition="left"
+              className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-8 py-4"
+            >
+              Devenir Membre VIP
+            </Button>
+          </Link>
         </motion.div>
       </div>
     </section>

@@ -200,63 +200,87 @@ const ProfileSection = () => {
         </div>
 
         {/* Profile Form - Prend 9 colonnes sur 12 */}
-        <div className="space-y-4 lg:col-span-9">
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1">Nom complet</label>
-            {isEditing ? (
-              <Input
-                value={editData.nom || ''}
-                onChange={(e) => handleInputChange('nom', e.target.value)}
-                className="w-full"
-                placeholder="Votre nom complet"
-              />
-            ) : (
-              <p className="text-foreground">{profileData.nom || 'Non renseigné'}</p>
-            )}
+        <div className="space-y-6 lg:col-span-9">
+          {/* Première ligne : Nom et Email côte à côte */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Nom complet</label>
+              {isEditing ? (
+                <Input
+                  value={editData.nom || ''}
+                  onChange={(e) => handleInputChange('nom', e.target.value)}
+                  className="w-full"
+                  placeholder="Votre nom complet"
+                />
+              ) : (
+                <p className="text-foreground">{profileData.nom || 'Non renseigné'}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Email</label>
+              {isEditing ? (
+                <Input
+                  type="email"
+                  value={editData.email || ''}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  className="w-full"
+                  placeholder="Votre adresse email"
+                />
+              ) : (
+                <p className="text-foreground">{profileData.email}</p>
+              )}
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1">Email</label>
-            {isEditing ? (
-              <Input
-                type="email"
-                value={editData.email || ''}
-                onChange={(e) => handleInputChange('email', e.target.value)}
-                className="w-full"
-                placeholder="Votre adresse email"
-              />
-            ) : (
-              <p className="text-foreground">{profileData.email}</p>
-            )}
+          {/* Deuxième ligne : Téléphone et Adresse côte à côte */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Téléphone</label>
+              {isEditing ? (
+                <Input
+                  type="tel"
+                  value={editData.telephone || ''}
+                  onChange={(e) => handleInputChange('telephone', e.target.value)}
+                  className="w-full"
+                  placeholder="Votre numéro de téléphone"
+                />
+              ) : (
+                <p className="text-foreground">{profileData.telephone || 'Non renseigné'}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Adresse</label>
+              {isEditing ? (
+                <Input
+                  value={editData.adresse || ''}
+                  onChange={(e) => handleInputChange('adresse', e.target.value)}
+                  className="w-full"
+                  placeholder="Votre adresse complète"
+                />
+              ) : (
+                <p className="text-foreground">{profileData.adresse || 'Non renseignée'}</p>
+              )}
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1">Téléphone</label>
-            {isEditing ? (
-              <Input
-                type="tel"
-                value={editData.telephone || ''}
-                onChange={(e) => handleInputChange('telephone', e.target.value)}
-                className="w-full"
-                placeholder="Votre numéro de téléphone"
-              />
-            ) : (
-              <p className="text-foreground">{profileData.telephone || 'Non renseigné'}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1">Adresse</label>
-            {isEditing ? (
-              <Input
-                value={editData.adresse || ''}
-                onChange={(e) => handleInputChange('adresse', e.target.value)}
-                className="w-full"
-                placeholder="Votre adresse complète"
-              />
-            ) : (
-              <p className="text-foreground">{profileData.adresse || 'Non renseignée'}</p>
-            )}
+          {/* Information Alert */}
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-sm">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <Icon name="AlertCircle" className="h-5 w-5 text-red-500" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Important Notice</h3>
+                <div className="mt-1 text-sm text-red-700">
+                  <p>
+                    Please ensure your contact information is accurate and up-to-date to prevent any issues with your orders and deliveries. 
+                    Incorrect information may lead to delivery delays or order cancellations.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Action Buttons */}

@@ -1,11 +1,14 @@
+// Configuration de l'URL de base de l'API
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api").replace(/\/$/, "");
-const PUBLIC_API = API_BASE;
+const API_PREFIX = "";
+const PUBLIC_API = `${API_BASE}`;
 
 // ---------- Helpers ----------
 async function fetchApi(endpoint, options = {}) {
   const url = `${PUBLIC_API}${endpoint}`;
   const headers = {
-    "Content-Type": "application/json",
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
     ...options.headers,
   };
 
@@ -15,22 +18,30 @@ async function fetchApi(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const fetchOptions = {
+    method: options.method || 'GET',
+    headers,
+    credentials: 'include',
+    ...options,
+  };
+
+  // Ne pas sérialiser le corps si c'est déjà une chaîne ou si c'est un FormData
+  if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+    fetchOptions.body = JSON.stringify(options.body);
+  }
+
   try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      credentials: "include",  // Assure-toi que les cookies sont envoyés si nécessaire
-    });
+    const response = await fetch(url, fetchOptions);
+    const responseData = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Erreur HTTP ${response.status}`);
+      const error = new Error(responseData.message || `Erreur HTTP ${response.status}`);
+      error.status = response.status;
+      error.data = responseData;
+      throw error;
     }
 
-    const data = await response.json();
-    if (data && typeof data === "object") {
-      return data;
-    }
+    return responseData;
 
     return { success: true, data };
   } catch (error) {
@@ -64,30 +75,29 @@ const privateApi = {
     // Fonction pour l'inscription
     signup: async (userData) => {
       try {
-        const response = await fetchApi("/api/signup", {
+        const response = await fetchApi("/signup", {
           method: "POST",
-          body: JSON.stringify(userData),
+          body: userData,
         });
 
         if (response.success) {
-          // Sauvegarder le token JWT dans le localStorage
-          localStorage.setItem("jwt_token", response.token);
+          // Ne pas sauvegarder le token ici, ce sera fait dans le composant
           return {
             success: true,
-            message: "Inscription réussie",
+            message: response.message || "Inscription réussie",
             user: response.user,
-          };
-        } else {
-          return {
-            success: false,
-            message: response.message || "Erreur lors de l'inscription",
+            token: response.token
           };
         }
+        return {
+          success: false,
+          message: response.message || "Erreur lors de l'inscription"
+        };
       } catch (error) {
         console.error("Erreur d'inscription:", error);
         return {
           success: false,
-          message: error.message || "Erreur inconnue",
+          message: error.message || "Erreur de connexion au serveur"
         };
       }
     },
@@ -95,31 +105,45 @@ const privateApi = {
     // Fonction pour la connexion
     login: async (credentials) => {
       try {
-        const response = await fetchApi("/api/login", {
+        console.log('Tentative de connexion avec :', {
+          email: credentials.email,
+          password: '[PROTECTED]'
+        });
+        
+        const response = await fetchApi("/login", {
           method: "POST",
-          body: JSON.stringify(credentials),
+          body: {
+            username: credentials.email.trim(),  // Symfony expects 'username' field
+            email: credentials.email.trim(),     // Keep for backward compatibility
+            password: credentials.password
+          }
         });
 
-        if (response.success) {
-          // Sauvegarder le token JWT dans le localStorage
-          localStorage.setItem("jwt_token", response.token);
+        console.log('Réponse du serveur :', response);
+
+        if (response.token) {
           return {
             success: true,
-            message: "Connexion réussie",
-            token: response.token,
-            user: response.user,
-          };
-        } else {
-          return {
-            success: false,
-            message: response.message || "Identifiants invalides",
+            message: response.message || "Connexion réussie",
+            user: response.user || {
+              id: response.id,
+              email: response.email,
+              nom: response.nom,
+              roles: response.roles || []
+            },
+            token: response.token
           };
         }
+        
+        return {
+          success: false,
+          message: response.message || "Identifiants invalides"
+        };
       } catch (error) {
         console.error("Erreur de connexion:", error);
         return {
           success: false,
-          message: error.message || "Erreur inconnue",
+          message: error.data?.message || error.message || "Impossible de se connecter au serveur"
         };
       }
     },
@@ -129,33 +153,32 @@ const privateApi = {
       const token = localStorage.getItem("jwt_token");
 
       if (!token) {
-        return {
-          success: false,
-          message: "Non authentifié",
-        };
+        return { success: false, message: "Non authentifié" };
       }
 
       try {
-        const response = await fetchApi("/api/profile", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await fetchApi("/me", {
+          method: "GET"
         });
 
-        return response.success
-          ? {
-              success: true,
-              user: response.user,
-            }
-          : {
-              success: false,
-              message: "Session expirée",
-            };
+        if (response.success) {
+          return {
+            success: true,
+            user: response.user
+          };
+        }
+        
+        // Si l'authentification échoue, nettoyer le token invalide
+        localStorage.removeItem("jwt_token");
+        return {
+          success: false,
+          message: response.message || "Session expirée"
+        };
       } catch (error) {
         console.error("Erreur de vérification d'authentification:", error);
         return {
           success: false,
-          message: "Erreur inconnue",
+          message: "Erreur de connexion au serveur"
         };
       }
     },

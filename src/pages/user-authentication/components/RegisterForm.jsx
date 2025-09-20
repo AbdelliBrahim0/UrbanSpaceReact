@@ -4,6 +4,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/uiiii/Button';
 import Input from '../../../components/uiiii/Input';
 import { useAuth } from '../../../contexts/AuthContext';
+import api from '../../../api';
 
 const RegisterForm = ({ onSuccess }) => {
   const navigate = useNavigate();
@@ -77,23 +78,28 @@ const RegisterForm = ({ onSuccess }) => {
 
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate successful registration
-      const userData = {
+      // Call the registration API
+      const response = await api.privateApi.auth.signup({
+        nom: formData.nom,
         email: formData.email,
-        name: formData.nom,
-        phone: formData.telephone,
-        address: formData.adresse
-      };
+        telephone: formData.telephone,
+        adresse: formData.adresse,
+        password: formData.password
+      });
       
-      // Call the login function from our auth context
-      login(userData);
-      onSuccess?.(userData);
-      
-      // Redirect to account page
-      navigate('/new-member-welcome');
+      if (response.success) {
+        // Call the login function with user data and token
+        login(response.user, response.token);
+        onSuccess?.(response.user);
+        
+        // Redirect to welcome page
+        navigate('/new-member-welcome');
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          form: response.message || "Échec de l'inscription. Veuillez réessayer."
+        }));
+      }
     } catch (error) {
       console.error('Registration error:', error);
       setErrors(prev => ({

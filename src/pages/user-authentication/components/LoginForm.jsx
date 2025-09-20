@@ -4,6 +4,7 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/uiiii/Button';
 import Input from '../../../components/uiiii/Input';
 import { useAuth } from '../../../contexts/AuthContext';
+import api from '../../../api';
 
 const LoginForm = ({ onSuccess }) => {
   const navigate = useNavigate();
@@ -53,29 +54,52 @@ const LoginForm = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
-    if (!validateForm()) return;
+    
+    // Validation du formulaire
+    if (!validateForm()) {
+      console.log('Échec de la validation du formulaire');
+      return;
+    }
 
     setIsLoading(true);
+    setErrors({}); // Réinitialiser les erreurs précédentes
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Tentative de connexion...');
       
-      // Simulate successful login
-      const userData = {
-        email: formData.email,
-        name: formData.email.split('@')[0] // Simple way to generate a username from email
-      };
+      // Appel de l'API de connexion
+      const response = await api.privateApi.auth.login({
+        email: formData.email.trim(),
+        password: formData.password
+      });
       
-      // Call the login function from our auth context
-      login(userData);
-      onSuccess?.(userData);
-      navigate('/user-account');
+      console.log('Réponse de l\'API :', response);
+      
+      if (response && response.success && response.token) {
+        console.log('Connexion réussie, redirection...');
+        // Connexion réussie
+        login(response.user, response.token);
+        onSuccess?.(response.user);
+        navigate('/user-account');
+      } else {
+        // Gestion des erreurs de l'API
+        const errorMessage = response?.message || 'Échec de la connexion. Veuillez vérifier vos identifiants.';
+        console.error('Échec de la connexion :', errorMessage);
+        setErrors({ form: errorMessage });
+      }
     } catch (error) {
-      console.error('Login error:', error);
-      setErrors(prev => ({
-        ...prev,
-        form: 'Une erreur est survenue lors de la connexion. Veuillez réessayer.'
-      }));
+      console.error('Erreur lors de la connexion:', error);
+      const errorMessage = error.data?.message || error.message || 'Une erreur est survenue lors de la connexion. Veuillez réessayer plus tard.';
+      setErrors({ form: errorMessage });
+      
+      // Afficher plus de détails sur l'erreur dans la console
+      if (error.response) {
+        console.error('Détails de l\'erreur:', {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data
+        });
+      }
     } finally {
       setIsLoading(false);
     }

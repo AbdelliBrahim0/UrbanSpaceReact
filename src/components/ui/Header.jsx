@@ -150,7 +150,7 @@ const Header = () => {
             <Icon name="User" size={20} className="group-hover:scale-110 transition-transform" />
             {user && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center">
-                {user.name.charAt(0).toUpperCase()}
+                {(user.nom || user.email || 'U').charAt(0).toUpperCase()}
               </span>
             )}
           </button>

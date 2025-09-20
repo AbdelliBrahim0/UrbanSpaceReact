@@ -70,6 +70,63 @@ function createEmptyPaginatedResponse(limit = 12) {
 
 // ---------- Private API ----------
 // Ajouter des méthodes pour la gestion du login et signup
+// API pour les opérations utilisateur
+const userApi = {
+  // Récupérer le profil de l'utilisateur connecté
+  getProfile: async () => {
+    try {
+      const response = await fetchApi("/user/profile", {
+        method: "GET"
+      });
+      
+      if (response.success && response.user) {
+        return {
+          success: true,
+          user: response.user
+        };
+      }
+      return {
+        success: false,
+        message: response.message || "Erreur lors de la récupération du profil"
+      };
+    } catch (error) {
+      console.error("Erreur lors de la récupération du profil:", error);
+      return {
+        success: false,
+        message: error.message || "Erreur de connexion au serveur"
+      };
+    }
+  },
+  
+  // Mettre à jour le profil utilisateur
+  updateProfile: async (userData) => {
+    try {
+      const response = await fetchApi("/user/update-profile", {
+        method: "PUT",
+        body: userData
+      });
+      
+      if (response.success) {
+        return {
+          success: true,
+          user: response.user,
+          message: response.message || "Profil mis à jour avec succès"
+        };
+      }
+      return {
+        success: false,
+        message: response.message || "Erreur lors de la mise à jour du profil"
+      };
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du profil:", error);
+      return {
+        success: false,
+        message: error.message || "Erreur de connexion au serveur"
+      };
+    }
+  }
+};
+
 const privateApi = {
   auth: {
     // Fonction pour l'inscription
@@ -298,6 +355,9 @@ export const subcategoriesApi = publicApi.subcategories;
 export const productsApi = publicApi.products;
 export const authApi = privateApi.auth;
 
+// Exporter l'API utilisateur
+export { userApi };
+
 // Export de l'API Black Friday
 export const blackfriday = {
   list: async () => {
@@ -343,9 +403,11 @@ export const salesApi = {
   }
 };
 
+// Export par défaut combinant toutes les APIs
 export default { 
   ...publicApi, 
   privateApi,
+  userApi,
   blackhour,
   sales: salesApi
 };

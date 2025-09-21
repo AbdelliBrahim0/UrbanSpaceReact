@@ -3,13 +3,31 @@ import { motion } from 'framer-motion';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
+import { useCart } from '../../../contexts/CartContext';
 
-const ProductCard = ({ product, onProductClick, onAddToCart, onToggleWishlist, isWishlisted }) => {
+const ProductCard = ({ product, onProductClick }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { addToCart, setIsCartOpen } = useCart();
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      image: product.urlImage,
+      size: product.size || 'Unique',
+      color: product.color || 'Standard',
+      source: 'From Collections' // Ajout de la source
+    });
+    
+    // Optionnel : ouvrir le panier après l'ajout
+    // setIsCartOpen(true);
+  };
 
   return (
     <motion.div
-      className="bg-surface rounded-lg overflow-hidden border border-street cursor-pointer group"
+      className="bg-surface rounded-lg overflow-hidden border border-street cursor-pointer group flex flex-col h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onProductClick(product.id)}
@@ -27,11 +45,15 @@ const ProductCard = ({ product, onProductClick, onAddToCart, onToggleWishlist, i
         <motion.div
           className="absolute inset-0 bg-black/40 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         >
-          <Button variant="secondary" size="icon" onClick={(e) => { e.stopPropagation(); onAddToCart(product); }}>
-            <Icon name="ShoppingBag" size={20} />
-          </Button>
-          <Button variant="secondary" size="icon" onClick={(e) => { e.stopPropagation(); onToggleWishlist(product.id); }}>
-            <Icon name={isWishlisted ? "Heart" : "Heart"} size={20} />
+          <Button 
+            variant="secondary" 
+            size="icon" 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              // Gérer les favoris ici si nécessaire
+            }}
+          >
+            <Icon name="Heart" size={20} />
           </Button>
         </motion.div>
 
@@ -43,14 +65,28 @@ const ProductCard = ({ product, onProductClick, onAddToCart, onToggleWishlist, i
         )}
       </div>
 
-      <div className="p-4">
+      <div className="p-4 flex-grow flex flex-col">
         <h3 className="font-heading font-bold text-foreground group-hover:text-accent line-clamp-2">{product.name}</h3>
-        {product.description && <p className="text-muted-foreground text-sm line-clamp-2">{product.description}</p>}
-        <div className="mt-2 flex items-center justify-between">
-          <span className="font-heading font-bold text-lg text-accent">{Number(product.price).toFixed(2)} TND</span>
-          {product.size && (
-            <span className="bg-background/80 text-foreground px-1.5 py-0.5 rounded text-xs">{product.size}</span>
-          )}
+        {product.description && <p className="text-muted-foreground text-sm line-clamp-2 mt-1">{product.description}</p>}
+        
+        <div className="mt-auto pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-heading font-bold text-lg text-accent">
+              {Number(product.price).toFixed(3)} TND
+            </span>
+            {product.size && (
+              <span className="bg-background/80 text-foreground px-1.5 py-0.5 rounded text-xs">{product.size}</span>
+            )}
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full border-accent text-accent hover:bg-accent hover:text-white transition-colors"
+            onClick={handleAddToCart}
+          >
+            <Icon name="ShoppingBag" className="mr-2" size={16} />
+            Ajouter au panier
+          </Button>
         </div>
       </div>
     </motion.div>

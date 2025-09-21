@@ -1,15 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import { formatPrice } from '../../../utils/formatters';
+import { CartContext } from '../../../contexts/CartContext';
+
+// Gestion des notifications toast simplifiée
+const toast = {
+  success: (title, options = {}) => {
+    console.log(`[SUCCESS] ${title}`, options);
+    // Pas d'alerte pour éviter les popups intempestifs
+  },
+  error: (title, options = {}) => {
+    console.error(`[ERROR] ${title}`, options);
+    // Afficher uniquement les erreurs critiques
+    if (options.critical && typeof window !== 'undefined' && window.alert) {
+      window.alert(`❌ ${title}\n${options.description || ''}`);
+    }
+  },
+  info: (title, options = {}) => {
+    console.log(`[INFO] ${title}`, options);
+  }
+};
 
 const UltraLimitedProduct = ({ product, index, onSelect }) => {
+  const { addToCart } = useContext(CartContext);
   const [quantity, setQuantity] = useState(product?.initialStock || 0);
   const [recentPurchases, setRecentPurchases] = useState([]);
   const [isHovered, setIsHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState(product?.sizes?.[0]);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -45,9 +66,55 @@ const UltraLimitedProduct = ({ product, index, onSelect }) => {
       ? Math.round(((originalPrice - salePrice) / originalPrice) * 100) 
       : 0;
 
-  const handleQuickPurchase = () => {
-    if (!isSoldOut) {
-      onSelect?.(product);
+  const handleQuickPurchase = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    
+    if (isSoldOut) {
+      toast.error('Produit en rupture de stock', {
+        description: 'Ce produit n\'est malheureusement plus disponible',
+        position: 'top-right',
+        duration: 3000,
+      });
+      return;
+    }
+    
+    if (isAddingToCart) return;
+    
+    setIsAddingToCart(true);
+    
+    try {
+      // Ajouter le produit au panier avec les détails nécessaires
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: parseFloat(product.salePrice || product.originalPrice),
+        image: product.image,
+        size: selectedSize || product.sizes?.[0] || 'Unique',
+        color: 'Standard',
+        source: 'Black Hour',
+        fromBlackHour: true,
+        quantity: 1
+      });
+      
+      // Afficher une notification de succès
+      console.log(`[Black Hour] Produit ajouté au panier: ${product.name}`);
+      
+      // Appeler la fonction onSelect si elle existe (pour la compatibilité avec le code existant)
+      if (onSelect) {
+        onSelect(product);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout au panier:', error);
+      toast.error('Erreur', {
+        description: 'Une erreur est survenue lors de l\'ajout au panier',
+        critical: true
+      });
+    } finally {
+      // Réinitialiser l'état après un court délai
+      setTimeout(() => {
+        setIsAddingToCart(false);
+      }, 1000);
     }
   };
 
@@ -119,6 +186,7 @@ const UltraLimitedProduct = ({ product, index, onSelect }) => {
                 className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold"
                 iconName="Zap"
                 iconPosition="left"
+                disabled={isAddingToCart}
               >
                 Acheter maintenant
               </Button>
@@ -248,10 +316,11 @@ const UltraLimitedProduct = ({ product, index, onSelect }) => {
                 fullWidth
                 onClick={handleQuickPurchase}
                 className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold"
-                iconName="ShoppingCart"
+                iconName={isAddingToCart ? 'Loader' : 'ShoppingCart'}
                 iconPosition="left"
+                disabled={isAddingToCart}
               >
-                Ajouter au panier
+                {isAddingToCart ? 'Ajout en cours...' : 'Ajouter au panier'}
               </Button>
               
               <Button
@@ -261,6 +330,7 @@ const UltraLimitedProduct = ({ product, index, onSelect }) => {
                 iconName="Zap"
                 iconPosition="left"
                 onClick={handleQuickPurchase}
+                disabled={isAddingToCart}
               >
                 Acheter maintenant
               </Button>
@@ -272,6 +342,13 @@ const UltraLimitedProduct = ({ product, index, onSelect }) => {
               className="border-error text-error hover:bg-error hover:text-error-foreground"
               iconName="Bell"
               iconPosition="left"
+              onClick={() => {
+                toast.info('Notification activée', {
+                  description: 'Vous serez averti lorsque ce produit sera à nouveau en stock',
+                  position: 'top-right',
+                  duration: 3000,
+                });
+              }}
             >
               M'avertir quand disponible
             </Button>

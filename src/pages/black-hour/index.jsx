@@ -6,7 +6,6 @@ import CountdownTimer from './components/CountdownTimer';
 import UltraLimitedProduct from './components/UltraLimitedProduct';
 import LiveActivityFeed from './components/LiveActivityFeed';
 import UrgencyBanner from './components/UrgencyBanner';
-import QuickCheckout from './components/QuickCheckout';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import FlashSaleBanner from './components/FlashSaleBanner';
@@ -363,12 +362,7 @@ const BlackHourPage = () => {
           </section>
         </main>
 
-        {/* Quick Checkout Modal */}
-        <QuickCheckout
-          isOpen={isCheckoutOpen}
-          onClose={() => setIsCheckoutOpen(false)}
-          product={selectedProduct}
-        />
+        
 
         {/* Footer */}
         <footer className="bg-surface border-t border-street py-8">

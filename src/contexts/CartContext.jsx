@@ -1,103 +1,105 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
-const CartContext = createContext(null);
+export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Street Hoodie Premium',
-      price: 89.99,
-      quantity: 2,
-      image: '/api/placeholder/80/80',
-      size: 'L',
-      color: 'Black'
-    },
-    {
-      id: 2,
-      name: 'Urban Sneakers',
-      price: 129.99,
-      quantity: 1,
-      image: '/api/placeholder/80/80',
-      size: '42',
-      color: 'White'
+
+  // Charger le panier depuis le localStorage au chargement
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
     }
-  ]);
-
-  const openCart = useCallback(() => {
-    setIsCartOpen(true);
   }, []);
 
-  const closeCart = useCallback(() => {
-    setIsCartOpen(false);
-  }, []);
+  // Sauvegarder le panier dans le localStorage à chaque modification
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } else {
+      localStorage.removeItem('cart');
+    }
+  }, [cartItems]);
 
-  const toggleCart = useCallback(() => {
-    setIsCartOpen(prev => !prev);
-  }, []);
-
-  const addToCart = useCallback((item) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(cartItem => cartItem.id === item.id);
+  const addToCart = (product, quantity = 1) => {
+    setCartItems(prevItems => {
+      const existingItem = prevItems.find(item => item.id === product.id);
+      
       if (existingItem) {
-        return prev.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
+        // Si le produit existe déjà, mettre à jour la quantité
+        return prevItems.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      
+      // Sinon, ajouter le nouveau produit
+      return [...prevItems, { ...product, quantity }];
     });
-  }, []);
+  };
 
-  const removeFromCart = useCallback((itemId) => {
-    setCartItems(prev => prev.filter(item => item.id !== itemId));
-  }, []);
+  const removeFromCart = (productId) => {
+    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+  };
 
-  const updateQuantity = useCallback((itemId, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(itemId);
+  const updateQuantity = (productId, quantity) => {
+    if (quantity < 1) {
+      removeFromCart(productId);
       return;
     }
-    setCartItems(prev =>
-      prev.map(item =>
-        item.id === itemId ? { ...item, quantity } : item
+    
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === productId ? { ...item, quantity } : item
       )
     );
-  }, [removeFromCart]);
+  };
 
-  const clearCart = useCallback(() => {
+  const clearCart = () => {
     setCartItems([]);
-  }, []);
+  };
 
-  const getTotalItems = useCallback(() => {
+  const getTotalItems = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
-  }, [cartItems]);
+  };
 
-  const getTotalPrice = useCallback(() => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  }, [cartItems]);
+  const getTotalPrice = () => {
+    return cartItems.reduce(
+      (total, item) => total + (parseFloat(item.price) * item.quantity),
+      0
+    );
+  };
+
+  // Fonction pour fermer le panier
+  const closeCart = () => {
+    setIsCartOpen(false);
+    document.body.style.overflow = 'unset'; // Réactiver le défilement
+  };
 
   return (
-    <CartContext.Provider value={{
-      isCartOpen,
-      cartItems,
-      openCart,
-      closeCart,
-      toggleCart,
-      addToCart,
-      removeFromCart,
-      updateQuantity,
-      clearCart,
-      getTotalItems,
-      getTotalPrice
-    }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        isCartOpen,
+        setIsCartOpen,
+        closeCart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        getTotalItems,
+        getTotalPrice,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
+// Hook personnalisé pour utiliser le contexte du panier
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
@@ -105,5 +107,3 @@ export const useCart = () => {
   }
   return context;
 };
-
-export default CartContext;

@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
+import { useCart } from '../../../contexts/CartContext';
 
 const SaleProductCard = ({ product, index }) => {
+  const { addToCart } = useCart();
   const [isWishlisted, setIsWishlisted] = useState(product?.isWishlisted || false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -20,7 +22,22 @@ const SaleProductCard = ({ product, index }) => {
   const handleQuickAdd = (e) => {
     e?.preventDefault();
     e?.stopPropagation();
-    console.log('Quick add to cart:', product?.id);
+    handleAddToCart(e);
+  };
+
+  const handleAddToCart = (e) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.salePrice),
+      image: product.image,
+      size: product.availableSizes?.[0] || 'Unique',
+      color: 'Standard',
+      source: 'From Sale'
+    });
   };
 
   const getBadgeColor = () => {
@@ -48,7 +65,7 @@ const SaleProductCard = ({ product, index }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link to="/product-detail" className="block">
+      <Link to={`/product/${product.id}`} className="block">
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden">
           <Image
@@ -107,8 +124,9 @@ const SaleProductCard = ({ product, index }) => {
               <button
                 onClick={handleQuickAdd}
                 className="bg-accent text-accent-foreground px-4 py-2 rounded-lg font-medium hover:scale-105 transition-street"
+                disabled={!product.stock || product.stock <= 0}
               >
-                Quick Add
+                {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
               </button>
             </div>
           </motion.div>
@@ -129,13 +147,13 @@ const SaleProductCard = ({ product, index }) => {
           {/* Pricing */}
           <div className="flex items-center space-x-2 mb-2">
             <span className="text-lg font-bold text-accent">
-              ${product?.salePrice?.toFixed(2)}
+              {product?.salePrice?.toFixed(3)} TND
             </span>
             <span className="text-sm text-muted-foreground line-through">
-              ${product?.originalPrice?.toFixed(2)}
+              {product?.originalPrice?.toFixed(3)} TND
             </span>
             <span className="text-xs bg-success text-success-foreground px-2 py-1 rounded-full font-medium">
-              Save ${savings?.toFixed(2)}
+              Save {(product?.originalPrice - product?.salePrice)?.toFixed(3)} TND
             </span>
           </div>
 
@@ -150,9 +168,9 @@ const SaleProductCard = ({ product, index }) => {
               <span className={`text-xs font-medium ${
                 urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'
               }`}>
-                {urgencyLevel === 'critical' ? `Only ${product?.stock} left!` : 
-                 urgencyLevel === 'low' ? `${product?.stock} remaining` : 
-                 'In Stock'}
+                {urgencyLevel === 'critical' ? `Seulement ${product?.stock} restant(s) !` : 
+                 urgencyLevel === 'low' ? `${product?.stock} restant(s)` : 
+                 'En stock'}
               </span>
             </div>
             
@@ -165,36 +183,31 @@ const SaleProductCard = ({ product, index }) => {
             </div>
           </div>
 
-          {/* Size Options Preview */}
-          {product?.availableSizes && (
-            <div className="flex items-center space-x-1 mb-2">
-              <span className="text-xs text-muted-foreground">Sizes:</span>
-              <div className="flex space-x-1">
-                {product?.availableSizes?.slice(0, 4)?.map((size) => (
-                  <span key={size} className="text-xs bg-muted text-muted-foreground px-1 py-0.5 rounded">
-                    {size}
-                  </span>
-                ))}
-                {product?.availableSizes?.length > 4 && (
-                  <span className="text-xs text-accent">+{product?.availableSizes?.length - 4}</span>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Flash Sale Timer */}
-          {product?.isFlashSale && product?.flashSaleEnds && (
-            <div className="bg-error/10 border border-error/20 rounded-lg p-2 mt-2">
-              <div className="flex items-center space-x-2">
-                <Icon name="Clock" size={12} className="text-error" />
-                <span className="text-xs text-error font-medium">
-                  Flash sale ends in {product?.flashSaleEnds}
-                </span>
-              </div>
-            </div>
-          )}
+          {/* Bouton Ajouter au panier - Version mobile/visible par défaut */}
+          <div className="lg:hidden mt-3">
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-accent text-accent-foreground py-2 px-4 rounded-lg font-medium hover:bg-accent/90 transition-street flex items-center justify-center"
+              disabled={!product.stock || product.stock <= 0}
+            >
+              <Icon name="ShoppingBag" className="mr-2" size={16} />
+              {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
+            </button>
+          </div>
         </div>
       </Link>
+      
+      {/* Bouton Ajouter au panier - Version desktop (visible au survol) */}
+      <div className="hidden lg:block absolute bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-sm translate-y-full group-hover:translate-y-0 transition-transform duration-300 border-t border-street">
+        <button
+          onClick={handleAddToCart}
+          className="w-full bg-accent text-accent-foreground py-2 px-4 rounded-lg font-medium hover:bg-accent/90 transition-street flex items-center justify-center"
+          disabled={!product.stock || product.stock <= 0}
+        >
+          <Icon name="ShoppingBag" className="mr-2" size={16} />
+          {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
+        </button>
+      </div>
     </motion.div>
   );
 };

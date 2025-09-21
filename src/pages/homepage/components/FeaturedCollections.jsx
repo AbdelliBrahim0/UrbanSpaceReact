@@ -4,12 +4,18 @@ import { Link } from 'react-router-dom';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import Icon from '../../../components/AppIcon';
-import { productsApi } from '../../../api'; // <-- importer l'API
+import { productsApi } from '../../../api';
+import { useCart } from '../../../contexts/CartContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const FeaturedCollections = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [addingProductId, setAddingProductId] = useState(null);
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
 
   // Fonction pour mélanger un tableau
   const shuffleArray = (array) => {
@@ -32,8 +38,8 @@ const FeaturedCollections = () => {
           title: product.name,
           subtitle: product.subtitle || "",
           description: product.description || "",
-          price: `${product.price} TND`,  // <-- prix en TND
-          originalPrice: product.originalPrice ? `${product.originalPrice} TND` : "", // <-- prix original en TND
+          price: `${product.price} TND`,
+          originalPrice: product.originalPrice ? `${product.originalPrice} TND` : "",
           image: product.urlImage,
           hoverImage: product.urlImageHover,
           badge: product.badge || "",
@@ -41,7 +47,7 @@ const FeaturedCollections = () => {
           category: product.categories?.[0]?.name || "",
           inStock: product.stock > 0,
           stockCount: product.stock || 0
-          }));
+        }));
         setCollections(formatted);
       } catch (err) {
         console.error(err);
@@ -66,6 +72,34 @@ const FeaturedCollections = () => {
     hover: { scale: 1.1, transition: { duration: 0.4, ease: "easeOut" } }
   };
 
+  const handleAddToCart = async (product) => {
+    if (!isAuthenticated) {
+      toast.error('Veuillez vous connecter pour ajouter des articles au panier');
+      return;
+    }
+
+    setAddingProductId(product.id);
+    
+    try {
+      await addToCart({
+        id: product.id,
+        name: product.title,
+        price: parseFloat(product.price.replace(' TND', '')),
+        image: product.image,
+        quantity: 1,
+        stock: product.stockCount,
+        source: 'Featured Collections'
+      });
+      
+      toast.success('Produit ajouté au panier');
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout au panier:', error);
+      toast.error('Une erreur est survenue lors de l\'ajout au panier');
+    } finally {
+      setAddingProductId(null);
+    }
+  };
+
   return (
     <section className="py-16 lg:py-24 px-4 lg:px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -87,7 +121,7 @@ const FeaturedCollections = () => {
 
         {/* Collections Grid */}
         {loading ? (
-          <div className="text-center text-muted-foreground">Loading products...</div>
+          <div className="text-center text-muted-foreground">Chargement des produits...</div>
         ) : (
           <motion.div
             variants={containerVariants}
@@ -112,7 +146,7 @@ const FeaturedCollections = () => {
                     className="w-full h-full"
                   >
                     <Image
-                      src={hoveredCard === collection?.id ? collection?.hoverImage : collection?.image}
+                      src={hoveredCard === collection?.id && collection?.hoverImage ? collection.hoverImage : collection?.image}
                       alt={collection?.title}
                       className="w-full h-full object-cover transition-street"
                     />
@@ -129,11 +163,11 @@ const FeaturedCollections = () => {
                   <div className="absolute top-4 right-4">
                     {collection?.inStock ? (
                       <div className="bg-success text-success-foreground px-2 py-1 rounded text-xs font-bold">
-                        {collection?.stockCount} LEFT
+                        {collection?.stockCount} EN STOCK
                       </div>
                     ) : (
                       <div className="bg-error text-error-foreground px-2 py-1 rounded text-xs font-bold">
-                        SOLD OUT
+                        RUPTURE
                       </div>
                     )}
                   </div>
@@ -149,7 +183,7 @@ const FeaturedCollections = () => {
                         variant="default"
                         className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold tracking-wide"
                       >
-                        QUICK VIEW
+                        VUE RAPIDE
                       </Button>
                     </Link>
                   </motion.div>
@@ -179,26 +213,42 @@ const FeaturedCollections = () => {
                     {collection?.description}
                   </p>
 
-                  {/* Price */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-foreground font-bold text-lg">
-                        {collection?.price}
-                      </span>
-                      {collection?.originalPrice && (
-                        <span className="text-text-secondary line-through text-sm">
-                          {collection?.originalPrice}
-                        </span>
-                      )}
+                  {/* Price and Add to Cart */}
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center">
+                        <span className="text-foreground font-bold">{collection.price}</span>
+                        {collection.originalPrice && (
+                          <span className="text-muted-foreground line-through text-sm ml-2">
+                            {collection.originalPrice}
+                          </span>
+                        )}
+                      </div>
                     </div>
-
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-accent hover:bg-accent hover:text-accent-foreground transition-street"
-                      disabled={!collection?.inStock}
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddToCart(collection);
+                      }}
+                      disabled={!collection.inStock || addingProductId === collection.id}
                     >
-                      <Icon name="ShoppingBag" size={20} />
+                      {addingProductId === collection.id ? (
+                        <>
+                          <span className="inline-block animate-spin mr-2">
+                            <Icon name="Loader" className="h-4 w-4" />
+                          </span>
+                          Ajout en cours...
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="ShoppingCart" className="mr-2 h-4 w-4" />
+                          {collection.inStock ? 'Ajouter au panier' : 'Rupture de stock'}
+                        </>
+                      )}
                     </Button>
                   </div>
                 </div>

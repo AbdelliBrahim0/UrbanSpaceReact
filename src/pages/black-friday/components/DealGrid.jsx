@@ -126,10 +126,25 @@ const DealGrid = () => {
   // Catégories uniques pour les filtres
   const categories = [
     { id: 'all', name: 'Tout voir' },
-    ...Array.from(new Map(products.flatMap(p => 
-      p.categories?.map(c => [c.id, { id: c.name?.toLowerCase(), name: c.name }])
-    ).values()))
+    ...Array.from(
+      new Map(
+        products.flatMap(p => 
+          p.categories?.map(c => [
+            c.id, 
+            { 
+              id: c.id, // Utiliser l'ID de la catégorie comme clé unique
+              name: c.name 
+            }
+          ]) || []
+        )
+      ).values()
+    )
   ];
+
+  // Supprimer les doublons de catégories (au cas où)
+  const uniqueCategories = Array.from(
+    new Map(categories.map(cat => [cat.id, cat])).values()
+  );
 
   // Afficher un indicateur de chargement
   if (loading) {
@@ -175,7 +190,7 @@ const DealGrid = () => {
       <div className="max-w-7xl mx-auto px-4">
         {/* Filtres de catégorie */}
         <div className="flex flex-wrap gap-2 mb-8 justify-center">
-          {categories.map((category) => (
+          {uniqueCategories.map((category) => (
             <Button
               key={category.id}
               variant={selectedCategory === category.id ? 'default' : 'outline'}

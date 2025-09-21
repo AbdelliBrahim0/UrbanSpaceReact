@@ -1,10 +1,18 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
+import Dialog from './Dialog';
 
 const CartSidebar = () => {
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showLoginAlert, setShowLoginAlert] = useState(false);
+  
   const {
     isCartOpen,
     closeCart,
@@ -217,9 +225,176 @@ const CartSidebar = () => {
               <Button
                 className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-heading font-semibold transition-street"
                 size="lg"
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    setShowLoginAlert(true);
+                    return;
+                  }
+                  setShowConfirmation(true);
+                }}
               >
                 Passer la commande
               </Button>
+              
+              {/* Modal de confirmation de commande */}
+              {showConfirmation && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                  <div className="bg-background rounded-lg p-6 w-full max-w-md">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-bold">Confirmer la commande</h3>
+                      <button 
+                        onClick={() => setShowConfirmation(false)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        <Icon name="X" size={20} />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4 mb-6">
+                      <div className="p-4 bg-muted/20 rounded-lg">
+                        <h4 className="font-medium mb-2">Vos coordonnées</h4>
+                        <div className="space-y-2 text-sm">
+                          <p><span className="text-muted-foreground">Nom complet :</span> {user?.fullName || 'Non renseigné'}</p>
+                          <p><span className="text-muted-foreground">Téléphone :</span> {user?.phone || 'Non renseigné'}</p>
+                          <p><span className="text-muted-foreground">Adresse :</span> {user?.address ? `${user.address.street}, ${user.address.city} ${user.address.postalCode}` : 'Non renseignée'}</p>
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-muted-foreground">
+                        Vérifiez vos informations avant de confirmer votre commande.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => navigate('/mon-compte')}
+                      >
+                        <Icon name="User" className="mr-2" />
+                        Modifier mes informations
+                      </Button>
+                      
+                      <Button
+                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                        onClick={() => {
+                          // Logique de confirmation de commande
+                          console.log('Commande confirmée');
+                          setShowConfirmation(false);
+                          // Ici, vous pourriez ajouter la logique pour finaliser la commande
+                        }}
+                      >
+                        Confirmer la commande
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Dialogue de connexion */}
+              <Dialog
+                isOpen={showLoginAlert}
+                onClose={() => setShowLoginAlert(false)}
+                title="Connexion requise"
+                confirmText="Se connecter"
+                cancelText="Annuler"
+                onConfirm={() => {
+                  setShowLoginAlert(false);
+                  navigate('/user-authentication');
+                }}
+              >
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <Icon name="AlertTriangle" className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-yellow-700">
+                        Vous devez être connecté pour passer une commande. Voulez-vous être redirigé vers la page de connexion ?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Dialog>
+              
+              {/* Dialogue de confirmation de commande */}
+              <Dialog
+                isOpen={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                title="Confirmer la commande"
+                confirmText="Confirmer la commande"
+                cancelText="Annuler"
+                onConfirm={() => {
+                  // Logique de confirmation de commande
+                  console.log('Commande confirmée');
+                  setShowConfirmation(false);
+                  // Ici, vous pourriez ajouter la logique pour finaliser la commande
+                }}
+              >
+                <div className="space-y-4">
+                  {/* Message d'information sur l'appel téléphonique */}
+                  <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <Icon name="PhoneCall" className="h-5 w-5 text-blue-500" />
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-blue-700">
+                          <strong>Important :</strong> Notre équipe vous contactera par téléphone dans les prochaines minutes pour confirmer votre commande, la taille souhaitée et les détails de livraison.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-muted/20 rounded-lg border border-muted">
+                    <h4 className="font-medium mb-3 text-foreground">Vos coordonnées</h4>
+                    <div className="space-y-4 text-sm">
+                      <div className="flex items-start">
+                        <Icon name="User" className="h-4 w-4 mt-0.5 text-muted-foreground mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-foreground">Nom complet</p>
+                          <p className="text-muted-foreground">{user?.nom || 'Non renseigné'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start">
+                        <Icon name="Phone" className="h-4 w-4 mt-0.5 text-muted-foreground mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-foreground">Téléphone</p>
+                          <p className="text-muted-foreground">{user?.telephone || 'Non renseigné'}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start">
+                        <Icon name="MapPin" className="h-4 w-4 mt-0.5 text-muted-foreground mr-2 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-foreground">Adresse de livraison</p>
+                          <p className="text-muted-foreground">
+                            {user?.adresse || 'Aucune adresse enregistrée'}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Bouton pour modifier les informations */}
+                      <div className="pt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full mt-2"
+                          onClick={() => {
+                            setShowConfirmation(false);
+                            navigate('/user-account?tab=profile');
+                          }}
+                        >
+                          <Icon name="Edit" className="mr-2 h-3.5 w-3.5" />
+                          Modifier mes informations
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Dialog>
+              
               <Button
                 variant="outline"
                 className="w-full border-street hover:border-accent hover:text-accent font-body"

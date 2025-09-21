@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Breadcrumb from '../../components/uii/Breadcrumb';
 import Icon from '../../components/AppIcon';
@@ -16,9 +16,18 @@ import AccountSettings from './components/AccountSettings';
 import ActivityFeed from './components/ActivityFeed';
 
 const UserAccount = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('profile');
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  // Mettre à jour l'onglet actif en fonction du paramètre d'URL
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && tabs.some(tab => tab.id === tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const checkMobile = () => {

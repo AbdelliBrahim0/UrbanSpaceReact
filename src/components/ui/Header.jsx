@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../contexts/CartContext';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
@@ -9,10 +10,10 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [cartCount, setCartCount] = useState(3);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { toggleCart, getTotalItems } = useCart();
 
   const navigationItems = [
     { label: 'Home', path: '/homepage', icon: 'Home' },
@@ -126,12 +127,12 @@ const Header = () => {
             variant="ghost"
             size="icon"
             className="relative hover:bg-surface hover:text-accent transition-street"
-            onClick={() => console.log('Cart clicked')}
+            onClick={toggleCart}
           >
             <Icon name="ShoppingBag" size={20} />
-            {cartCount > 0 && (
+            {getTotalItems() > 0 && (
               <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse-glow">
-                {cartCount}
+                {getTotalItems()}
               </span>
             )}
           </Button>
@@ -222,7 +223,7 @@ const Header = () => {
                 onClick={() => console.log('Cart clicked')}
               >
                 <Icon name="ShoppingBag" size={20} />
-                <span>Cart ({cartCount})</span>
+                <span>Cart ({getTotalItems()})</span>
               </Button>
 
               <Link

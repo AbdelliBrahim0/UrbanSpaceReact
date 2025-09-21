@@ -12,6 +12,8 @@ import Homepage from './pages/homepage';
 import UserAccount from './pages/user-account';
 import UserAuthentication from './pages/user-authentication';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CartProvider } from './contexts/CartContext';
+import CartSidebar from './components/ui/CartSidebar';
 import NewMemberWelcome from './pages/new-member-welcome';
 
 const PrivateRoute = ({ children }) => {
@@ -27,40 +29,43 @@ const PublicRoute = ({ children }) => {
 const Routes = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <ErrorBoundary>
-          <ScrollToTop />
-          <RouterRoutes>
-            <Route path="/" element={<BlackFridayPage />} />
-            <Route path="/product-detail" element={<ProductDetail />} />
-            <Route path="/sale" element={<Sale />} />
-            <Route path="/collections" element={<Collections />} />
-            <Route path="/black-friday" element={<BlackFridayPage />} />
-            <Route path="/black-hour" element={<BlackHourPage />} />
-            <Route path="/homepage" element={<Homepage />} />
-            <Route path="/new-member-welcome" element={<NewMemberWelcome />} />
+      <CartProvider>
+        <AuthProvider>
+          <ErrorBoundary>
+            <ScrollToTop />
+            <RouterRoutes>
+              <Route path="/" element={<BlackFridayPage />} />
+              <Route path="/product-detail" element={<ProductDetail />} />
+              <Route path="/sale" element={<Sale />} />
+              <Route path="/collections" element={<Collections />} />
+              <Route path="/black-friday" element={<BlackFridayPage />} />
+              <Route path="/black-hour" element={<BlackHourPage />} />
+              <Route path="/homepage" element={<Homepage />} />
+              <Route path="/new-member-welcome" element={<NewMemberWelcome />} />
 
 
-            <Route 
-              path="/user-account" 
-              element={
-                <PrivateRoute>
-                  <UserAccount />
-                </PrivateRoute>
-              } 
-            />
-            <Route 
-              path="/user-authentication" 
-              element={
-                <PublicRoute>
-                  <UserAuthentication />
-                </PublicRoute>
-              } 
-            />
-            <Route path="*" element={<NotFound />} />
-          </RouterRoutes>
-        </ErrorBoundary>
-      </AuthProvider>
+              <Route 
+                path="/user-account" 
+                element={
+                  <PrivateRoute>
+                    <UserAccount />
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/user-authentication" 
+                element={
+                  <PublicRoute>
+                    <UserAuthentication />
+                  </PublicRoute>
+                } 
+              />
+              <Route path="*" element={<NotFound />} />
+            </RouterRoutes>
+            <CartSidebar />
+          </ErrorBoundary>
+        </AuthProvider>
+      </CartProvider>
     </BrowserRouter>
   );
 };

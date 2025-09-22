@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import CountdownTimer from './components/CountdownTimer';
 import UltraLimitedProduct from './components/UltraLimitedProduct';
@@ -10,8 +11,9 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import FlashSaleBanner from './components/FlashSaleBanner';
 import { blackhour } from '../../api';
+import EventWrapper from '../../components/EventWrapper';
 
-const BlackHourPage = () => {
+const BlackHourContent = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
@@ -374,6 +376,17 @@ const BlackHourPage = () => {
         </footer>
       </div>
     </>
+  );
+};
+
+const BlackHourPage = () => {
+  return (
+    <EventWrapper 
+      eventType="black_hour"
+      fallbackRoute="/black-hour-limited-event"
+    >
+      <BlackHourContent />
+    </EventWrapper>
   );
 };
 

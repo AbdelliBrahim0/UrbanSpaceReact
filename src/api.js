@@ -387,8 +387,20 @@ export const blackhour = {
         currentTime: response.currentTime
       };
     }
-    return { success: false, message: "Erreur lors du chargement des produits Black Hour" };
-  }
+  },
+};
+
+export const eventsApi = {
+  async checkStatus() {
+    try {
+      // API_BASE already includes /api, so we start with /admin
+      const response = await fetchApi('/admin/events/status');
+      return response;
+    } catch (error) {
+      console.error('Error checking event status:', error);
+      return { success: false, error: error.message };
+    }
+  },
 };
 
 export const salesApi = {

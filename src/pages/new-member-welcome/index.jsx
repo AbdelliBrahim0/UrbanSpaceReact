@@ -2,10 +2,7 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import Header from '../../components/ui/Header';
 import WelcomeHero from './components/WelcomeHero';
-import MembershipBenefits from './components/MembershipBenefits';
 import OnboardingSteps from './components/OnboardingSteps';
-import CommunityShowcase from './components/CommunityShowcase';
-import ExclusiveAccess from './components/ExclusiveAccess';
 import GangStyleSeparator from './components/GangStyleSeparator';
 import WelcomeFooter from './components/WelcomeFooter';
 
@@ -46,36 +43,13 @@ const NewMemberWelcome = () => {
           {/* Welcome Hero Section */}
           <WelcomeHero />
 
-          {/* Gang Style Separator */}
-          <GangStyleSeparator 
-            variant="diamond" 
-            showText={true} 
-            text="Privilèges Exclusifs" 
-            animated={true} 
-          />
-
-          {/* Membership Benefits */}
-          <MembershipBenefits />
-
-          {/* Gang Style Separator */}
-          <GangStyleSeparator 
-            variant="dots" 
-            animated={true} 
-          />
-
+          
           {/* Onboarding Steps */}
           <OnboardingSteps />
 
-          {/* Gang Style Separator */}
-          <GangStyleSeparator 
-            variant="chains" 
-            showText={true} 
-            text="Communauté Elite" 
-            animated={true} 
-          />
+       
 
-          {/* Community Showcase */}
-          <CommunityShowcase />
+          
 
           {/* Gang Style Separator */}
           <GangStyleSeparator 
@@ -83,8 +57,7 @@ const NewMemberWelcome = () => {
             animated={true} 
           />
 
-          {/* Exclusive Access */}
-          <ExclusiveAccess />
+          
 
           {/* Gang Style Separator */}
           <GangStyleSeparator 
@@ -93,7 +66,7 @@ const NewMemberWelcome = () => {
             text="Votre Aventure Commence" 
             animated={true} 
           />
-
+          
           {/* Welcome Footer */}
           <WelcomeFooter />
         </main>

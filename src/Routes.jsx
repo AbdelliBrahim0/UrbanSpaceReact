@@ -15,6 +15,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import CartSidebar from './components/ui/CartSidebar';
 import NewMemberWelcome from './pages/new-member-welcome';
+import BlackFridayEvent from './pages/black-friday-event';
+import BlackHourLimitedEvent from './pages/black-hour-limited-event';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -42,6 +44,8 @@ const Routes = () => {
               <Route path="/black-hour" element={<BlackHourPage />} />
               <Route path="/homepage" element={<Homepage />} />
               <Route path="/new-member-welcome" element={<NewMemberWelcome />} />
+              <Route path="/black-friday-event" element={<BlackFridayEvent />} />
+              <Route path="/black-hour-limited-event" element={<BlackHourLimitedEvent />} />
 
 
               <Route 

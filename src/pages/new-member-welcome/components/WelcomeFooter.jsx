@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
 
 const WelcomeFooter = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -12,15 +11,15 @@ const WelcomeFooter = () => {
       title: "Découvrir les Produits",
       description: "Explorez notre collection exclusive de streetwear premium",
       icon: "ShoppingBag",
-      link: "/products-catalog",
+      link: "/collections",
       gradient: "from-accent to-red-500",
       delay: 0.2
     },
     {
-      title: "Rejoindre la Communauté",
-      description: "Connectez-vous avec d\'autres passionnés de mode urbaine",
+      title: "Profitez des réductions",
+      description: "Bénéficiez d’offres exclusives et économisez sur vos achats.",
       icon: "Users",
-      link: "/homepage",
+      link: "/sale",
       gradient: "from-success to-green-400",
       delay: 0.4
     },
@@ -28,7 +27,7 @@ const WelcomeFooter = () => {
       title: "Événements VIP",
       description: "Accédez aux événements exclusifs et aux ventes privées",
       icon: "Calendar",
-      link: "/black-friday-event",
+      link: "/black-hour",
       gradient: "from-blue-500 to-purple-500",
       delay: 0.6
     }
@@ -36,9 +35,7 @@ const WelcomeFooter = () => {
 
   const socialLinks = [
     { name: "Instagram", icon: "Instagram", url: "#" },
-    { name: "Twitter", icon: "Twitter", url: "#" },
-    { name: "TikTok", icon: "Music", url: "#" },
-    { name: "Discord", icon: "MessageCircle", url: "#" }
+    { name: "Facebook", icon: "Facebook", url: "#" },
   ];
 
   useEffect(() => {
@@ -145,22 +142,7 @@ const WelcomeFooter = () => {
             ))}
           </div>
 
-          {/* Newsletter Signup */}
-          <div className="max-w-md mx-auto">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                placeholder="Votre email pour les exclusivités"
-                className="flex-1 px-4 py-3 bg-input border border-border rounded-lg text-foreground placeholder-text-secondary focus:border-accent focus:outline-none transition-colors duration-300"
-              />
-              <Button variant="default" iconName="Mail" iconPosition="right">
-                S'abonner
-              </Button>
-            </div>
-            <p className="text-xs text-text-secondary mt-3">
-              Recevez en avant-première nos nouveautés et offres exclusives
-            </p>
-          </div>
+          
         </motion.div>
 
         {/* Footer Bottom */}
@@ -189,7 +171,7 @@ const WelcomeFooter = () => {
               <Link to="/homepage" className="text-text-secondary hover:text-accent transition-colors duration-300">
                 Accueil
               </Link>
-              <Link to="/products-catalog" className="text-text-secondary hover:text-accent transition-colors duration-300">
+              <Link to="/collections" className="text-text-secondary hover:text-accent transition-colors duration-300">
                 Produits
               </Link>
               <a href="#" className="text-text-secondary hover:text-accent transition-colors duration-300">

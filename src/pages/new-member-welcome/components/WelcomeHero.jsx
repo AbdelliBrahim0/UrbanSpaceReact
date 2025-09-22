@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 
 const WelcomeHero = () => {
   const [currentText, setCurrentText] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   const welcomeTexts = [
     "Bienvenue dans la famille UrbanSpace",
@@ -21,7 +23,7 @@ const WelcomeHero = () => {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-surface to-background">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-surface to-background" style={{ position: 'relative', zIndex: 1 }}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
         {[...Array(20)]?.map((_, i) => (
@@ -91,12 +93,16 @@ const WelcomeHero = () => {
           transition={{ duration: 0.8, delay: 2 }}
           className="relative"
         >
-          <button className="group relative px-12 py-4 bg-gradient-to-r from-accent to-success rounded-full text-white font-heading font-bold text-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+          <button 
+            onClick={() => navigate('/homepage')}
+            className="group relative px-12 py-4 bg-gradient-to-r from-accent to-success rounded-full text-black font-heading font-bold text-lg overflow-hidden transform hover:scale-105 transition-all duration-300 z-50"
+            style={{ position: 'relative' }}
+          >
             <span className="relative z-10 flex items-center space-x-3">
               <span>Commencer l'aventure</span>
-              <Icon name="ArrowRight" size={20} />
+              <Icon name="ArrowRight" size={20} className="text-black" />
             </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-success to-accent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
           <div className="absolute -inset-2 bg-gradient-to-r from-accent to-success rounded-full blur-lg opacity-30 animate-pulse"></div>
         </motion.div>

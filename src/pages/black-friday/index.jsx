@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import CountdownTimer from './components/CountdownTimer';
 import HeroSection from './components/HeroSection';
 import FlashSaleCarousel from './components/FlashSaleCarousel';
 import DealGrid from './components/DealGrid';
 import LiveNotifications from './components/LiveNotifications';
+import EventWrapper from '../../components/EventWrapper';
 
-const BlackFridayPage = () => {
+const BlackFridayContent = () => {
   useEffect(() => {
     // Set page title
     document.title = 'Black Friday Mega Sale - UrbanSpace | Up to 80% Off';
@@ -163,6 +165,17 @@ const BlackFridayPage = () => {
         </div>
       </footer>
     </div>
+  );
+};
+
+const BlackFridayPage = () => {
+  return (
+    <EventWrapper 
+      eventType="black_friday"
+      fallbackRoute="/black-friday-event"
+    >
+      <BlackFridayContent />
+    </EventWrapper>
   );
 };
 

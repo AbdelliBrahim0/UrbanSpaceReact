@@ -6,12 +6,15 @@ import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
 import Dialog from './Dialog';
+import { ordersApi } from '../../api';
+import { toast } from 'react-hot-toast';
 
 const CartSidebar = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   
   const {
     isCartOpen,
@@ -20,8 +23,11 @@ const CartSidebar = () => {
     removeFromCart,
     updateQuantity,
     getTotalItems,
-    getTotalPrice
+    getTotalPrice,
+    clearCart
   } = useCart();
+  
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Close cart when clicking outside
   const handleBackdropClick = useCallback((e) => {
@@ -49,7 +55,14 @@ const CartSidebar = () => {
     };
   }, [isCartOpen, closeCart]);
 
-  if (!isCartOpen) return null;
+  // Ne pas retourner null si showSuccessPopup est vrai
+  if (!isCartOpen && !showSuccessPopup) return null;
+  
+  console.log('Rendering CartSidebar', { 
+    isCartOpen, 
+    showSuccessPopup, 
+    cartItemsCount: cartItems.length 
+  });
 
   // Handle continue shopping button click
   const handleContinueShopping = () => {
@@ -58,17 +71,20 @@ const CartSidebar = () => {
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
-        onClick={handleBackdropClick}
-      />
+      {/* Backdrop for cart */}
+      {isCartOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
+          onClick={handleBackdropClick}
+        />
+      )}
 
       {/* Cart Sidebar */}
-      <div 
-        className="fixed top-0 right-0 h-full w-full max-w-md bg-background border-l border-street shadow-street z-50 transform transition-transform duration-300 ease-street flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
+      {(isCartOpen || showSuccessPopup) && (
+        <div 
+          className="fixed top-0 right-0 h-full w-full max-w-md bg-background border-l border-street shadow-street z-50 transform transition-transform duration-300 ease-street flex flex-col"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Header */}
         <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-street bg-background">
           <div className="flex items-center space-x-2">
@@ -276,15 +292,63 @@ const CartSidebar = () => {
                       </Button>
                       
                       <Button
-                        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
-                        onClick={() => {
-                          // Logique de confirmation de commande
-                          console.log('Commande confirmée');
-                          setShowConfirmation(false);
-                          // Ici, vous pourriez ajouter la logique pour finaliser la commande
+                        className={`w-full bg-accent hover:bg-accent/90 text-accent-foreground ${
+                          isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                        }`}
+                        disabled={isSubmitting}
+                        onClick={async () => {
+                          if (cartItems.length === 0) {
+                            toast.error('Votre panier est vide');
+                            return;
+                          }
+
+                          // Valider les articles du panier
+                          const hasInvalidItems = cartItems.some(item => !item.id || item.quantity < 1);
+                          if (hasInvalidItems) {
+                            toast.error('Certains articles du panier sont invalides');
+                            return;
+                          }
+
+                          // Préparer les données de la commande
+                          const orderData = {
+                            items: cartItems.map(item => ({
+                              product_id: item.id,
+                              quantity: item.quantity,
+                              source: item.source || null
+                            }))
+                          };
+
+                          try {
+                            setIsSubmitting(true);
+                            const result = await ordersApi.create(orderData);
+                            
+                            if (result.success) {
+                              console.log('Commande réussie, affichage de la popup de succès');
+                              setShowConfirmation(false);
+                              setShowSuccessPopup(true);
+                              // Ne pas vider le panier ni fermer le panier ici
+                              // La popup de succès gérera ces actions
+                            } else {
+                              toast.error(result.message || 'Erreur lors de la confirmation de la commande');
+                            }
+                          } catch (error) {
+                            console.error('Erreur lors de la commande:', error);
+                            toast.error(error.message || 'Une erreur est survenue lors de la commande');
+                          } finally {
+                            setIsSubmitting(false);
+                          }
                         }}
                       >
-                        Confirmer la commande
+                        {isSubmitting ? (
+                          <>
+                            <span className="animate-spin mr-2">
+                              <Icon name="Loader" size={18} className="animate-spin" />
+                            </span>
+                            Traitement...
+                          </>
+                        ) : (
+                          'Confirmer la commande'
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -324,11 +388,57 @@ const CartSidebar = () => {
                 title="Confirmer la commande"
                 confirmText="Confirmer la commande"
                 cancelText="Annuler"
-                onConfirm={() => {
-                  // Logique de confirmation de commande
-                  console.log('Commande confirmée');
-                  setShowConfirmation(false);
-                  // Ici, vous pourriez ajouter la logique pour finaliser la commande
+                onConfirm={async () => {
+                  if (cartItems.length === 0) {
+                    toast.error('Votre panier est vide');
+                    return;
+                  }
+
+                  // Valider les articles du panier
+                  const hasInvalidItems = cartItems.some(item => !item.id || item.quantity < 1);
+                  if (hasInvalidItems) {
+                    toast.error('Certains articles du panier sont invalides');
+                    return;
+                  }
+
+                  // Préparer les données de la commande
+                  const orderData = {
+                    items: cartItems.map(item => ({
+                      product_id: item.id,
+                      quantity: item.quantity,
+                      source: item.source || null
+                    }))
+                  };
+
+                  try {
+                    setIsSubmitting(true);
+                    const result = await ordersApi.create(orderData);
+                    
+                    if (result.success) {
+                      setShowConfirmation(false);
+                      setShowSuccessPopup(true);
+                      // Ne pas vider le panier ni fermer le panier ici
+                      // La popup de succès gérera ces actions
+                    } else {
+                      toast.error(result.message || 'Erreur lors de la confirmation de la commande');
+                    }
+                  } catch (error) {
+                    console.error('Erreur lors de la commande:', error);
+                    toast.error(error.message || 'Une erreur est survenue lors de la commande');
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+                confirmButtonProps={{
+                  disabled: isSubmitting,
+                  children: isSubmitting ? (
+                    <>
+                      <span className="animate-spin mr-2">
+                        <Icon name="Loader" size={18} className="animate-spin" />
+                      </span>
+                      Traitement...
+                    </>
+                  ) : 'Confirmer la commande'
                 }}
               >
                 <div className="space-y-4">
@@ -395,6 +505,7 @@ const CartSidebar = () => {
                 </div>
               </Dialog>
               
+              
               <Button
                 variant="outline"
                 className="w-full border-street hover:border-accent hover:text-accent font-body"
@@ -405,7 +516,91 @@ const CartSidebar = () => {
             </div>
           </div>
         )}
-      </div>
+
+        {/* Success Popup - Inside the cart */}
+        {showSuccessPopup && (
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full max-w-md p-6 mx-auto bg-white rounded-lg shadow-lg">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-bold text-gray-900">Commande confirmée !</h3>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSuccessPopup(false);
+                    clearCart(); // Vider le panier quand on ferme avec la croix
+                    closeCart();
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-start p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r">
+                  <svg className="w-5 h-5 mt-0.5 mr-3 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                  </svg>
+                  <div>
+                    <p className="text-sm text-blue-700">
+                      <strong>À bientôt !</strong> Notre équipe d'assistance vous contactera sous peu pour confirmer les détails de votre commande, y compris la taille et les informations de livraison.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start p-4 bg-green-50 border-l-4 border-green-500 rounded-r">
+                  <svg className="w-5 h-5 mt-0.5 mr-3 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <div>
+                    <p className="text-sm text-green-700">
+                      Votre commande a bien été enregistrée. Vous recevrez un e-mail de confirmation sous peu.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pt-2">
+                  <p className="text-sm text-gray-600">
+                    N'hésitez pas à nous contacter si vous avez des questions concernant votre commande.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex justify-end mt-6 space-x-3">
+                <Button
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSuccessPopup(false);
+                    clearCart(); // Vider le panier uniquement quand on ferme la popup
+                    closeCart();
+                  }}
+                  className="border-street hover:border-accent hover:text-accent"
+                >
+                  Fermer
+                </Button>
+                <Button
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowSuccessPopup(false);
+                    clearCart(); // Vider le panier avant la redirection
+                    closeCart();
+                    navigate('/mes-commandes');
+                  }}
+                >
+                  Voir mes commandes
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        </div>
+      )}
+      
     </>
   );
 };

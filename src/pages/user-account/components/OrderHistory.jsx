@@ -1,308 +1,288 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'react-hot-toast';
+import { useAuth } from "../../../contexts/AuthContext";
+import { fetchApi } from '../../../../src/api';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
 const OrderHistory = () => {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all');
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    items_per_page: 10,
+    total_items: 0,
+    total_pages: 1
+  });
 
-  const orders = [
-    {
-      id: "ORD-2024-001",
-      date: "2024-09-10",
-      status: "delivered",
-      total: 289.99,
-      items: [
-        {
-          id: 1,
-          name: "Urban Rebel Hoodie",
-          image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=100&h=100&fit=crop",
-          size: "L",
-          color: "Black",
-          quantity: 1,
-          price: 149.99
-        },
-        {
-          id: 2,
-          name: "Street King Joggers",
-          image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=100&h=100&fit=crop",
-          size: "M",
-          color: "Charcoal",
-          quantity: 1,
-          price: 89.99
-        }
-      ],
-      tracking: "TRK123456789",
-      shippingAddress: "123 Street Ave, Urban City, UC 12345"
-    },
-    {
-      id: "ORD-2024-002",
-      date: "2024-09-05",
-      status: "shipped",
-      total: 199.99,
-      items: [
-        {
-          id: 3,
-          name: "Gang Leader Jacket",
-          image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=100&h=100&fit=crop",
-          size: "XL",
-          color: "Navy",
-          quantity: 1,
-          price: 199.99
-        }
-      ],
-      tracking: "TRK987654321",
-      shippingAddress: "123 Street Ave, Urban City, UC 12345"
-    },
-    {
-      id: "ORD-2024-003",
-      date: "2024-08-28",
-      status: "processing",
-      total: 459.97,
-      items: [
-        {
-          id: 4,
-          name: "Streetwear Sneakers",
-          image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=100&h=100&fit=crop",
-          size: "10",
-          color: "White/Black",
-          quantity: 1,
-          price: 179.99
-        },
-        {
-          id: 5,
-          name: "Urban Cap Collection",
-          image: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=100&h=100&fit=crop",
-          size: "OS",
-          color: "Black",
-          quantity: 2,
-          price: 139.99
-        }
-      ],
-      tracking: null,
-      shippingAddress: "123 Street Ave, Urban City, UC 12345"
+  // Fonction pour récupérer les commandes de l'utilisateur
+  const fetchUserOrders = async (page = 1, status = 'all') => {
+    if (!user?.id) return;
+    
+    try {
+      setLoading(true);
+      const params = new URLSearchParams({
+        page,
+        limit: 10,
+        ...(status !== 'all' && { status })
+      });
+
+      const response = await fetchApi(`/orders/user/${user.id}?${params}`);
+      
+      if (response && response.orders) {
+        setOrders(response.orders);
+        setPagination({
+          current_page: response.pagination?.current_page || 1,
+          items_per_page: response.pagination?.items_per_page || 10,
+          total_items: response.pagination?.total_items || 0,
+          total_pages: response.pagination?.total_pages || 1
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des commandes:', error);
+      toast.error('Une erreur est survenue lors du chargement de vos commandes');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
+  // Charger les commandes au montage du composant et quand le filtre change
+  useEffect(() => {
+    fetchUserOrders(1, filterStatus === 'all' ? undefined : filterStatus);
+  }, [user, filterStatus]);
+
+  // Fonction pour changer de page
+  const handlePageChange = (page) => {
+    fetchUserOrders(page, filterStatus === 'all' ? undefined : filterStatus);
+  };
+
+  // Fonction pour formater la date
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('fr-FR', options);
+  };
+
+  // Configuration des statuts
   const statusConfig = {
-    processing: { color: 'text-warning', bg: 'bg-warning/10', icon: 'Clock' },
-    shipped: { color: 'text-primary', bg: 'bg-primary/10', icon: 'Truck' },
-    delivered: { color: 'text-success', bg: 'bg-success/10', icon: 'CheckCircle' },
-    cancelled: { color: 'text-error', bg: 'bg-error/10', icon: 'XCircle' }
+    processing: { 
+      color: 'text-yellow-600', 
+      bg: 'bg-yellow-100', 
+      icon: 'Clock',
+      label: 'En traitement' 
+    },
+    shipped: { 
+      color: 'text-blue-600', 
+      bg: 'bg-blue-100', 
+      icon: 'Truck',
+      label: 'Expédiée' 
+    },
+    delivered: { 
+      color: 'text-green-600', 
+      bg: 'bg-green-100', 
+      icon: 'CheckCircle',
+      label: 'Livrée' 
+    },
+    cancelled: { 
+      color: 'text-red-600', 
+      bg: 'bg-red-100', 
+      icon: 'XCircle',
+      label: 'Annulée' 
+    },
+    pending: {
+      color: 'text-gray-600',
+      bg: 'bg-gray-100',
+      icon: 'Clock',
+      label: 'En attente'
+    }
   };
 
-  const filteredOrders = filterStatus === 'all' 
-    ? orders 
-    : orders?.filter(order => order?.status === filterStatus);
+  // Si chargement
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+      </div>
+    );
+  }
 
-  const toggleOrderExpansion = (orderId) => {
-    setExpandedOrder(expandedOrder === orderId ? null : orderId);
-  };
-
-  const handleReorder = (order) => {
-    // Simulate reorder functionality
-    console.log('Reordering:', order?.id);
-  };
-
-  const handleTrackOrder = (tracking) => {
-    // Simulate tracking functionality
-    console.log('Tracking:', tracking);
-  };
+  // Si pas de commandes
+  if (orders.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <Icon name="Package" size={48} className="mx-auto text-gray-400 mb-4" />
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune commande trouvée</h3>
+        <p className="text-gray-500 mb-6">Vous n'avez pas encore passé de commande.</p>
+        <Button onClick={() => window.location.href = '/'}>
+          Faire du shopping
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="bg-card rounded-xl border border-border p-8"
-    >
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 space-y-4 sm:space-y-0">
-        <h2 className="text-2xl font-bold text-foreground">Order History</h2>
-        
-        {/* Filter Buttons */}
-        <div className="flex items-center space-x-2">
-          {['all', 'processing', 'shipped', 'delivered']?.map((status) => (
-            <Button
-              key={status}
-              variant={filterStatus === status ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus(status)}
-              className="capitalize animate-scale-hover"
-            >
-              {status}
-            </Button>
-          ))}
-        </div>
+    <div className="space-y-6">
+      {/* Filtres */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        <Button
+          variant={filterStatus === 'all' ? 'default' : 'outline'}
+          onClick={() => setFilterStatus('all')}
+          className="capitalize"
+        >
+          Toutes les commandes
+        </Button>
+        {Object.keys(statusConfig).map((status) => (
+          <Button
+            key={status}
+            variant={filterStatus === status ? 'default' : 'outline'}
+            onClick={() => setFilterStatus(status)}
+            className="capitalize"
+          >
+            {statusConfig[status].label}
+          </Button>
+        ))}
       </div>
-      <div className="space-y-4">
-        <AnimatePresence>
-          {filteredOrders?.map((order) => (
-            <motion.div
-              key={order?.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-surface rounded-lg border border-border overflow-hidden"
-            >
-              {/* Order Header */}
-              <div 
-                className="p-6 cursor-pointer hover:bg-muted/5 transition-colors duration-150"
-                onClick={() => toggleOrderExpansion(order?.id)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <h3 className="font-bold text-foreground font-mono">{order?.id}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(order.date)?.toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </p>
-                    </div>
-                    
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium ${statusConfig?.[order?.status]?.bg} ${statusConfig?.[order?.status]?.color} flex items-center space-x-1`}>
-                      <Icon name={statusConfig?.[order?.status]?.icon} size={12} />
-                      <span className="capitalize">{order?.status}</span>
-                    </div>
-                  </div>
 
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                      <div className="font-bold text-foreground">${order?.total}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {order?.items?.length} item{order?.items?.length > 1 ? 's' : ''}
-                      </div>
-                    </div>
-                    <Icon 
-                      name={expandedOrder === order?.id ? "ChevronUp" : "ChevronDown"} 
-                      size={20} 
-                      className="text-muted-foreground"
-                    />
-                  </div>
+      {/* Liste des commandes */}
+      <div className="space-y-4">
+        {orders.map((order) => (
+          <div key={order.id} className="border rounded-lg overflow-hidden">
+            <div 
+              className="p-4 bg-gray-50 border-b cursor-pointer hover:bg-gray-100 transition-colors"
+              onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-medium">Commande #{order.id}</h3>
+                  <p className="text-sm text-gray-500">
+                    Passée le {formatDate(order.createdAt)}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusConfig[order.status]?.bg} ${statusConfig[order.status]?.color}`}>
+                    {statusConfig[order.status]?.label}
+                  </span>
+                  <span className="font-medium">{order.total.toFixed(2)} €</span>
+                  <Icon 
+                    name={expandedOrder === order.id ? 'ChevronUp' : 'ChevronDown'} 
+                    className="text-gray-500" 
+                  />
                 </div>
               </div>
+            </div>
 
-              {/* Expanded Order Details */}
-              <AnimatePresence>
-                {expandedOrder === order?.id && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="border-t border-border"
-                  >
-                    <div className="p-6 space-y-6">
-                      {/* Order Items */}
-                      <div>
-                        <h4 className="font-semibold text-foreground mb-4">Items Ordered</h4>
-                        <div className="space-y-4">
-                          {order?.items?.map((item) => (
-                            <div key={item?.id} className="flex items-center space-x-4">
-                              <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
-                                <Image
-                                  src={item?.image}
-                                  alt={item?.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <h5 className="font-medium text-foreground">{item?.name}</h5>
-                                <p className="text-sm text-muted-foreground">
-                                  Size: {item?.size} • Color: {item?.color} • Qty: {item?.quantity}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-medium text-foreground">${item?.price}</div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Shipping Info */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="font-semibold text-foreground mb-2">Shipping Address</h4>
-                          <p className="text-sm text-muted-foreground">{order?.shippingAddress}</p>
-                        </div>
-                        {order?.tracking && (
-                          <div>
-                            <h4 className="font-semibold text-foreground mb-2">Tracking Number</h4>
-                            <p className="text-sm text-muted-foreground font-mono">{order?.tracking}</p>
+            <AnimatePresence>
+              {expandedOrder === order.id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="p-4 space-y-4">
+                    {/* Articles de la commande */}
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Articles commandés</h4>
+                      {order.items?.map((item) => (
+                        <div key={item.id} className="flex items-center p-2 bg-gray-50 rounded">
+                          <div className="w-16 h-16 bg-gray-200 rounded overflow-hidden">
+                            {item.image && (
+                              <Image
+                                src={item.image}
+                                alt={item.productName}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
                           </div>
-                        )}
-                      </div>
+                          <div className="ml-4 flex-1">
+                            <h5 className="font-medium">{item.productName}</h5>
+                            <p className="text-sm text-gray-500">
+                              Quantité: {item.quantity} × {item.price.toFixed(2)} €
+                            </p>
+                          </div>
+                          <div className="font-medium">
+                            {(item.quantity * item.price).toFixed(2)} €
+                          </div>
+                        </div>
+                      ))}
+                    </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center space-x-4 pt-4 border-t border-border">
-                        <Button
-                          variant="outline"
-                          iconName="RotateCcw"
-                          iconPosition="left"
-                          onClick={() => handleReorder(order)}
-                          className="animate-scale-hover"
-                        >
-                          Reorder
-                        </Button>
-                        {order?.tracking && (
+                    {/* Adresse de livraison */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                      <div>
+                            <h4 className="font-medium mb-2">Adresse de livraison</h4>
+                            <p className="text-sm text-gray-600">
+                              {order.shippingAddress || 'Non spécifiée'}
+                            </p>
+                          </div>
+                          <div>
+                            <h4 className="font-medium mb-2">Statut de la commande</h4>
+                            <div className="flex items-center">
+                              <Icon 
+                                name={statusConfig[order.status]?.icon} 
+                                className={`mr-2 ${statusConfig[order.status]?.color}`} 
+                              />
+                              <span className="text-sm">
+                                {statusConfig[order.status]?.label}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Boutons d'action */}
+                        <div className="flex justify-end pt-4 border-t">
                           <Button
                             variant="outline"
-                            iconName="Truck"
-                            iconPosition="left"
-                            onClick={() => handleTrackOrder(order?.tracking)}
-                            className="animate-scale-hover"
+                            onClick={() => {
+                              // Implémenter le suivi de commande
+                              console.log('Suivre la commande', order.id);
+                            }}
+                            className="mr-2"
                           >
-                            Track Order
+                            <Icon name="Truck" className="mr-2" />
+                            Suivre ma commande
                           </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          iconName="Download"
-                          iconPosition="left"
-                          className="animate-scale-hover"
-                        >
-                          Invoice
-                        </Button>
+                          <Button
+                            onClick={() => {
+                              // Implémenter la réorganisation
+                              console.log('Commander à nouveau', order.id);
+                            }}
+                          >
+                            <Icon name="RotateCcw" className="mr-2" />
+                            Commander à nouveau
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
 
-        {filteredOrders?.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <Icon name="Package" size={48} className="text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">No Orders Found</h3>
-            <p className="text-muted-foreground mb-6">
-              {filterStatus === 'all' ? "You haven't placed any orders yet." 
-                : `No ${filterStatus} orders found.`}
-            </p>
-            <Button
-              variant="default"
-              iconName="ShoppingBag"
-              iconPosition="left"
-              onClick={() => window.location.href = '/product-catalog'}
-              className="animate-scale-hover"
-            >
-              Start Shopping
-            </Button>
-          </motion.div>
-        )}
-      </div>
-    </motion.div>
-  );
-};
+          {/* Pagination */}
+          {pagination.total_pages > 1 && (
+            <div className="flex justify-center mt-8">
+              <div className="flex items-center space-x-2">
+                {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={pagination.current_page === page ? 'default' : 'outline'}
+                    onClick={() => handlePageChange(page)}
+                    className="w-10 h-10 p-0 flex items-center justify-center"
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    };
 
 export default OrderHistory;

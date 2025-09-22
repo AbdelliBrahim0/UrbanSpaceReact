@@ -3,6 +3,8 @@ import Icon from '../AppIcon';
 import Button from './Button';
 import Image from '../AppImage';
 import { useCart } from '../../contexts/CartContext';
+import { ordersApi } from '../../api';
+import { toast } from 'react-hot-toast';
 
 const ShoppingCart = ({ isOpen = false, onClose }) => {
   const [isClosing, setIsClosing] = useState(false);
@@ -26,9 +28,48 @@ const ShoppingCart = ({ isOpen = false, onClose }) => {
     updateQuantity(itemId, newQuantity);
   };
 
-  const handleCheckout = () => {
-    // Rediriger vers la page de paiement
-    console.log('Checkout:', cartItems);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) {
+      toast.error('Votre panier est vide');
+      return;
+    }
+
+    // Valider les articles du panier
+    const hasInvalidItems = cartItems.some(item => !item.id || item.quantity < 1);
+    if (hasInvalidItems) {
+      toast.error('Certains articles du panier sont invalides');
+      return;
+    }
+
+    // Préparer les données de la commande
+    const orderData = {
+      items: cartItems.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        source: item.source || null
+      }))
+    };
+
+    try {
+      setIsSubmitting(true);
+      const result = await ordersApi.create(orderData);
+      
+      if (result.success) {
+        toast.success('Commande passée avec succès !');
+        // Vider le panier après une commande réussie
+        // Vous pourriez vouloir rediriger vers une page de confirmation ici
+        // navigate('/commande-confirmee');
+      } else {
+        toast.error(result.message || 'Erreur lors de la commande');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la commande:', error);
+      toast.error(error.message || 'Une erreur est survenue lors de la commande');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -180,10 +221,24 @@ const ShoppingCart = ({ isOpen = false, onClose }) => {
                   variant="default"
                   fullWidth
                   onClick={handleCheckout}
-                  className="bg-accent text-accent-foreground hover:bg-accent/90 gang-hover-scale font-heading font-semibold"
+                  disabled={isSubmitting || cartItems.length === 0}
+                  className={`bg-accent text-accent-foreground hover:bg-accent/90 gang-hover-scale font-heading font-semibold ${
+                    isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
                 >
-                  Passer la commande
-                  <Icon name="ArrowRight" size={18} className="ml-2" />
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin mr-2">
+                        <Icon name="Loader" size={18} className="animate-spin" />
+                      </span>
+                      Traitement...
+                    </>
+                  ) : (
+                    <>
+                      Passer la commande
+                      <Icon name="ArrowRight" size={18} className="ml-2" />
+                    </>
+                  )}
                 </Button>
 
                 {/* Continue Shopping */}

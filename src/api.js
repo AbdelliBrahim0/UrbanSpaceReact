@@ -349,6 +349,9 @@ const publicApi = {
   },
 };
 
+// Export de la fonction fetchApi
+export { fetchApi };
+
 // Export des APIs individuelles
 export const categoriesApi = publicApi.categories;
 export const subcategoriesApi = publicApi.subcategories;
@@ -390,17 +393,44 @@ export const blackhour = {
 
 export const salesApi = {
   list: async () => {
-    const response = await fetchApi("/sales");
-    if (response.success && Array.isArray(response.data)) {
+    try {
+      const response = await fetchApi("/sales");
+      return response.success ? response : createEmptyPaginatedResponse();
+    } catch (error) {
+      console.error("Error fetching sales:", error);
+      return createEmptyPaginatedResponse();
+    }
+  },
+};
+
+export const ordersApi = {
+  create: async (orderData) => {
+    try {
+      const response = await fetchApi("/orders", {
+        method: "POST",
+        body: orderData
+      });
+      
+      if (response.success) {
+        return {
+          success: true,
+          order: response.data,
+          message: "Commande créée avec succès"
+        };
+      }
+      
       return {
-        success: true,
-        data: response.data,
-        count: response.count,
-        currentTime: response.currentTime
+        success: false,
+        message: response.message || "Erreur lors de la création de la commande"
+      };
+    } catch (error) {
+      console.error("Error creating order:", error);
+      return {
+        success: false,
+        message: error.message || "Erreur lors de la création de la commande"
       };
     }
-    return { success: false, message: "Erreur lors du chargement des produits en solde" };
-  }
+  },
 };
 
 // Export par défaut combinant toutes les APIs

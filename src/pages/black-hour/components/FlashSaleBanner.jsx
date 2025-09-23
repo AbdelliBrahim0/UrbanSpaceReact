@@ -11,36 +11,36 @@ const FlashSaleBanner = () => {
   const flashDeals = [
     {
       id: 1,
-      title: 'MIDNIGHT MADNESS',
-      subtitle: 'Extra 20% off everything',
-      discount: '80% OFF',
-      originalPrice: '$299',
-      salePrice: '$59',
-      productName: 'Gang Boss Hoodie',
+      title: 'FOLIE DE MINUIT',
+      subtitle: '20% de réduction supplémentaire sur tout',
+      discount: '-80%',
+      originalPrice: '299 TND',
+      salePrice: '59 TND',
+      productName: 'Hoodie Gang Boss',
       endTime: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
       bgGradient: 'from-error/20 via-background to-background',
       accentColor: 'error'
     },
     {
       id: 2,
-      title: 'LIGHTNING DEALS',
-      subtitle: 'Limited time flash sale',
-      discount: '75% OFF',
-      originalPrice: '$199',
-      salePrice: '$49',
-      productName: 'Street Warrior Jacket',
+      title: 'OFFRES ÉCLAIRS',
+      subtitle: 'Vente flash à durée limitée',
+      discount: '-75%',
+      originalPrice: '199 TND',
+      salePrice: '49 TND',
+      productName: 'Veste Street Warrior',
       endTime: new Date(Date.now() + 12 * 60 * 1000), // 12 minutes from now
       bgGradient: 'from-warning/20 via-background to-background',
       accentColor: 'warning'
     },
     {
       id: 3,
-      title: 'FINAL HOURS',
-      subtitle: 'Last chance to save big',
-      discount: '70% OFF',
-      originalPrice: '$149',
-      salePrice: '$44',
-      productName: 'Urban Legend Tee',
+      title: 'DERNIÈRES HEURES',
+      subtitle: 'Dernière chance pour économiser',
+      discount: '-70%',
+      originalPrice: '149 TND',
+      salePrice: '44 TND',
+      productName: 'T-shirt Urban Legend',
       endTime: new Date(Date.now() + 8 * 60 * 1000), // 8 minutes from now
       bgGradient: 'from-accent/20 via-background to-background',
       accentColor: 'accent'
@@ -125,7 +125,7 @@ const FlashSaleBanner = () => {
                   >
                     <div className={`bg-${currentFlashDeal?.accentColor} text-${currentFlashDeal?.accentColor}-foreground px-4 py-2 rounded-full flex items-center space-x-2`}>
                       <Icon name="Zap" size={20} />
-                      <span className="font-data font-bold text-sm">FLASH SALE ACTIVE</span>
+                      <span className="font-data font-bold text-sm">PROCHAINE OFFRE DANS</span>
                     </div>
                   </motion.div>
 
@@ -154,9 +154,9 @@ const FlashSaleBanner = () => {
 
                   {/* Product Info */}
                   <div className="mb-6">
-                    <h3 className="font-heading font-bold text-xl text-foreground mb-2">
-                      {currentFlashDeal?.productName}
-                    </h3>
+                    <div className="font-data font-bold text-2xl text-foreground/80">
+                      NE MANQUEZ PAS ÇA ! <span className="text-accent">VENTE FLASH</span> SE TERMINE BIENTÔT
+                    </div>
                     <div className="flex items-center justify-center lg:justify-start space-x-4">
                       <span className={`font-data font-black text-3xl text-${currentFlashDeal?.accentColor}`}>
                         {currentFlashDeal?.salePrice}
@@ -192,7 +192,7 @@ const FlashSaleBanner = () => {
                         className={`bg-${currentFlashDeal?.accentColor} text-${currentFlashDeal?.accentColor}-foreground hover:bg-${currentFlashDeal?.accentColor}/90 font-heading font-bold text-lg px-8 py-4 gang-shadow`}
                       >
                         <Icon name="ShoppingBag" size={24} className="mr-3" />
-                        GRAB THIS DEAL
+                        PROFITER DE L'OFFRE
                       </Button>
                     </motion.div>
                   </Link>

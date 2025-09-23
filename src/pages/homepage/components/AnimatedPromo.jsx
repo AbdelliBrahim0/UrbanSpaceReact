@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import { salesApi } from '../../../api';
+import { useCart } from '../../../contexts/CartContext';
 
 // Fonction utilitaire pour sélectionner des éléments aléatoires d'un tableau
 const getRandomItems = (array, count) => {
@@ -14,6 +15,8 @@ const AnimatedPromo = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [promoSlides, setPromoSlides] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [saleProducts, setSaleProducts] = useState([]); // Pour stocker les produits complets
+  const { addToCart } = useCart();
 
   // Récupérer les produits en solde
   useEffect(() => {
@@ -22,6 +25,9 @@ const AnimatedPromo = () => {
         const response = await salesApi.list();
         
         if (response.success && Array.isArray(response.data)) {
+          // Sauvegarder les produits complets pour l'ajout au panier
+          setSaleProducts(response.data);
+          
           // Sélectionner 3 produits aléatoires
           const randomProducts = getRandomItems(response.data, 3);
           
@@ -189,16 +195,34 @@ const AnimatedPromo = () => {
                 className={`bg-gradient-to-r ${currentPromo?.gradient} text-white font-heading font-bold py-4 px-8 rounded-xl hover:shadow-lg transition-all duration-300`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const product = saleProducts.find(p => p.id === currentPromo.id);
+                  if (product) {
+                    addToCart({
+                      id: product.id,
+                      name: product.name,
+                      price: parseFloat(product.sale?.discountedPrice || product.price),
+                      image: product.urlImage,
+                      size: product.size || 'Unique',
+                      color: product.color || 'Standard',
+                      source: 'From Promo Banner'
+                    });
+                    
+                    // Animation de confirmation
+                    const button = e.target;
+                    button.textContent = 'Ajouté !';
+                    button.classList.add('bg-green-500');
+                    setTimeout(() => {
+                      button.textContent = 'Ajouter au panier';
+                      button.classList.remove('bg-green-500');
+                    }, 2000);
+                  }
+                }}
               >
-                ACHETER MAINTENANT
+                Ajouter au panier
               </motion.button>
-              <motion.button
-                className="border-2 border-accent text-accent font-heading font-bold py-4 px-8 rounded-xl hover:bg-accent hover:text-white transition-all duration-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                VOIR DÉTAILS
-              </motion.button>
+            
             </motion.div>
           </motion.div>
 

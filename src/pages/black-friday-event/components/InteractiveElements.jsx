@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import { Link } from 'react-router-dom';
 
 const InteractiveElements = ({ onNavigate }) => {
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -13,7 +14,7 @@ const InteractiveElements = ({ onNavigate }) => {
       description: 'Découvrez notre collection complète de streetwear urbain avec des designs uniques.',
       icon: 'ShoppingBag',
       color: 'accent',
-      route: '/products-catalog',
+      route: '/collections',
       stats: '200+ Articles'
     },
     {
@@ -22,16 +23,16 @@ const InteractiveElements = ({ onNavigate }) => {
       description: 'Ventes flash ultra-limitées avec des réductions exceptionnelles pendant 1 heure seulement.',
       icon: 'Clock',
       color: 'warning',
-      route: '/black-hour-limited-event',
+      route: '/black-hour',
       stats: 'Jusqu\'à 80% OFF'
     },
     {
       id: 'member',
-      title: 'Devenir Membre',
-      description: 'Rejoignez notre communauté exclusive et débloquez des avantages VIP incroyables.',
+      title: 'Profitez des réductions VIP',
+      description: 'Bénéficiez de réductions exclusives et profitez de nos offres spéciales.',
       icon: 'Crown',
       color: 'success',
-      route: '/new-member-welcome',
+      route: '/sale',
       stats: 'Accès VIP'
     }
   ];
@@ -166,18 +167,14 @@ const InteractiveElements = ({ onNavigate }) => {
                 </div>
                 <div className="text-left">
                   <h4 className="font-heading font-bold text-foreground">Navigation Fluide</h4>
-                  <p className="text-sm text-text-secondary">Interface intuitive</p>
+                  
                 </div>
               </div>
 
               <div className="flex items-center space-x-3">
                 <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center">
-                  <Icon name="Sparkles" size={20} className="text-success" />
                 </div>
-                <div className="text-left">
-                  <h4 className="font-heading font-bold text-foreground">Animations 3D</h4>
-                  <p className="text-sm text-text-secondary">Effets visuels avancés</p>
-                </div>
+                
               </div>
 
               <div className="flex items-center space-x-3">
@@ -185,8 +182,7 @@ const InteractiveElements = ({ onNavigate }) => {
                   <Icon name="Zap" size={20} className="text-warning" />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-heading font-bold text-foreground">Temps Réel</h4>
-                  <p className="text-sm text-text-secondary">Mises à jour instantanées</p>
+                  <h4 className="font-heading font-bold text-foreground">Assistance 24/7</h4>
                 </div>
               </div>
             </div>
@@ -198,7 +194,7 @@ const InteractiveElements = ({ onNavigate }) => {
               iconPosition="left"
               className="border-accent text-accent hover:bg-accent hover:text-white px-8 py-4 font-bold uppercase tracking-wider"
             >
-              Commencer l'Exploration
+              <Link to="/homepage">Commencer l'Exploration</Link>
             </Button>
           </div>
         </motion.div>

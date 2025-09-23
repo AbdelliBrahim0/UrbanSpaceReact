@@ -293,17 +293,7 @@ const PromotionalBanner = () => {
           <p className="text-text-secondary mb-6">
             Rejoignez notre communauté pour être informé en premier des événements exclusifs
           </p>
-          <Link to="/new-member-welcome">
-            <Button
-              variant="default"
-              size="lg"
-              iconName="Users"
-              iconPosition="left"
-              className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-8 py-4"
-            >
-              Devenir Membre VIP
-            </Button>
-          </Link>
+          
         </motion.div>
       </div>
     </section>

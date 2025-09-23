@@ -5,6 +5,7 @@ import Image from '../../../components/AppImage';
 import { blackhour } from '../../../api';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useCart } from '../../../contexts/CartContext';
 
 // Fonction utilitaire pour sélectionner des éléments aléatoires d'un tableau
 const getRandomItems = (array, count) => {
@@ -42,6 +43,8 @@ const FeaturedDeals = () => {
   const [featuredDeals, setFeaturedDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [buttonText, setButtonText] = useState('Ajouter au panier');
+  const { addToCart } = useCart();
 
   // Fonction pour formater les données des produits
   const formatProductData = (products) => {
@@ -139,7 +142,7 @@ const FeaturedDeals = () => {
           <div className="flex items-center space-x-2">
             <Icon name="Zap" size={24} className="text-accent-foreground" />
             <h2 className="text-xl font-heading font-bold text-accent-foreground">
-              DEAL OF THE HOUR
+OFFRE DU MOMENT
             </h2>
           </div>
           <div className="flex items-center space-x-2 bg-accent-foreground/20 rounded-lg px-3 py-1">
@@ -221,14 +224,14 @@ const FeaturedDeals = () => {
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <span className="text-3xl font-bold text-accent">
-                  ${currentDealData?.salePrice?.toFixed(2)}
+                  {currentDealData?.salePrice?.toFixed(3)} TND
                 </span>
                 <span className="text-xl text-muted-foreground line-through">
-                  ${currentDealData?.originalPrice?.toFixed(2)}
+                  {currentDealData?.originalPrice?.toFixed(3)} TND
                 </span>
               </div>
               <div className="bg-success text-success-foreground inline-block px-3 py-1 rounded-full text-sm font-bold">
-                YOU SAVE ${savings?.toFixed(2)}
+                ÉCONOMISEZ {savings?.toFixed(3)} TND
               </div>
             </div>
 
@@ -237,13 +240,13 @@ const FeaturedDeals = () => {
               <div className="flex items-center space-x-2">
                 <Icon name="Package" size={16} className={currentDealData?.stock <= 5 ? 'text-error' : 'text-success'} />
                 <span className={`text-sm font-medium ${currentDealData?.stock <= 5 ? 'text-error' : 'text-success'}`}>
-                  {currentDealData?.stock <= 5 ? `Only ${currentDealData?.stock} left!` : `${currentDealData?.stock} in stock`}
+                  {currentDealData?.stock <= 5 ? `Plus que ${currentDealData?.stock} restants !` : `${currentDealData?.stock} en stock`}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Icon name="TrendingUp" size={16} className="text-accent" />
                 <span className="text-sm text-muted-foreground">
-                  {currentDealData?.socialProof}
+                  {currentDealData?.socialProof?.replace('personnes ont acheté aujourd\'hui', 'personnes ont acheté aujourd\'hui')}
                 </span>
               </div>
               
@@ -261,11 +264,32 @@ const FeaturedDeals = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
-              <button className="flex-1 bg-accent text-accent-foreground py-3 px-6 rounded-lg font-heading font-bold text-lg hover:scale-105 transition-street box-shadow-street">
-                ADD TO CART
-              </button>
-              <button className="flex-1 border border-accent text-accent py-3 px-6 rounded-lg font-heading font-bold text-lg hover:bg-accent hover:text-accent-foreground transition-street">
-                VIEW DETAILS
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (currentDealData) {
+                    addToCart({
+                      id: currentDealData.id,
+                      name: currentDealData.title,
+                      price: parseFloat(currentDealData.salePrice),
+                      image: currentDealData.image,
+                      size: 'Unique',
+                      color: 'Standard',
+                      source: 'Offre du moment',
+                      quantity: 1
+                    });
+                    
+                    // Animation de confirmation
+                    setButtonText('Ajouté !');
+                    setTimeout(() => {
+                      setButtonText('Ajouter au panier');
+                    }, 2000);
+                  }
+                }}
+                className="flex-1 bg-accent text-accent-foreground py-3 px-6 rounded-lg font-heading font-bold text-lg hover:scale-105 transition-street box-shadow-street flex items-center justify-center space-x-2"
+              >
+                <span>Ajouter au panier</span>
+                {buttonText === 'Ajouté !' && <Icon name="Check" size={20} />}
               </button>
             </div>
 
@@ -273,15 +297,15 @@ const FeaturedDeals = () => {
             <div className="flex items-center justify-between pt-4 border-t border-street">
               <div className="flex items-center space-x-2">
                 <Icon name="Shield" size={16} className="text-success" />
-                <span className="text-xs text-muted-foreground">Secure Payment</span>
+                <span className="text-xs text-muted-foreground">Payement en Livraison</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Icon name="Truck" size={16} className="text-success" />
-                <span className="text-xs text-muted-foreground">Free Shipping</span>
+                <span className="text-xs text-muted-foreground">Livraison Gratuite</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Icon name="RotateCcw" size={16} className="text-success" />
-                <span className="text-xs text-muted-foreground">30-Day Returns</span>
+                <span className="text-xs text-muted-foreground">Retour 7 jrs</span>
               </div>
             </div>
           </motion.div>

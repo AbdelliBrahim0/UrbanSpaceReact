@@ -300,24 +300,13 @@ const Sale = () => {
               className="max-w-2xl mx-auto space-y-6"
             >
               <h2 className="text-3xl font-heading font-bold text-foreground">
-                Never Miss a Sale
+                Ne manquez jamais une vente
               </h2>
               <p className="text-muted-foreground text-lg">
-                Get exclusive access to flash sales, early bird discounts, and limited edition drops.
+                Bénéficiez d'un accès exclusif aux ventes flash, aux remises pour les lève-tôt et aux éditions limitées.
               </p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 bg-input border border-street rounded-lg px-4 py-3 text-foreground focus:border-accent focus:ring-1 focus:ring-accent"
-                />
-                <button className="bg-accent text-accent-foreground px-6 py-3 rounded-lg font-medium hover:scale-105 transition-street">
-                  Subscribe
-                </button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Join 50,000+ streetwear enthusiasts. Unsubscribe anytime.
-              </p>
+              
+              
             </motion.div>
           </div>
         </div>

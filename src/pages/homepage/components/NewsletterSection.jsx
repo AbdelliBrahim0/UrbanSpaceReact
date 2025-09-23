@@ -15,7 +15,7 @@ const NewsletterSection = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
+    // Simuler un appel API
     setTimeout(() => {
       setIsSubscribed(true);
       setIsLoading(false);
@@ -30,10 +30,10 @@ const NewsletterSection = () => {
   ];
 
   const benefits = [
-    { icon: 'Zap', text: 'Exclusive drops & early access' },
-    { icon: 'Gift', text: 'Member-only discounts' },
-    { icon: 'Crown', text: 'VIP gang member status' },
-    { icon: 'Bell', text: 'Street culture updates' }
+    { icon: 'Zap', text: 'Accès prioritaire aux nouveautés' },
+    { icon: 'Gift', text: 'Réductions exclusives pour membres' },
+    { icon: 'Crown', text: 'Statut VIP pour les membres UrbanSpace' },
+    { icon: 'Bell', text: 'Infos et tendances streetwear' }
   ];
 
   return (
@@ -44,6 +44,7 @@ const NewsletterSection = () => {
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-accent/5 rounded-full blur-3xl" />
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/3 rounded-full blur-3xl" />
       </div>
+
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Side - Content */}
@@ -59,17 +60,17 @@ const NewsletterSection = () => {
               <div className="inline-flex items-center space-x-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2">
                 <Icon name="Users" size={16} className="text-primary" />
                 <span className="text-primary font-mono text-sm font-bold">
-                  JOIN THE GANG
+                  REJOIGNEZ LA GANG
                 </span>
               </div>
               
               <h2 className="text-4xl lg:text-5xl font-bold text-foreground leading-tight">
-                STAY IN THE
-                <span className="block text-primary">STREET LOOP</span>
+                RESTEZ DANS LA
+                <span className="block text-primary">LOOP STREET</span>
               </h2>
               
               <p className="text-xl text-muted-foreground">
-                Get exclusive access to new drops, gang member discounts, and street culture updates before anyone else.
+                Recevez un accès exclusif aux nouveautés, des réductions pour membres et toutes les tendances streetwear avant tout le monde.
               </p>
             </div>
 
@@ -104,11 +105,8 @@ const NewsletterSection = () => {
             >
               {!isSubscribed ? (
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    
-                  </div>
                   <p className="text-sm text-muted-foreground">
-                    By joining, you agree to our terms and privacy policy. Unsubscribe anytime.
+                    En vous inscrivant, vous acceptez nos conditions et notre politique de confidentialité. Désinscription possible à tout moment.
                   </p>
                 </form>
               ) : (
@@ -122,10 +120,10 @@ const NewsletterSection = () => {
                     <Icon name="Check" size={24} className="text-success" />
                   </div>
                   <h3 className="text-xl font-bold text-foreground mb-2">
-                    Welcome to the Gang! 🔥
+                    Bienvenue dans la Gang ! 🔥
                   </h3>
                   <p className="text-muted-foreground">
-                    You're now part of the exclusive StreetGang community. Check your email for your welcome package!
+                    Vous faites maintenant partie de la communauté exclusive UrbanSpace. Vérifiez votre email pour votre pack de bienvenue !
                   </p>
                 </motion.div>
               )}
@@ -149,10 +147,7 @@ const NewsletterSection = () => {
                   </div>
                 ))}
               </div>
-              <div className="text-sm">
-                <p className="text-foreground font-bold">25,000+ Gang Members</p>
-                <p className="text-muted-foreground font-mono">Join the street culture revolution</p>
-              </div>
+              
             </motion.div>
           </motion.div>
 
@@ -166,10 +161,10 @@ const NewsletterSection = () => {
           >
             <div className="text-center lg:text-left">
               <h3 className="text-2xl font-bold text-foreground mb-4">
-                FOLLOW THE MOVEMENT
+                SUIVEZ LE MOUVEMENT
               </h3>
               <p className="text-muted-foreground">
-                Stay connected with the latest street culture trends and gang updates
+                Restez connecté avec les dernières tendances streetwear et les actualités de la Gang.
               </p>
             </div>
 
@@ -203,14 +198,14 @@ const NewsletterSection = () => {
                       {social?.name}
                     </h4>
                     <p className="text-sm text-muted-foreground font-mono">
-                      {social?.followers} followers
+                      {social?.followers} abonnés
                     </p>
                   </div>
                 </motion.a>
               ))}
             </div>
 
-            {/* Street Art Element */}
+            {/* Élément Street Art */}
             <motion.div
               className="relative bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl p-8 border border-primary/20"
               initial={{ opacity: 0, scale: 0.9 }}
@@ -223,10 +218,10 @@ const NewsletterSection = () => {
                   <Icon name="Zap" size={24} className="text-primary" />
                 </div>
                 <h4 className="text-xl font-bold text-foreground mb-2">
-                  GANG EXCLUSIVE
+                  EXCLUSIF AUX MEMBRES
                 </h4>
                 <p className="text-muted-foreground text-sm">
-                  Members get 20% off first purchase + free shipping on all orders
+                  Les membres bénéficient de 20 % de réduction sur leur premier achat + livraison gratuite sur toutes les commandes.
                 </p>
               </div>
             </motion.div>
@@ -238,3 +233,5 @@ const NewsletterSection = () => {
 };
 
 export default NewsletterSection;
+
+           

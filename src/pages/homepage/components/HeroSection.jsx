@@ -9,34 +9,37 @@ const HeroSection = () => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   const heroSlides = [
-    {
-      id: 1,
-      title: "STREET LEGENDS",
-      subtitle: "BORN FROM THE CONCRETE",
-      description: "Exclusive drops that define the culture. Limited quantities, unlimited attitude.",
-      cta: "SHOP THE DROP",
-      videoUrl: "/assets/videos/1.webm",
-      overlayColor: "from-black/80 via-black/60 to-transparent"
-    },
-    {
-      id: 2,
-      title: "GANG MENTALITY",
-      subtitle: "UNITY THROUGH STYLE",
-      description: "Join the movement. Wear the rebellion. Express your truth through authentic streetwear.",
-      cta: "JOIN THE CREW",
-      videoUrl: "/assets/videos/2.webm",
-      overlayColor: "from-error/80 via-error/40 to-transparent"
-    },
-    {
-      id: 3,
-      title: "VAULT EXCLUSIVE",
-      subtitle: "UNDERGROUND COLLECTION",
-      description: "Rare pieces for the real ones. When you know, you know.",
-      cta: "ACCESS VAULT",
-      videoUrl: "/assets/videos/3.webm",
-      overlayColor: "from-accent/80 via-accent/40 to-transparent"
-    }
-  ];
+  {
+    id: 1,
+    title: "LÉGENDES URBAINES",
+    subtitle: "FORGÉES DANS LE BÉTON",
+    description: "Des pièces iconiques qui dictent les codes de la rue. Rares, puissantes et taillées pour marquer les esprits.",
+    cta: "DÉCOUVRIR LA COLLECTION",
+    videoUrl: "/assets/videos/1.webm",
+    overlayColor: "from-black/80 via-black/60 to-transparent"
+  },
+  {
+    id: 2,
+    title: "L’ESPRIT CREW",
+    subtitle: "L’UNITÉ PAR LE STYLE",
+    description: "Ne suis pas la tendance, crée-la. Affirme ton identité avec un streetwear authentique signé UrbanSpace.",
+    cta: "REJOINDRE LA COMMUNAUTÉ",
+    videoUrl: "/assets/videos/2.webm",
+    overlayColor: "from-error/80 via-error/40 to-transparent"
+  },
+  {
+    id: 3,
+    title: "EXCLUSIVITÉS URBANSPACE",
+    subtitle: "COLLECTION SIGNATURE",
+    description: "Des pièces uniques, introuvables ailleurs. L’ADN UrbanSpace : audace, authenticité et attitude.",
+    cta: "ACCÉDER AUX EXCLUS",
+    videoUrl: "/assets/videos/3.webm",
+    overlayColor: "from-accent/80 via-accent/40 to-transparent"
+  }
+];
+
+
+
 
   useEffect(() => {
     const interval = setInterval(() => {

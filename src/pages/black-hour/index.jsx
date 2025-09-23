@@ -226,102 +226,7 @@ const BlackHourContent = () => {
             </div>
           </section>
 
-          {/* Live Activity & Stats Section */}
-          <section className="py-16">
-            <div className="container mx-auto px-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Live Activity Feed */}
-                <div className="lg:col-span-2">
-                  <LiveActivityFeed />
-                </div>
-
-                {/* Quick Stats */}
-                <div className="space-y-6">
-                  <motion.div
-                    className="bg-card border border-street rounded-lg p-6"
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                  >
-                    <h3 className="font-heading font-bold text-lg text-foreground mb-4">
-                      Black Hour Stats
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Total Savings</span>
-                        <span className="text-2xl font-black text-success">$2,847</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Items Sold</span>
-                        <span className="text-2xl font-black text-accent">1,247</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Active Shoppers</span>
-                        <span className="text-2xl font-black text-warning">89</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 pt-4 border-t border-street">
-                      <Button
-                        variant="outline"
-                        fullWidth
-                        className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                        iconName="Bell"
-                        iconPosition="left"
-                      >
-                        Get Restock Alerts
-                      </Button>
-                    </div>
-                  </motion.div>
-
-                  {/* Social Proof */}
-                  <motion.div
-                    className="bg-card border border-street rounded-lg p-6"
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                  >
-                    <h3 className="font-heading font-bold text-lg text-foreground mb-4">
-                      What People Say
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
-                          <span className="text-accent-foreground text-sm font-bold">M</span>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground font-medium">
-                            "Copped the Supreme hoodie in seconds! Best deals ever."
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            @mike_streetwear
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
-                          <span className="text-success-foreground text-sm font-bold">S</span>
-                        </div>
-                        <div>
-                          <p className="text-sm text-foreground font-medium">
-                            "Black Hour is insane! Got Yeezys for 25% off 🔥"
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            @sneaker_sarah
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </section>
+          
 
           {/* Final CTA Section */}
           <section className="py-16 bg-gradient-to-r from-accent/10 via-transparent to-accent/10">
@@ -332,33 +237,12 @@ const BlackHourContent = () => {
                 transition={{ duration: 0.6 }}
               >
                 <h2 className="font-heading text-3xl md:text-4xl font-black text-foreground mb-4">
-                  Don't Miss Out
-                </h2>
+                  Ne manquez pas les offres Black Hour                </h2>
                 <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-                  Black Hour deals are ending soon. Join our VIP list for exclusive access to future drops.
+                  Les offres Black Hour se terminent bientôt. Rejoignez notre liste VIP pour un accès exclusif aux prochaines sorties.
                 </p>
                 
-                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold"
-                    iconName="Star"
-                    iconPosition="left"
-                  >
-                    Join VIP List
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                    iconName="Share2"
-                    iconPosition="left"
-                  >
-                    Share with Friends
-                  </Button>
-                </div>
+                
               </motion.div>
             </div>
           </section>

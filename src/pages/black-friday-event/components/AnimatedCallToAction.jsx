@@ -109,7 +109,7 @@ const AnimatedCallToAction = ({ onPrimaryAction, onSecondaryAction }) => {
 
               {/* Description */}
               <p className="text-xl text-text-secondary font-body mb-8 leading-relaxed">
-                Le Black Friday UrbanSpace touche à sa fin. C'est votre dernière chance 
+                Chaque vendredi est votre chance 
                 de profiter de réductions exceptionnelles sur notre collection streetwear exclusive.
               </p>
 
@@ -143,40 +143,7 @@ const AnimatedCallToAction = ({ onPrimaryAction, onSecondaryAction }) => {
                 </motion.div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="default"
-                    size="xl"
-                    iconName="ShoppingBag"
-                    iconPosition="left"
-                    onClick={onPrimaryAction}
-                    className="bg-accent hover:bg-accent/90 text-white px-12 py-6 text-xl font-bold uppercase tracking-wider shadow-lg shadow-accent/25"
-                  >
-                    Shop Maintenant
-                  </Button>
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="outline"
-                    size="xl"
-                    iconName="Crown"
-                    iconPosition="left"
-                    onClick={onSecondaryAction}
-                    className="border-success text-success hover:bg-success hover:text-black px-12 py-6 text-xl font-bold uppercase tracking-wider"
-                  >
-                    Devenir VIP
-                  </Button>
-                </motion.div>
-              </div>
+              
 
               {/* Trust Signals */}
               <motion.div
@@ -187,7 +154,7 @@ const AnimatedCallToAction = ({ onPrimaryAction, onSecondaryAction }) => {
               >
                 <div className="flex items-center space-x-2">
                   <Icon name="Shield" size={16} className="text-success" />
-                  <span className="text-sm font-caption">Paiement Sécurisé</span>
+                  <span className="text-sm font-caption">Paiement en livraison</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Icon name="Truck" size={16} className="text-accent" />
@@ -195,7 +162,7 @@ const AnimatedCallToAction = ({ onPrimaryAction, onSecondaryAction }) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Icon name="RotateCcw" size={16} className="text-warning" />
-                  <span className="text-sm font-caption">Retour 30j</span>
+                  <span className="text-sm font-caption">Retour 7j</span>
                 </div>
               </motion.div>
             </div>
@@ -214,7 +181,7 @@ const AnimatedCallToAction = ({ onPrimaryAction, onSecondaryAction }) => {
               transition={{ duration: 3, repeat: Infinity }}
               className="text-lg text-warning font-body font-medium"
             >
-              ⚡ Plus que quelques heures pour profiter de ces offres exceptionnelles !
+              
             </motion.p>
           </motion.div>
         </motion.div>

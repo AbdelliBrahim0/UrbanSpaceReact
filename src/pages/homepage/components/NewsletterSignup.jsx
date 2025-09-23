@@ -11,39 +11,40 @@ const NewsletterSignup = () => {
   const [error, setError] = useState('');
 
   const benefits = [
-    {
-      icon: "Zap",
-      title: "FIRST ACCESS",
-      description: "Get early access to limited drops before they sell out"
-    },
-    {
-      icon: "Tag",
-      title: "EXCLUSIVE DEALS",
-      description: "Member-only discounts and special pricing on premium pieces"
-    },
-    {
-      icon: "Crown",
-      title: "VIP TREATMENT",
-      description: "Priority customer service and exclusive vault member perks"
-    },
-    {
-      icon: "Truck",
-      title: "FREE SHIPPING",
-      description: "Complimentary shipping on all orders for newsletter subscribers"
-    }
-  ];
+  {
+    icon: "Zap",
+    title: "ACCÈS PRIORITAIRE",
+    description: "Profitez des nouvelles collections avant tout le monde, avant qu’elles ne soient épuisées."
+  },
+  {
+    icon: "Tag",
+    title: "OFFRES EXCLUSIVES",
+    description: "Des réductions réservées aux membres et des prix spéciaux sur les pièces premium."
+  },
+  {
+    icon: "Crown",
+    title: "TRAITEMENT VIP",
+    description: "Service client prioritaire et avantages exclusifs pour nos membres UrbanSpace."
+  },
+  {
+    icon: "Truck",
+    title: "LIVRAISON GRATUITE",
+    description: "Expédition offerte sur toutes vos commandes pour nos abonnés à la newsletter."
+  }
+];
+
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
     setError('');
     
     if (!email) {
-      setError('Email is required');
+      setError('Un email est requis');
       return;
     }
 
     if (!email?.includes('@')) {
-      setError('Please enter a valid email address');
+      setError('Veuillez entrer une adresse email valide');
       return;
     }
 
@@ -116,11 +117,11 @@ const NewsletterSignup = () => {
             </motion.div>
 
             <h2 className="font-heading font-black text-3xl md:text-4xl text-foreground mb-4">
-              WELCOME TO THE <span className="text-accent">VAULT</span>
+              Bienvenue dans <span className="text-accent">UrbanSpace</span>
             </h2>
             
             <p className="text-text-secondary text-lg mb-8">
-              You're now part of the inner circle. Get ready for exclusive drops, early access, and street culture updates.
+              Vous faites maintenant partie du cercle privilégié. Préparez-vous pour des exclusivités, un accès anticipé et des mises à jour sur la culture urbaine.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -130,7 +131,7 @@ const NewsletterSignup = () => {
                 iconName="ShoppingBag"
                 iconPosition="left"
               >
-                START SHOPPING
+                COMMENCER MES ACHATS
               </Button>
               
               <Button
@@ -139,7 +140,7 @@ const NewsletterSignup = () => {
                 iconName="Users"
                 iconPosition="left"
               >
-                JOIN COMMUNITY
+                REJOINDRE LA COMMUNAUTÉ
               </Button>
             </div>
           </motion.div>
@@ -167,12 +168,12 @@ const NewsletterSignup = () => {
           <div>
             <motion.div variants={itemVariants}>
               <h2 className="font-heading font-black text-3xl md:text-5xl lg:text-6xl text-foreground mb-6">
-                JOIN THE <span className="text-accent">UNDERGROUND</span>
+                REJOIGNEZ LE <span className="text-accent">MOUVEMENT</span>
               </h2>
               
               <p className="text-text-secondary text-lg md:text-xl mb-8 leading-relaxed">
-                Get exclusive access to limited drops, street culture updates, and member-only deals. 
-                Be the first to know when fire pieces drop.
+                Accédez en exclusivité aux collections limitées, aux dernières tendances de la culture urbaine et aux offres réservées aux membres. 
+                Soyez le premier informé des nouvelles sorties.
               </p>
             </motion.div>
 
@@ -207,21 +208,7 @@ const NewsletterSignup = () => {
               variants={itemVariants}
               className="flex items-center space-x-4 text-text-secondary text-sm"
             >
-              <div className="flex -space-x-2">
-                {[
-                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-                  "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-                  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
-                ]?.map((avatar, index) => (
-                  <img
-                    key={index}
-                    src={avatar}
-                    alt={`Member ${index + 1}`}
-                    className="w-8 h-8 rounded-full border-2 border-background object-cover"
-                  />
-                ))}
-              </div>
-              <span>Join 50,000+ street culture enthusiasts</span>
+              
             </motion.div>
           </div>
 
@@ -240,43 +227,36 @@ const NewsletterSignup = () => {
                   <Icon name="Mail" size={32} className="text-accent" />
                 </div>
                 <h3 className="font-heading font-bold text-2xl text-foreground mb-2">
-                  GET VAULT ACCESS
+                  OBTENEZ UN ACCÈS EXCLUSIF
                 </h3>
                 <p className="text-text-secondary">
-                  Enter your email to unlock exclusive streetwear drops
+                  Entrez votre adresse email pour débloquer les dernières sorties de streetwear
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Input
                   type="email"
-                  label="Email Address"
-                  placeholder="your.email@example.com"
+                  placeholder="Votre adresse email"
                   value={email}
-                  onChange={(e) => setEmail(e?.target?.value)}
-                  error={error}
-                  required
-                  className="text-center"
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pr-32 py-5 bg-surface border-street focus:border-accent"
                 />
-
                 <Button
                   type="submit"
                   variant="default"
                   size="lg"
-                  loading={isLoading}
-                  fullWidth
-                  className="bg-accent text-accent-foreground hover:bg-accent/90 font-bold tracking-wide"
-                  iconName="ArrowRight"
-                  iconPosition="right"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-accent hover:bg-accent/90 text-accent-foreground font-bold"
+                  disabled={isLoading}
                 >
-                  {isLoading ? 'JOINING...' : 'JOIN THE VAULT'}
+                  {isLoading ? 'ENVOI...' : 'S\'INSCRIRE'}
                 </Button>
-
-                <p className="text-text-secondary text-xs text-center">
-                  By subscribing, you agree to receive marketing emails from UrbanSpace. 
-                  You can unsubscribe at any time. Privacy policy applies.
-                </p>
               </form>
+
+              {error && <p className="mt-2 text-sm text-error">{error}</p>}
+              <p className="text-xs text-text-secondary mt-3">
+                En vous inscrivant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.
+              </p>
 
               {/* Trust Badges */}
               <div className="flex justify-center items-center space-x-6 mt-8 pt-6 border-t border-street">

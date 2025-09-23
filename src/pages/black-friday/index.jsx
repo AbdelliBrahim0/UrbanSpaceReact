@@ -75,24 +75,9 @@ const BlackFridayContent = () => {
                 DON'T MISS OUT!
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                These Black Friday deals won't last forever. Join the streetwear revolution and grab your favorites before they're gone.
+                Ces offres du Black Friday ne dureront pas éternellement. Rejoignez la révolution streetwear et profitez de vos articles préférés avant qu'ils ne disparaissent.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300"
-                >
-                  SHOP ALL DEALS
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="border-2 border-warning text-warning hover:bg-warning hover:text-warning-foreground font-bold px-8 py-4 rounded-lg text-lg transition-all duration-300"
-                >
-                  JOIN NEWSLETTER
-                </motion.button>
-              </div>
+              
             </motion.div>
           </div>
         </section>

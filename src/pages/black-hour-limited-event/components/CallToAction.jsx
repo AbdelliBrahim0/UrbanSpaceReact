@@ -90,76 +90,10 @@ const CallToAction = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              <Link to="/products-catalog">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="default"
-                    iconName="ShoppingBag"
-                    iconPosition="left"
-                    className="bg-gradient-to-r from-accent to-error hover:from-accent/80 hover:to-error/80 text-white font-heading font-bold py-4 px-8 text-lg"
-                  >
-                    VOIR LES OFFRES
-                  </Button>
-                </motion.div>
-              </Link>
-
-              <Link to="/new-member-welcome">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    variant="outline"
-                    iconName="UserPlus"
-                    iconPosition="left"
-                    className="border-2 border-accent text-accent hover:bg-accent hover:text-white font-heading font-bold py-4 px-8 text-lg"
-                  >
-                    DEVENIR MEMBRE
-                  </Button>
-                </motion.div>
-              </Link>
+              
             </motion.div>
 
-            {/* Newsletter Signup */}
-            <motion.div
-              className="max-w-md mx-auto"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              <div className="text-center mb-4">
-                <h3 className="font-heading font-bold text-foreground mb-2">
-                  RESTEZ INFORMÉ
-                </h3>
-                <p className="text-text-secondary font-body text-sm">
-                  Recevez nos offres exclusives en avant-première
-                </p>
-              </div>
-
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e?.target?.value)}
-                  placeholder="votre@email.com"
-                  className="flex-1 bg-surface border border-border rounded-lg px-4 py-3 text-foreground placeholder-text-secondary focus:outline-none focus:border-accent transition-colors"
-                  required
-                />
-                <Button
-                  type="submit"
-                  variant="default"
-                  iconName="Send"
-                  iconPosition="right"
-                  className="bg-accent hover:bg-accent/80"
-                  disabled={isSubscribed}
-                >
-                  {isSubscribed ? 'INSCRIT !' : 'S\'INSCRIRE'}
-                </Button>
-              </form>
-            </motion.div>
+            
           </div>
         </div>
       </motion.div>

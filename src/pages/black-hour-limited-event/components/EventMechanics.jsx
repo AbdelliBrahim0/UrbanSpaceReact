@@ -24,7 +24,7 @@ const EventMechanics = () => {
       id: 3,
       step: "03",
       title: "VALIDATION IMMÉDIATE",
-      description: "Finalisez votre commande avec notre système de paiement sécurisé en un clic.",
+      description: "Finalisez votre commande avec notre système sécurisé en un clic.",
       icon: "CreditCard",
       color: "warning"
     },
@@ -32,7 +32,7 @@ const EventMechanics = () => {
       id: 4,
       step: "04",
       title: "LIVRAISON EXPRESS",
-      description: "Recevez vos articles streetwear en 24-48h partout en France métropolitaine.",
+      description: "Recevez vos articles streetwear en 24-48h partout en Grand Tunis.",
       icon: "Truck",
       color: "error"
     }
@@ -40,11 +40,10 @@ const EventMechanics = () => {
 
   const eligibilityCriteria = [
     "Être membre UrbanSpace (inscription gratuite)",
-    "Commande minimum de 50€ pour bénéficier des réductions",
     "Stock limité - Premier arrivé, premier servi",
     "Offre valable uniquement pendant la Black Hour",
     "Une commande par membre maximum",
-    "Livraison en France métropolitaine uniquement"
+    "Livraison en Grand Tunis uniquement"
   ];
 
   return (

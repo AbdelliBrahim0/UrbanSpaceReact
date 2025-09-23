@@ -9,38 +9,7 @@ const SocialProof = () => {
     timeLeft: '2h 47m'
   });
 
-  const testimonials = [
-    {
-      id: 1,
-      name: "Marie L.",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      rating: 5,
-      comment: "Incroyable ! J\'ai économisé 180€ sur ma commande. La qualité est au rendez-vous !",
-      purchase: "Hoodie Gang Premium",
-      timeAgo: "Il y a 2 minutes",
-      verified: true
-    },
-    {
-      id: 2,
-      name: "Alex R.",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-      rating: 5,
-      comment: "Black Hour = le meilleur moment pour acheter ! Livraison ultra rapide en plus.",
-      purchase: "Sneakers Street Edition",
-      timeAgo: "Il y a 5 minutes",
-      verified: true
-    },
-    {
-      id: 3,
-      name: "Sarah M.",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-      rating: 5,
-      comment: "Je recommande à 100% ! Le style UrbanSpace est unique et les prix défient toute concurrence.",
-      purchase: "Pack Accessoires Urban",
-      timeAgo: "Il y a 8 minutes",
-      verified: true
-    }
-  ];
+  
 
   const liveActivities = [
     "Emma vient de commander un Hoodie Gang (-70%)",
@@ -172,65 +141,7 @@ const SocialProof = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials?.map((testimonial, index) => (
-            <motion.div
-              key={testimonial?.id}
-              className="bg-surface/80 backdrop-blur-sm border border-border rounded-xl p-6 hover:border-accent/30 transition-all duration-300"
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.6 + (index * 0.1), duration: 0.6 }}
-              whileHover={{ scale: 1.02 }}
-            >
-              {/* Header */}
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="relative">
-                  <img
-                    src={testimonial?.avatar}
-                    alt={testimonial?.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  {testimonial?.verified && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-success rounded-full flex items-center justify-center">
-                      <Icon name="Check" size={12} className="text-white" />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-heading font-bold text-foreground text-sm">
-                      {testimonial?.name}
-                    </span>
-                    {testimonial?.verified && (
-                      <Icon name="BadgeCheck" size={16} className="text-success" />
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    {[...Array(testimonial?.rating)]?.map((_, i) => (
-                      <Icon key={i} name="Star" size={12} className="text-warning fill-current" />
-                    ))}
-                  </div>
-                </div>
-                <div className="text-xs font-caption text-text-secondary">
-                  {testimonial?.timeAgo}
-                </div>
-              </div>
-
-              {/* Comment */}
-              <p className="text-text-secondary font-body text-sm mb-4 leading-relaxed">
-                "{testimonial?.comment}"
-              </p>
-
-              {/* Purchase Info */}
-              <div className="flex items-center space-x-2 p-3 bg-background/50 rounded-lg">
-                <Icon name="ShoppingBag" size={14} className="text-accent" />
-                <span className="text-xs font-caption text-text-secondary">
-                  A acheté : {testimonial?.purchase}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        
       </div>
       {/* Trust Badges */}
       <motion.div

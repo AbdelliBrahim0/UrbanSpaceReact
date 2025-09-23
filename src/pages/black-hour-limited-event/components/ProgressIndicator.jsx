@@ -154,35 +154,7 @@ const ProgressIndicator = () => {
           </span>
         </div>
         
-        <div className="space-y-2 text-xs font-body text-text-secondary">
-          <motion.div
-            className="flex items-center space-x-2"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="w-2 h-2 bg-success rounded-full"></div>
-            <span>Marie L. vient de commander un hoodie Gang Premium</span>
-          </motion.div>
-          <motion.div
-            className="flex items-center space-x-2"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <div className="w-2 h-2 bg-warning rounded-full"></div>
-            <span>Stock limité : Plus que 23 hoodies disponibles</span>
-          </motion.div>
-          <motion.div
-            className="flex items-center space-x-2"
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <div className="w-2 h-2 bg-accent rounded-full"></div>
-            <span>Nouveau membre : Alex R. rejoint UrbanSpace</span>
-          </motion.div>
-        </div>
+        
       </motion.div>
     </div>
   );

@@ -88,16 +88,8 @@ const BlackHourLimitedEventContent = () => {
             <CountdownTimer />
           </motion.section>
 
-          {/* Urgency Banner */}
-          <motion.section variants={sectionVariants}>
-            <UrgencyBanner />
-          </motion.section>
 
-          {/* Animated Promo Showcase */}
-          <motion.section variants={sectionVariants}>
-            <AnimatedPromo />
-          </motion.section>
-
+          
           {/* Discount Showcase */}
           <motion.section variants={sectionVariants}>
             <DiscountShowcase />
@@ -108,11 +100,7 @@ const BlackHourLimitedEventContent = () => {
             <ProgressIndicator />
           </motion.section>
 
-          {/* Exclusive Access Levels */}
-          <motion.section variants={sectionVariants}>
-            <ExclusiveAccess />
-          </motion.section>
-
+          
           {/* Event Mechanics & Rules */}
           <motion.section variants={sectionVariants}>
             <EventMechanics />

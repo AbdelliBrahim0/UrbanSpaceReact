@@ -58,16 +58,16 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-street">
-        <nav className="flex items-center justify-between h-16 px-4 lg:px-6">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-street w-screen max-w-[100vw] overflow-x-hidden">
+        <nav className="flex items-center justify-between h-16 px-3 sm:px-4 lg:px-6 w-full max-w-[100%] mx-auto">
           {/* Logo */}
-          <Link to="/homepage" className="flex items-center space-x-2 group">
+          <Link to="/homepage" className="flex items-center space-x-1 sm:space-x-2 group flex-shrink-0">
             <img
               src="/logo.png"
               alt="UrbanSpace Logo"
-              className="w-28 h-28 object-contain transition-street group-hover:scale-110"
+              className="w-16 h-16 md:w-20 md:h-20 lg:w-28 lg:h-28 object-contain transition-street group-hover:scale-110"
             />
-            <span className="font-heading font-bold text-xl text-foreground group-hover:text-accent transition-street">
+            <span className="font-heading font-bold text-base md:text-lg lg:text-xl text-foreground group-hover:text-accent transition-street">
               UrbanSpace
             </span>
           </Link>

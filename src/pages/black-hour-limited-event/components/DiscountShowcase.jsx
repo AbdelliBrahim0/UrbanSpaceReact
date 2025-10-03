@@ -52,7 +52,7 @@ const DiscountShowcase = () => {
           Profitez de ces offres limitées avant qu'il ne soit trop tard !
         </p>
       </motion.div>
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
         {discountTiers?.map((tier, index) => (
           <motion.div
             key={tier?.id}

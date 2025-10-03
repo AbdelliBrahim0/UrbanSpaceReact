@@ -99,7 +99,7 @@ const PromotionalBanner = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-black">
+    <section className="py-20 px-4 sm:px-6 bg-black">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
@@ -109,21 +109,25 @@ const PromotionalBanner = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center space-x-2 bg-accent/20 border border-accent/30 rounded-full px-6 py-3 mb-6">
+          <div className="inline-flex items-center space-x-2 bg-accent/20 border border-accent/30 rounded-full px-4 sm:px-6 py-2 sm:py-3 mb-6">
             <Icon name="Flame" size={20} className="text-accent" />
-            <span className="text-accent font-caption font-bold">OFFRES EXCEPTIONNELLES</span>
+            <span className="text-accent font-caption font-bold text-sm sm:text-base">OFFRES EXCEPTIONNELLES</span>
           </div>
-          <h2 className="text-4xl lg:text-6xl font-heading font-black text-foreground mb-4">
-            ÉVÉNEMENTS
-            <span className="text-accent ml-4">EXCLUSIFS</span>
-          </h2>
-          <p className="text-lg text-text-secondary max-w-2xl mx-auto">
+          <div className="px-2 mb-4">
+            <h2 className="text-4xl font-heading font-black text-foreground sm:text-5xl lg:text-6xl">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2">
+                <span className="block sm:inline">ÉVÉNEMENTS</span>
+                <span className="block sm:inline text-accent">EXCLUSIFS</span>
+              </div>
+            </h2>
+          </div>
+          <p className="text-base sm:text-lg text-text-secondary max-w-2xl mx-auto px-2">
             Ne manquez pas nos événements promotionnels exceptionnels avec des réductions incroyables sur toute la collection UrbanSpace
           </p>
         </motion.div>
-
+        
         {/* Promotional Cards */}
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {promotions?.map((promo, index) => (
             <motion.div
               key={promo?.id}
@@ -133,7 +137,7 @@ const PromotionalBanner = () => {
               viewport={{ once: true }}
               className="group relative"
             >
-              <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${promo?.bgGradient} border ${promo?.borderColor} p-8 lg:p-12 hover:scale-105 transition-all duration-500`}>
+              <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${promo?.bgGradient} border ${promo?.borderColor} p-4 sm:p-6 lg:p-8 xl:p-12 hover:scale-105 transition-all duration-500`}>
                 {/* Animated Background Pattern */}
                 <div className="absolute inset-0 opacity-10">
                   {[...Array(15)]?.map((_, i) => (

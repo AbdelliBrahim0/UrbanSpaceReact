@@ -12,8 +12,8 @@ import AnimatedPromo from './components/AnimatedPromo';
 import DiscountCard from './components/DiscountCard';
 import GangStyleStrip from './components/GangStyleStrip';
 import UrgencyBanner from './components/UrgencyBanner';
-
-
+import ScrollVelocity from './components/ScrollVelocity';
+import StickerPeel from './components/StickerPeel';
 const Homepage = () => {
   useEffect(() => {
     // Smooth scroll behavior for the page
@@ -76,6 +76,23 @@ const Homepage = () => {
       <main className="pt-16">
         {/* Hero Section */}
         <HeroSection />
+        <div className="flex flex-col items-center w-full overflow-hidden">
+          <div className="w-full">
+            <ScrollVelocity   
+              texts={['Urban Space : Style infini.','Vibe urbaine. Mode, liberté.']}
+              className="w-full"
+            />
+          </div>
+          <div className="mt-8 -ml-40">
+            <StickerPeel 
+              imageSrc="/logo.png"
+              rotate={15}
+            />
+          </div>
+        </div>
+
+        {/* Espace de 1cm */}
+        <div style={{ height: '50px' }}></div>
 
         {/* Featured Collections */}
         <FeaturedCollections />

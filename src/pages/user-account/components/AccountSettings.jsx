@@ -372,7 +372,7 @@ const AccountSettings = () => {
 
             <div className="flex items-center justify-between py-3">
               <div>
-                <h4 className="font-medium text-foreground">Export Data</h4>
+                
                 <p className="text-sm text-muted-foreground">
                   Download a copy of your account data
                 </p>

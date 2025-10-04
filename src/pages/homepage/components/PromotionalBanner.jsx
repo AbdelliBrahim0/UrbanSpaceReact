@@ -86,7 +86,7 @@ const PromotionalBanner = () => {
       id: 'black-hour',
       title: 'BLACK HOUR',
       subtitle: 'FLASH SALE',
-      description: 'Offres limitées dans le temps - Dépêchez-vous !',
+      description: 'Offres limitées dans le temps - Dépêchez-vous ! 1 seul heur par jour',
       discount: '50%',
       countdown: blackHourTime,
       bgGradient: 'from-purple-900/90 via-black to-purple-900/90',

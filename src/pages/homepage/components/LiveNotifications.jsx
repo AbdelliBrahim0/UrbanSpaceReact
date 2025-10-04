@@ -72,7 +72,7 @@ const LiveNotifications = () => {
     },
     {
       id: 9,
-      message: "🎯 Free shipping on orders over $100 today only!",
+      message: "🎯 Free shipping on orders over 100 TND today only!",
       type: "promo",
       priority: "low"
     }

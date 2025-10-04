@@ -76,14 +76,24 @@ const Homepage = () => {
       <main className="pt-16">
         {/* Hero Section */}
         <HeroSection />
-        <div className="flex flex-col items-center w-full overflow-hidden">
-          <div className="w-full">
-            <ScrollVelocity   
-              texts={['Urban Space : Style infini.','Vibe urbaine. Mode, liberté.']}
-              className="w-full"
-            />
-          </div>
-          <div className="mt-8 -ml-40">
+        <div className="w-full overflow-hidden">
+        <ScrollVelocity   
+            texts={[
+              <span key="text1" style={{ whiteSpace: 'nowrap' }}>
+                <span style={{ color: '#00ffc3' }}>U</span>rban <span style={{ color: '#00ffc3' }}>S</span>pace : Style infini.
+              </span>,
+              <span key="text2">
+                <span style={{ color: '#00ffc3' }}>Vibe</span> urbaine. <span style={{ color: '#00ffc3' }}>Mode</span>, liberté.
+              </span>
+            ]}
+            className="whitespace-nowrap"
+            velocity={50}
+            velocityMapping={{
+              input: [0, 500],
+              output: [0, 3],
+            }}
+          />
+          <div className="mt-8 flex justify-center w-full mb-12 md:mb-0">
             <StickerPeel 
               imageSrc="/logo.png"
               rotate={15}

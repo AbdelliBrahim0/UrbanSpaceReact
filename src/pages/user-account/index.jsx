@@ -85,24 +85,7 @@ const UserAccount = () => {
               </p>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                iconName="Download"
-                iconPosition="left"
-                className="animate-scale-hover"
-              >
-                Export Data
-              </Button>
-              <Button
-                variant="outline"
-                iconName="HelpCircle"
-                iconPosition="left"
-                className="animate-scale-hover"
-              >
-                Help
-              </Button>
-            </div>
+            
           </div>
         </motion.div>
 

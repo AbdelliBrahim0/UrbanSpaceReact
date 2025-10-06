@@ -9,24 +9,33 @@ import SaleHero from "./components/SaleHero";
 import UrgencyBanner from "./components/UrgencyBanner";
 import PaginationControls from "./components/PaginationControls";
 import CombinedFilter from "./components/CombinedFilter";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const Collections = () => {
   const navigate = useNavigate();
   const MAX_PRICE = 1000; // Or a more appropriate max value
+  const ITEMS_PER_PAGE = 16;
 
-  // New state for filter data and active filters
+  // State for filter data and active filters
   const [filterData, setFilterData] = useState([]);
   const [activeFilters, setActiveFilters] = useState({ categories: [], subcategories: [] });
   const [priceRange, setPriceRange] = useState({ min: 0, max: MAX_PRICE });
-  
-  const [products, setProducts] = useState([]);
-  const [pagination, setPagination] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  
-  const [loadingFilters, setLoadingFilters] = useState(true);
-  const [loadingProducts, setLoadingProducts] = useState(false);
+  const debouncedPriceRange = useDebounce(priceRange, 500);
 
-  // Effect to fetch and structure categories and subcategories
+  // State for products
+  const [allProducts, setAllProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [paginatedProducts, setPaginatedProducts] = useState([]);
+  
+  // State for pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Loading states
+  const [loadingFilters, setLoadingFilters] = useState(true);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  // Effect to fetch filter data (categories and subcategories)
   useEffect(() => {
     const fetchFilterData = async () => {
       setLoadingFilters(true);
@@ -35,7 +44,6 @@ const Collections = () => {
           categoriesApi.list(),
           subcategoriesApi.list()
         ]);
-
         const structuredData = categories.map(cat => ({
           ...cat,
           type: 'category',
@@ -43,9 +51,7 @@ const Collections = () => {
             sub.categories.some(subCat => subCat.id === cat.id)
           ).map(sub => ({ ...sub, type: 'subcategory' }))
         }));
-
         setFilterData(structuredData);
-
       } catch (err) {
         console.error("Failed to load filter data:", err);
       } finally {
@@ -54,53 +60,132 @@ const Collections = () => {
     };
     fetchFilterData();
   }, []);
-  
-  // Effect to fetch products based on active filters
+
+  // Effect to fetch all products once
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchAllProducts = async () => {
       setLoadingProducts(true);
       try {
-        const categoryIds = activeFilters.categories.length > 0 ? activeFilters.categories : null;
-        const subcategoryIds = activeFilters.subcategories.length > 0 ? activeFilters.subcategories : null;
-        const minPrice = priceRange.min > 0 ? priceRange.min : null;
-        const maxPrice = priceRange.max < MAX_PRICE ? priceRange.max : null;
-        
-        const data = await productsApi.list(currentPage, 16, categoryIds, subcategoryIds, minPrice, maxPrice);
-        
-        setProducts(data.items || []);
-        if (data.pagination && data.pagination.total_pages > 1) {
-          setPagination(data.pagination);
-        } else {
-          setPagination({
-            current_page: currentPage,
-            total_pages: (data.items || []).length === 16 ? currentPage + 1 : currentPage,
-          });
+        // Fetch all products - assuming the API can handle a large limit
+        const data = await productsApi.list(1, 1000);
+        if (data.items) {
+          setAllProducts(data.items);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch all products:", err);
       } finally {
         setLoadingProducts(false);
       }
     };
-    fetchProducts();
-  }, [currentPage, activeFilters, priceRange]);
+    fetchAllProducts();
+  }, []);
 
-  // New handler for the combined filter
-  const handleFilterChange = (filterType, value) => {
-    setActiveFilters(prev => ({ ...prev, [filterType]: value }));
-    setCurrentPage(1);
+  // Effect to apply filters and update filtered products
+  useEffect(() => {
+    let productsToFilter = [...allProducts];
+
+    // Category and Subcategory filtering
+    if (activeFilters.categories.length > 0) {
+        productsToFilter = productsToFilter.filter(p => 
+            p.category && activeFilters.categories.includes(p.category.id)
+        );
+    }
+    if (activeFilters.subcategories.length > 0) {
+        productsToFilter = productsToFilter.filter(p => 
+            p.subcategory && activeFilters.subcategories.includes(p.subcategory.id)
+        );
+    }
+
+    // Price filtering
+    productsToFilter = productsToFilter.filter(p => {
+      const price = parseFloat(p.price);
+      return price >= debouncedPriceRange.min && price <= debouncedPriceRange.max;
+    });
+
+    setFilteredProducts(productsToFilter);
+    setCurrentPage(1); // Reset to first page after filtering
+
+  }, [allProducts, activeFilters, debouncedPriceRange]);
+
+  // Effect for client-side pagination
+  useEffect(() => {
+    const newTotalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+    setTotalPages(newTotalPages > 0 ? newTotalPages : 1);
+
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    setPaginatedProducts(filteredProducts.slice(startIndex, endIndex));
+
+  }, [filteredProducts, currentPage]);
+
+
+  const handleCategoryToggle = (categoryId, isChecked) => {
+    const category = filterData.find(c => c.id === categoryId);
+    if (!category) return;
+
+    const subIdsForCategory = category.subcategories?.map(sub => sub.id) || [];
+    
+    setActiveFilters(prevFilters => {
+      let newCategories = [...prevFilters.categories];
+      let newSubcategories = [...prevFilters.subcategories];
+
+      if (isChecked) {
+        newCategories = [...new Set([...newCategories, categoryId])];
+        newSubcategories = [...new Set([...newSubcategories, ...subIdsForCategory])];
+      } else {
+        newCategories = newCategories.filter(c => c !== categoryId);
+        newSubcategories = newSubcategories.filter(subId => !subIdsForCategory.includes(subId));
+      }
+
+      return { categories: newCategories, subcategories: newSubcategories };
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSubcategoryChange = (subcategoryId, isChecked, parentCategoryId) => {
+    setActiveFilters(prevFilters => {
+      let newSubcategories = [...prevFilters.subcategories];
+
+      if (isChecked) {
+        newSubcategories = [...new Set([...newSubcategories, subcategoryId])];
+      } else {
+        newSubcategories = newSubcategories.filter(id => id !== subcategoryId);
+      }
+
+      // Check if parent category needs to be updated
+      const parentCategory = filterData.find(c => c.id === parentCategoryId);
+      let newCategories = [...prevFilters.categories];
+
+      if (parentCategory) {
+        const siblingSubcategoryIds = parentCategory.subcategories.map(s => s.id);
+        const allSiblingsChecked = siblingSubcategoryIds.every(id => newSubcategories.includes(id));
+
+        if (allSiblingsChecked) {
+          if (!newCategories.includes(parentCategoryId)) {
+            newCategories = [...newCategories, parentCategoryId];
+          }
+        } else {
+          if (newCategories.includes(parentCategoryId)) {
+            newCategories = newCategories.filter(id => id !== parentCategoryId);
+          }
+        }
+      }
+
+      return { categories: newCategories, subcategories: newSubcategories };
+    });
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleResetFilters = () => {
     setActiveFilters({ categories: [], subcategories: [] });
     setPriceRange({ min: 0, max: MAX_PRICE });
-    setCurrentPage(1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePageChange = (newPage) => {
-    if (newPage > 0 && (!pagination || newPage <= pagination.total_pages)) {
+    if (newPage > 0 && newPage <= totalPages) {
       setCurrentPage(newPage);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -137,7 +222,7 @@ const Collections = () => {
         </section>
 
         {/* Filters and Products Section */}
-        <section className="max-w-7xl mx-auto px-4 lg:px-6 py-12">
+        <section className="px-4 lg:px-6 py-12">
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filter Panel */}
             <aside className="w-full lg:w-1/4 xl:w-1/5">
@@ -147,7 +232,8 @@ const Collections = () => {
                 <CombinedFilter
                   filterData={filterData}
                   activeFilters={activeFilters}
-                  onFilterChange={handleFilterChange}
+                  onCategoryToggle={handleCategoryToggle}
+                  onSubcategoryChange={handleSubcategoryChange}
                   onReset={handleResetFilters}
                   priceRange={priceRange}
                   onPriceChange={setPriceRange}
@@ -158,11 +244,11 @@ const Collections = () => {
 
             {/* Products Grid */}
             <div className="w-full lg:w-3/4 xl:w-4/5">
-              {pagination && pagination.total_pages > 1 && (
+              {totalPages > 1 && (
                 <div className="flex justify-end mb-4">
                   <PaginationControls
                     currentPage={currentPage}
-                    totalPages={pagination.total_pages}
+                    totalPages={totalPages}
                     onPageChange={handlePageChange}
                   />
                 </div>
@@ -170,9 +256,9 @@ const Collections = () => {
 
               {loadingProducts ? (
                 <div className="text-center text-muted-foreground mt-10">Loading products...</div>
-              ) : products.length > 0 ? (
+              ) : paginatedProducts.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {products.map(product => (
+                  {paginatedProducts.map(product => (
                     <ProductCard
                       key={product.id}
                       product={{
@@ -192,11 +278,11 @@ const Collections = () => {
                 </div>
               )}
 
-              {pagination && pagination.total_pages > 1 && (
+              {totalPages > 1 && (
                 <div className="flex justify-center mt-10">
                   <PaginationControls
                     currentPage={currentPage}
-                    totalPages={pagination.total_pages}
+                    totalPages={totalPages}
                     onPageChange={handlePageChange}
                   />
                 </div>

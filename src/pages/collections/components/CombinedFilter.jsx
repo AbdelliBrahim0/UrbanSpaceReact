@@ -3,7 +3,8 @@ import React from 'react';
 const CombinedFilter = ({
   filterData,
   activeFilters,
-  onFilterChange,
+  onCategoryToggle,
+  onSubcategoryChange,
   onReset,
   priceRange,
   onPriceChange,
@@ -11,11 +12,11 @@ const CombinedFilter = ({
 }) => {
 
   // This assumes activeFilters is now an object like { categories: [], subcategories: [] }
-  const isFilterActive = 
-    (activeFilters.categories && activeFilters.categories.length > 0) || 
-    (activeFilters.subcategories && activeFilters.subcategories.length > 0) ||
-    priceRange.min > 0 ||
-    priceRange.max < maxPrice;
+  const isFilterActive =
+    (activeFilters?.categories?.length > 0) ||
+    (activeFilters?.subcategories?.length > 0) ||
+    priceRange?.min > 0 ||
+    priceRange?.max < maxPrice;
 
   return (
     <div className="p-4 bg-surface rounded-lg shadow-sm w-full">
@@ -40,25 +41,7 @@ const CombinedFilter = ({
                 type="checkbox"
                 className="w-4 h-4 text-accent bg-surface border-street rounded focus:ring-accent focus:ring-2"
                 checked={activeFilters.categories?.includes(category.id) || false}
-                onChange={(e) => {
-                  const isChecked = e.target.checked;
-                  
-                  const newCategories = isChecked
-                    ? [...(activeFilters.categories || []), category.id]
-                    : (activeFilters.categories || []).filter(c => c !== category.id);
-                  onFilterChange('categories', newCategories);
-
-                  const subIdsForCategory = category.subcategories?.map(sub => sub.id) || [];
-                  const currentSubcategories = activeFilters.subcategories || [];
-                  let newSubcategories;
-
-                  if (isChecked) {
-                    newSubcategories = [...new Set([...currentSubcategories, ...subIdsForCategory])];
-                  } else {
-                    newSubcategories = currentSubcategories.filter(subId => !subIdsForCategory.includes(subId));
-                  }
-                  onFilterChange('subcategories', newSubcategories);
-                }}
+                onChange={(e) => onCategoryToggle(category.id, e.target.checked)}
               />
               <span className="font-bold text-foreground group-hover:text-accent transition-street">{category.name}</span>
             </label>
@@ -71,30 +54,7 @@ const CombinedFilter = ({
                       type="checkbox"
                       className="w-4 h-4 text-accent bg-surface border-street rounded focus:ring-accent focus:ring-2"
                       checked={activeFilters.subcategories?.includes(subcategory.id) || false}
-                      onChange={(e) => {
-                        const isChecked = e.target.checked;
-                        const parentCategoryId = category.id;
-
-                        const currentSubcategories = activeFilters.subcategories || [];
-                        const newSubcategories = isChecked
-                          ? [...currentSubcategories, subcategory.id]
-                          : currentSubcategories.filter(id => id !== subcategory.id);
-                        onFilterChange('subcategories', newSubcategories);
-
-                        const siblingSubcategoryIds = category.subcategories.map(s => s.id);
-                        const allSiblingsChecked = siblingSubcategoryIds.every(id => newSubcategories.includes(id));
-
-                        const currentCategories = activeFilters.categories || [];
-                        if (allSiblingsChecked) {
-                          if (!currentCategories.includes(parentCategoryId)) {
-                            onFilterChange('categories', [...currentCategories, parentCategoryId]);
-                          }
-                        } else {
-                          if (currentCategories.includes(parentCategoryId)) {
-                            onFilterChange('categories', currentCategories.filter(id => id !== parentCategoryId));
-                          }
-                        }
-                      }}
+                      onChange={(e) => onSubcategoryChange(subcategory.id, e.target.checked, category.id)}
                     />
                     <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{subcategory.name}</span>
                   </label>

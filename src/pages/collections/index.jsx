@@ -3,105 +3,77 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import Header from "../../components/ui/Header";
 import Button from "../../components/ui/Button";
-import CategoryTabs from "./components/CategoryTabs";
 import ProductCard from "./components/ProductCard";
 import { categoriesApi, subcategoriesApi, productsApi } from "../../api";
 import SaleHero from "./components/SaleHero";
 import UrgencyBanner from "./components/UrgencyBanner";
 import PaginationControls from "./components/PaginationControls";
-
-
-
-const SubcategoryTabs = ({ subcategories, activeSubcategory, onSubcategoryChange }) => (
-  <div className="flex gap-4 overflow-x-auto py-2 mb-6">
-    {subcategories.map(sub => (
-      <button
-        key={sub.id}
-        onClick={() => onSubcategoryChange(sub.id)}
-        className={`px-4 py-2 rounded-full text-sm font-medium ${
-          activeSubcategory === sub.id
-            ? "bg-accent text-accent-foreground"
-            : "bg-surface text-muted-foreground"
-        }`}
-      >
-        {sub.name}
-      </button>
-    ))}
-  </div>
-);
+import CombinedFilter from "./components/CombinedFilter";
 
 const Collections = () => {
   const navigate = useNavigate();
+  const MAX_PRICE = 1000; // Or a more appropriate max value
 
-  const [categories, setCategories] = useState([]);
-  const [subcategories, setSubcategories] = useState([]);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [activeSubcategory, setActiveSubcategory] = useState(null);
+  // New state for filter data and active filters
+  const [filterData, setFilterData] = useState([]);
+  const [activeFilters, setActiveFilters] = useState({ categories: [], subcategories: [] });
+  const [priceRange, setPriceRange] = useState({ min: 0, max: MAX_PRICE });
+  
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   
-  const [loadingCategories, setLoadingCategories] = useState(true);
-  const [loadingSubcategories, setLoadingSubcategories] = useState(false);
+  const [loadingFilters, setLoadingFilters] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(false);
 
-  // Charger catégories
+  // Effect to fetch and structure categories and subcategories
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchFilterData = async () => {
+      setLoadingFilters(true);
       try {
-        const data = await categoriesApi.list();
-        setCategories([{ id: "all", name: "All Items" }, ...data]);
+        const [categories, subcategories] = await Promise.all([
+          categoriesApi.list(),
+          subcategoriesApi.list()
+        ]);
+
+        const structuredData = categories.map(cat => ({
+          ...cat,
+          type: 'category',
+          subcategories: subcategories.filter(sub => 
+            sub.categories.some(subCat => subCat.id === cat.id)
+          ).map(sub => ({ ...sub, type: 'subcategory' }))
+        }));
+
+        setFilterData(structuredData);
+
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load filter data:", err);
       } finally {
-        setLoadingCategories(false);
+        setLoadingFilters(false);
       }
     };
-    fetchCategories();
+    fetchFilterData();
   }, []);
-
-  // Charger sous-catégories
-  useEffect(() => {
-    if (activeCategory === "all") {
-      setSubcategories([]);
-      setActiveSubcategory(null);
-      return;
-    }
-    const fetchSubcategories = async () => {
-      setLoadingSubcategories(true);
-      try {
-        const data = await subcategoriesApi.list();
-        const filtered = data.filter(sub =>
-          sub.categories.some(cat => cat.id === Number(activeCategory))
-        );
-        setSubcategories(filtered);
-        setActiveSubcategory(filtered.length > 0 ? filtered[0].id : null);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingSubcategories(false);
-      }
-    };
-    fetchSubcategories();
-  }, [activeCategory]);
-
-  // Charger produits
+  
+  // Effect to fetch products based on active filters
   useEffect(() => {
     const fetchProducts = async () => {
       setLoadingProducts(true);
       try {
-        const categoryId = activeCategory === 'all' ? null : activeCategory;
-        const data = await productsApi.list(currentPage, 16, categoryId, activeSubcategory);
-        console.log("Pagination data from API:", data);
+        const categoryIds = activeFilters.categories.length > 0 ? activeFilters.categories : null;
+        const subcategoryIds = activeFilters.subcategories.length > 0 ? activeFilters.subcategories : null;
+        const minPrice = priceRange.min > 0 ? priceRange.min : null;
+        const maxPrice = priceRange.max < MAX_PRICE ? priceRange.max : null;
+        
+        const data = await productsApi.list(currentPage, 16, categoryIds, subcategoryIds, minPrice, maxPrice);
+        
         setProducts(data.items || []);
         if (data.pagination && data.pagination.total_pages > 1) {
           setPagination(data.pagination);
         } else {
-          // Fallback if API doesn't send pagination info or total_pages is 1
-          const hasMore = (data.items || []).length === 16;
           setPagination({
             current_page: currentPage,
-            total_pages: hasMore ? currentPage + 1 : currentPage,
+            total_pages: (data.items || []).length === 16 ? currentPage + 1 : currentPage,
           });
         }
       } catch (err) {
@@ -111,16 +83,20 @@ const Collections = () => {
       }
     };
     fetchProducts();
-  }, [currentPage, activeCategory, activeSubcategory]);
+  }, [currentPage, activeFilters, priceRange]);
 
-  const handleCategoryChange = (newCategory) => {
-    setActiveCategory(newCategory);
+  // New handler for the combined filter
+  const handleFilterChange = (filterType, value) => {
+    setActiveFilters(prev => ({ ...prev, [filterType]: value }));
     setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubcategoryChange = (newSubcategory) => {
-    setActiveSubcategory(newSubcategory);
+  const handleResetFilters = () => {
+    setActiveFilters({ categories: [], subcategories: [] });
+    setPriceRange({ min: 0, max: MAX_PRICE });
     setCurrentPage(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePageChange = (newPage) => {
@@ -160,73 +136,77 @@ const Collections = () => {
           </div>
         </section>
 
-        {/* Categories et produits */}
+        {/* Filters and Products Section */}
         <section className="max-w-7xl mx-auto px-4 lg:px-6 py-12">
-          {loadingCategories ? (
-            <div className="text-center text-muted-foreground">Loading categories...</div>
-          ) : (
-            <CategoryTabs
-              categories={categories}
-              activeCategory={activeCategory}
-              onCategoryChange={handleCategoryChange}
-            />
-          )}
-
-          {loadingSubcategories ? (
-            <div className="text-center text-muted-foreground">Loading subcategories...</div>
-          ) : subcategories.length > 0 ? (
-            <SubcategoryTabs
-              subcategories={subcategories}
-              activeSubcategory={activeSubcategory}
-              onSubcategoryChange={handleSubcategoryChange}
-            />
-          ) : null}
-
-          {pagination && pagination.total_pages > 1 && (
-            <div className="flex justify-end mb-4">
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={pagination.total_pages}
-                onPageChange={handlePageChange}
-              />
-            </div>
-          )}
-
-          {loadingProducts ? (
-            <div className="text-center text-muted-foreground mt-10">Loading products...</div>
-          ) : products.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-              {products.map(product => (
-                <ProductCard
-                  key={product.id}
-                  product={{
-                    ...product,
-                    images: [product.urlImage, product.urlImageHover].filter(Boolean),
-                    isNew: new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-                  }}
-                  onProductClick={id => navigate(`/product/${id}`)}
-                  onAddToCart={prod => console.log("Add to cart", prod)}
-                  onToggleWishlist={id => console.log("Toggle wishlist", id)}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Filter Panel */}
+            <aside className="w-full lg:w-1/4 xl:w-1/5">
+              {loadingFilters ? (
+                <div className="text-center text-muted-foreground">Loading filters...</div>
+              ) : (
+                <CombinedFilter
+                  filterData={filterData}
+                  activeFilters={activeFilters}
+                  onFilterChange={handleFilterChange}
+                  onReset={handleResetFilters}
+                  priceRange={priceRange}
+                  onPriceChange={setPriceRange}
+                  maxPrice={MAX_PRICE}
                 />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-muted-foreground mt-10">
-              Aucun produit trouvé pour cette catégorie/sous-catégorie.
-            </div>
-          )}
+              )}
+            </aside>
 
-          {pagination && pagination.total_pages > 1 && (
-            <div className="flex justify-center mt-10">
-              <PaginationControls
-                currentPage={currentPage}
-                totalPages={pagination.total_pages}
-                onPageChange={handlePageChange}
-              />
+            {/* Products Grid */}
+            <div className="w-full lg:w-3/4 xl:w-4/5">
+              {pagination && pagination.total_pages > 1 && (
+                <div className="flex justify-end mb-4">
+                  <PaginationControls
+                    currentPage={currentPage}
+                    totalPages={pagination.total_pages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+
+              {loadingProducts ? (
+                <div className="text-center text-muted-foreground mt-10">Loading products...</div>
+              ) : products.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {products.map(product => (
+                    <ProductCard
+                      key={product.id}
+                      product={{
+                        ...product,
+                        images: [product.urlImage, product.urlImageHover].filter(Boolean),
+                        isNew: new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                      }}
+                      onProductClick={id => navigate(`/product/${id}`)}
+                      onAddToCart={prod => console.log("Add to cart", prod)}
+                      onToggleWishlist={id => console.log("Toggle wishlist", id)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground mt-10">
+                  No products found for this selection.
+                </div>
+              )}
+
+              {pagination && pagination.total_pages > 1 && (
+                <div className="flex justify-center mt-10">
+                  <PaginationControls
+                    currentPage={currentPage}
+                    totalPages={pagination.total_pages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </section>
+        
         <SaleHero />
+        
         {/* Newsletter Section */}
         <section className="bg-surface py-16">
           <div className="max-w-4xl mx-auto px-4 lg:px-6 text-center">

@@ -293,13 +293,15 @@ const publicApi = {
   },
 
   products: {
-    list: async (page = 1, limit = 12, categoryId, subcategoryId) => {
+    list: async (page = 1, limit = 12, categoryId, subcategoryId, minPrice, maxPrice) => {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
       });
       if (categoryId) params.append("category", categoryId.toString());
       if (subcategoryId) params.append("subcategory", subcategoryId.toString());
+      if (minPrice) params.append("min_price", minPrice.toString());
+      if (maxPrice) params.append("max_price", maxPrice.toString());
 
       try {
         const url = `/products?${params}`;

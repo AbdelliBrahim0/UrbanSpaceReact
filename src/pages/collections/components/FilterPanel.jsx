@@ -3,30 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const FilterPanel = ({ 
-  isOpen, 
-  onClose, 
-  filters, 
-  onFilterChange, 
+const FilterPanel = ({
+  isOpen,
+  onClose,
+  filters,
+  onFilterChange,
   onClearFilters,
-  isMobile 
+  isMobile,
+  categories,
+  subcategories
 }) => {
-  const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  const colorOptions = [
-    { name: 'Black', value: '#000000' },
-    { name: 'White', value: '#FFFFFF' },
-    { name: 'Red', value: '#FF0040' },
-    { name: 'Green', value: '#00FF88' },
-    { name: 'Blue', value: '#0066FF' },
-    { name: 'Yellow', value: '#FFB800' },
-    { name: 'Purple', value: '#8B00FF' },
-    { name: 'Gray', value: '#808080' }
-  ];
-
-  const brandOptions = [
-    'Supreme', 'Off-White', 'Stone Island', 'A Bathing Ape', 
-    'Stussy', 'Palace', 'Fear of God', 'Kith'
-  ];
 
   const FilterContent = () => (
     <div className="space-y-6">
@@ -39,104 +25,114 @@ const FilterPanel = ({
               type="range"
               min="0"
               max="1000"
-              value={filters?.priceRange?.[0]}
-              onChange={(e) => onFilterChange('priceRange', [parseInt(e?.target?.value), filters?.priceRange?.[1]])}
+              value={filters?.priceRange?.[0] || 0}
+              onChange={(e) => onFilterChange('priceRange', [parseInt(e.target.value), filters?.priceRange?.[1] || 1000])}
               className="flex-1 h-2 bg-surface rounded-lg appearance-none cursor-pointer slider"
             />
-            <span className="text-sm text-muted-foreground w-16">${filters?.priceRange?.[0]}</span>
+            <span className="text-sm text-muted-foreground w-16">{filters?.priceRange?.[0] || 0}TND</span>
           </div>
           <div className="flex items-center space-x-4">
             <input
               type="range"
               min="0"
               max="1000"
-              value={filters?.priceRange?.[1]}
-              onChange={(e) => onFilterChange('priceRange', [filters?.priceRange?.[0], parseInt(e?.target?.value)])}
+              value={filters?.priceRange?.[1] || 1000}
+              onChange={(e) => onFilterChange('priceRange', [filters?.priceRange?.[0] || 0, parseInt(e.target.value)])}
               className="flex-1 h-2 bg-surface rounded-lg appearance-none cursor-pointer slider"
             />
-            <span className="text-sm text-muted-foreground w-16">${filters?.priceRange?.[1]}</span>
+            <span className="text-sm text-muted-foreground w-16">{filters?.priceRange?.[1] || 1000}TND</span>
           </div>
         </div>
       </div>
 
-      {/* Sizes */}
+      {/* Categories & Subcategories */}
       <div>
-        <h3 className="font-heading font-bold text-lg mb-4 text-foreground">Sizes</h3>
-        <div className="grid grid-cols-3 gap-2">
-          {sizeOptions?.map((size) => (
-            <button
-              key={size}
-              onClick={() => {
-                const newSizes = filters?.sizes?.includes(size)
-                  ? filters?.sizes?.filter(s => s !== size)
-                  : [...filters?.sizes, size];
-                onFilterChange('sizes', newSizes);
-              }}
-              className={`p-2 rounded-lg border transition-street ${
-                filters?.sizes?.includes(size)
-                  ? 'border-accent bg-accent text-accent-foreground'
-                  : 'border-street bg-surface text-foreground hover:border-accent hover:text-accent'
-              }`}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
-      </div>
+        <h3 className="font-heading font-bold text-lg mb-4 text-foreground">Categories</h3>
+        <div className="space-y-4">
+          {categories?.map((category) => (
+            <div key={category.id}>
+              <label className="flex items-center space-x-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={filters?.categories?.includes(category.id)}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    
+                    // Update categories filter
+                    const newCategories = isChecked
+                      ? [...(filters?.categories || []), category.id]
+                      : filters?.categories?.filter(c => c !== category.id);
+                    onFilterChange('categories', newCategories);
 
-      {/* Colors */}
-      <div>
-        <h3 className="font-heading font-bold text-lg mb-4 text-foreground">Colors</h3>
-        <div className="grid grid-cols-4 gap-3">
-          {colorOptions?.map((color) => (
-            <button
-              key={color?.name}
-              onClick={() => {
-                const newColors = filters?.colors?.includes(color?.name)
-                  ? filters?.colors?.filter(c => c !== color?.name)
-                  : [...filters?.colors, color?.name];
-                onFilterChange('colors', newColors);
-              }}
-              className={`relative w-12 h-12 rounded-full border-2 transition-street ${
-                filters?.colors?.includes(color?.name)
-                  ? 'border-accent scale-110' :'border-street hover:border-accent hover:scale-105'
-              }`}
-              style={{ backgroundColor: color?.value }}
-              title={color?.name}
-            >
-              {filters?.colors?.includes(color?.name) && (
-                <Icon 
-                  name="Check" 
-                  size={16} 
-                  className={`absolute inset-0 m-auto ${
-                    color?.name === 'White' ? 'text-black' : 'text-white'
-                  }`} 
+                    // Find subcategory IDs for the current category
+                    const subIdsForCategory = subcategories
+                      ?.filter(sub => sub.category_id === category.id)
+                      ?.map(sub => sub.id) || [];
+
+                    // Update subcategories filter
+                    const currentSubcategories = filters?.subcategories || [];
+                    let newSubcategories;
+
+                    if (isChecked) {
+                      // Add this category's subcategories to the selection
+                      newSubcategories = [...new Set([...currentSubcategories, ...subIdsForCategory])];
+                    } else {
+                      // Remove this category's subcategories from the selection
+                      newSubcategories = currentSubcategories.filter(subId => !subIdsForCategory.includes(subId));
+                    }
+                    onFilterChange('subcategories', newSubcategories);
+                  }}
+                  className="w-4 h-4 text-accent bg-surface border-street rounded focus:ring-accent focus:ring-2"
                 />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+                <span className="font-bold text-foreground group-hover:text-accent transition-street">{category.name}</span>
+              </label>
+              <div className="pl-6 mt-2 space-y-2">
+                {subcategories
+                  ?.filter(sub => sub.category_id === category.id)
+                  ?.map((subcategory) => (
+                  <label key={subcategory.id} className="flex items-center space-x-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={filters?.subcategories?.includes(subcategory.id)}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        const subcategoryId = subcategory.id;
+                        const parentCategoryId = subcategory.category_id;
 
-      {/* Brands */}
-      <div>
-        <h3 className="font-heading font-bold text-lg mb-4 text-foreground">Brands</h3>
-        <div className="space-y-2">
-          {brandOptions?.map((brand) => (
-            <label key={brand} className="flex items-center space-x-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={filters?.brands?.includes(brand)}
-                onChange={(e) => {
-                  const newBrands = e?.target?.checked
-                    ? [...filters?.brands, brand]
-                    : filters?.brands?.filter(b => b !== brand);
-                  onFilterChange('brands', newBrands);
-                }}
-                className="w-4 h-4 text-accent bg-surface border-street rounded focus:ring-accent focus:ring-2"
-              />
-              <span className="text-foreground group-hover:text-accent transition-street">{brand}</span>
-            </label>
+                        // 1. Update subcategories filter
+                        const currentSubcategories = filters?.subcategories || [];
+                        const newSubcategories = isChecked
+                          ? [...currentSubcategories, subcategoryId]
+                          : currentSubcategories.filter(id => id !== subcategoryId);
+                        onFilterChange('subcategories', newSubcategories);
+
+                        // 2. Check siblings to update parent category state
+                        const siblingSubcategoryIds = subcategories
+                          .filter(s => s.category_id === parentCategoryId)
+                          .map(s => s.id);
+                        
+                        const allSiblingsChecked = siblingSubcategoryIds.every(id => newSubcategories.includes(id));
+
+                        const currentCategories = filters?.categories || [];
+                        if (allSiblingsChecked) {
+                          // Add parent category if not already present
+                          if (!currentCategories.includes(parentCategoryId)) {
+                            onFilterChange('categories', [...currentCategories, parentCategoryId]);
+                          }
+                        } else {
+                          // Remove parent category if it's present
+                          if (currentCategories.includes(parentCategoryId)) {
+                            onFilterChange('categories', currentCategories.filter(id => id !== parentCategoryId));
+                          }
+                        }
+                      }}
+                      className="w-4 h-4 text-accent bg-surface border-street rounded focus:ring-accent focus:ring-2"
+                    />
+                    <span className="text-foreground group-hover:text-accent transition-street">{subcategory.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

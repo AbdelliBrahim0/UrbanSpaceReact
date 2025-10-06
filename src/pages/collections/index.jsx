@@ -8,6 +8,7 @@ import ProductCard from "./components/ProductCard";
 import { categoriesApi, subcategoriesApi, productsApi } from "../../api";
 import SaleHero from "./components/SaleHero";
 import UrgencyBanner from "./components/UrgencyBanner";
+import PaginationControls from "./components/PaginationControls";
 
 
 
@@ -37,6 +38,9 @@ const Collections = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeSubcategory, setActiveSubcategory] = useState(null);
   const [products, setProducts] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingSubcategories, setLoadingSubcategories] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(false);
@@ -86,8 +90,20 @@ const Collections = () => {
     const fetchProducts = async () => {
       setLoadingProducts(true);
       try {
-        const data = await productsApi.list();
+        const categoryId = activeCategory === 'all' ? null : activeCategory;
+        const data = await productsApi.list(currentPage, 16, categoryId, activeSubcategory);
+        console.log("Pagination data from API:", data);
         setProducts(data.items || []);
+        if (data.pagination && data.pagination.total_pages > 1) {
+          setPagination(data.pagination);
+        } else {
+          // Fallback if API doesn't send pagination info or total_pages is 1
+          const hasMore = (data.items || []).length === 16;
+          setPagination({
+            current_page: currentPage,
+            total_pages: hasMore ? currentPage + 1 : currentPage,
+          });
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -95,18 +111,24 @@ const Collections = () => {
       }
     };
     fetchProducts();
-  }, []);
+  }, [currentPage, activeCategory, activeSubcategory]);
 
-  // Filtrer produits côté front
-  const filteredProducts = products.filter(product => {
-    const matchesCategory =
-      activeCategory === "all" ||
-      product.categories?.some(cat => cat.id === Number(activeCategory));
-    const matchesSubcategory =
-      !activeSubcategory ||
-      product.subCategories?.some(sub => sub.id === Number(activeSubcategory));
-    return matchesCategory && matchesSubcategory;
-  });
+  const handleCategoryChange = (newCategory) => {
+    setActiveCategory(newCategory);
+    setCurrentPage(1);
+  };
+
+  const handleSubcategoryChange = (newSubcategory) => {
+    setActiveSubcategory(newSubcategory);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && (!pagination || newPage <= pagination.total_pages)) {
+      setCurrentPage(newPage);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -146,7 +168,7 @@ const Collections = () => {
             <CategoryTabs
               categories={categories}
               activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
+              onCategoryChange={handleCategoryChange}
             />
           )}
 
@@ -156,15 +178,25 @@ const Collections = () => {
             <SubcategoryTabs
               subcategories={subcategories}
               activeSubcategory={activeSubcategory}
-              onSubcategoryChange={setActiveSubcategory}
+              onSubcategoryChange={handleSubcategoryChange}
             />
           ) : null}
 
+          {pagination && pagination.total_pages > 1 && (
+            <div className="flex justify-end mb-4">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={pagination.total_pages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+
           {loadingProducts ? (
             <div className="text-center text-muted-foreground mt-10">Loading products...</div>
-          ) : filteredProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-              {filteredProducts.map(product => (
+              {products.map(product => (
                 <ProductCard
                   key={product.id}
                   product={{
@@ -181,6 +213,16 @@ const Collections = () => {
           ) : (
             <div className="text-center text-muted-foreground mt-10">
               Aucun produit trouvé pour cette catégorie/sous-catégorie.
+            </div>
+          )}
+
+          {pagination && pagination.total_pages > 1 && (
+            <div className="flex justify-center mt-10">
+              <PaginationControls
+                currentPage={currentPage}
+                totalPages={pagination.total_pages}
+                onPageChange={handlePageChange}
+              />
             </div>
           )}
         </section>

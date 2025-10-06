@@ -11,6 +11,7 @@ import BlackHourPage from './pages/black-hour';
 import Homepage from './pages/homepage';
 import UserAccount from './pages/user-account';
 import UserAuthentication from './pages/user-authentication';
+import Welcome from './pages/Welcome';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import CartSidebar from './components/ui/CartSidebar';
@@ -36,7 +37,8 @@ const Routes = () => {
           <ErrorBoundary>
             <ScrollToTop />
             <RouterRoutes>
-              <Route path="/" element={<BlackFridayPage />} />
+              <Route path="/" element={<Welcome />} />
+              <Route path="/black-friday-original" element={<BlackFridayPage />} />
               <Route path="/product-detail" element={<ProductDetail />} />
               <Route path="/sale" element={<Sale />} />
               <Route path="/collections" element={<Collections />} />

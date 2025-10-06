@@ -219,19 +219,6 @@ const HeroSection = () => {
           />
         ))}
       </div>
-      {/* Street Art Overlay */}
-      <div className="absolute top-0 right-0 z-10 w-64 h-64 opacity-10">
-        <svg viewBox="0 0 200 200" className="w-full h-full">
-          <path
-            d="M20,20 L180,20 L180,180 L20,180 Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className="text-accent"
-          />
-          <circle cx="100" cy="100" r="50" fill="none" stroke="currentColor" strokeWidth="2" className="text-accent" />
-        </svg>
-      </div>
     </section>
   );
 };

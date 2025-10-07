@@ -189,10 +189,13 @@ const FeaturedCollections = () => {
               {/* Product Info */}
               <div className="p-4">
                 <Link to={`/product/${collection.id}`} className="block mb-2">
-                  <h3 className="font-heading font-bold text-lg text-foreground group-hover:text-accent transition-colors">
+                  <h3 className="font-heading font-bold text-lg text-foreground group-hover:text-accent transition-colors truncate">
                     {collection.title}
                   </h3>
-                  <p className="text-accent font-bold">
+                  {collection.description && (
+                    <p className="text-sm text-muted-foreground truncate">{collection.description}</p>
+                  )}
+                  <p className="text-accent font-bold mt-2">
                     {collection.price.toFixed(3)} TND
                     {collection.originalPrice && (
                       <span className="ml-2 text-muted-foreground line-through text-sm">

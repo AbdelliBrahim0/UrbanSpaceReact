@@ -118,9 +118,7 @@ const SaleProductCard = ({ product, index }) => {
             className="absolute inset-0 bg-background/80 flex items-center justify-center"
           >
             <div className="text-center space-y-3">
-              <div className="text-accent font-heading font-bold text-lg">
-                SAVE ${savings?.toFixed(2)}
-              </div>
+              
               <button
                 onClick={handleQuickAdd}
                 className="bg-accent text-accent-foreground px-4 py-2 rounded-lg font-medium hover:scale-105 transition-street"
@@ -139,48 +137,47 @@ const SaleProductCard = ({ product, index }) => {
             <p className="text-xs text-accent font-medium uppercase tracking-wide">
               {product?.brand}
             </p>
-            <h3 className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-accent transition-street">
+            <h3 className="text-sm font-medium text-foreground truncate group-hover:text-accent transition-street">
               {product?.name}
             </h3>
           </div>
 
           {/* Pricing */}
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="text-lg font-bold text-accent">
-              {product?.salePrice?.toFixed(3)} TND
-            </span>
-            <span className="text-sm text-muted-foreground line-through">
-              {product?.originalPrice?.toFixed(3)} TND
-            </span>
-            <span className="text-xs bg-success text-success-foreground px-2 py-1 rounded-full font-medium">
-              Save {(product?.originalPrice - product?.salePrice)?.toFixed(3)} TND
-            </span>
+          <div className="flex items-baseline space-x-2 mb-2">
+            <div>
+              <div className="text-lg font-bold text-accent">
+                {product?.salePrice?.toFixed(3)}
+              </div>
+              <div className="text-accent text-sm font-medium">TND</div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground line-through">
+                {product?.originalPrice?.toFixed(3)}
+              </div>
+              <div className="text-xs text-muted-foreground line-through">TND</div>
+            </div>
           </div>
 
           {/* Stock Status */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center space-x-1">
-              <Icon 
-                name="Package" 
-                size={14} 
-                className={urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'} 
-              />
-              <span className={`text-xs font-medium ${
-                urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'
-              }`}>
-                {urgencyLevel === 'critical' ? `Seulement ${product?.stock} restant(s) !` : 
-                 urgencyLevel === 'low' ? `${product?.stock} restant(s)` : 
-                 'En stock'}
-              </span>
-            </div>
-            
-            {/* Rating */}
-            <div className="flex items-center space-x-1">
-              <Icon name="Star" size={12} className="text-warning fill-current" />
-              <span className="text-xs text-muted-foreground">
-                {product?.rating} ({product?.reviews})
-              </span>
-            </div>
+          <div className="flex items-center space-x-1 mb-1">
+            <Icon 
+              name="Package" 
+              size={14} 
+              className={urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'} 
+            />
+            <span className={`text-xs font-medium ${
+              urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'
+            }`}>
+              {product?.stock > 0 ? `${product?.stock} restant(s)` : 'Rupture de stock'}
+            </span>
+          </div>
+
+          {/* Rating */}
+          <div className="flex items-center space-x-1 mb-2">
+            <Icon name="Star" size={12} className="text-warning fill-current" />
+            <span className="text-xs text-muted-foreground">
+              {product?.rating} ({product?.reviews})
+            </span>
           </div>
 
           {/* Bouton Ajouter au panier - Version mobile/visible par défaut */}

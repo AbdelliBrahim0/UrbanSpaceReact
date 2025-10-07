@@ -70,6 +70,14 @@ const Collections = () => {
         const data = await productsApi.list(1, 1000);
         if (data.items) {
           setAllProducts(data.items);
+          const max = data.items.reduce((maxVal, p) => {
+            const price = parseFloat(p.price);
+            return price > maxVal ? price : maxVal;
+          }, 0);
+          if (max > 0) {
+            setMaxPrice(max);
+            setPriceRange({ min: 0, max: max });
+          }
         }
       } catch (err) {
         console.error("Failed to fetch all products:", err);

@@ -66,8 +66,8 @@ const ProductCard = ({ product, onProductClick }) => {
       </div>
 
       <div className="p-4 flex-grow flex flex-col">
-        <h3 className="font-heading font-bold text-foreground group-hover:text-accent line-clamp-2">{product.name}</h3>
-        {product.description && <p className="text-muted-foreground text-sm line-clamp-2 mt-1">{product.description}</p>}
+                <h3 className="w-full block font-heading font-bold text-foreground group-hover:text-accent truncate">{product.name}</h3>
+        {product.description && <p className="text-muted-foreground text-sm truncate mt-1">{product.description}</p>}
         
         <div className="mt-auto pt-4">
           <div className="flex items-center justify-between mb-3">

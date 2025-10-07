@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet';
 import Header from '../../components/ui/Header';
 import SaleHero from './components/SaleHero';
-import SaleFilters from './components/SaleFilters';
 import SaleProductCard from './components/SaleProductCard';
 import FeaturedDeals from './components/FeaturedDeals';
 import TrustSignals from './components/TrustSignals';
@@ -164,18 +163,9 @@ const Sale = () => {
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-8">
-          {/* Featured Deals */}
-          <FeaturedDeals />
+          
 
           <div className="grid lg:grid-cols-4 gap-8">
-            {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
-              <SaleFilters 
-                onFilterChange={handleFilterChange}
-                activeFilters={activeFilters}
-              />
-            </div>
-
             {/* Products Section */}
             <div className="lg:col-span-3">
               {/* Products Header */}
@@ -219,7 +209,7 @@ const Sale = () => {
                   </div>
                 </div>
               ) : (
-                <div className={`${viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'space-y-6'} gap-6`}>
+                <div className={`${viewMode === 'grid' ? 'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'space-y-6'} gap-6`}>
                   {currentProducts.map((product, index) => (
                     <motion.div
                       key={product.id}

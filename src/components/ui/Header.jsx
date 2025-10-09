@@ -6,6 +6,7 @@ import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
 import ShoppingCart from '../uiii/ShoppingCart';
+import AnimatedLogoText from './AnimatedLogoText';
 
 const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -65,11 +66,9 @@ const Header = () => {
             <img
               src="/logo.png"
               alt="UrbanSpace Logo"
-              className="w-16 h-16 md:w-20 md:h-20 lg:w-28 lg:h-28 object-contain transition-street group-hover:scale-110"
+              className="w-14 h-14 md:w-16 md:h-16 lg:w-24 lg:h-24 object-contain transition-street group-hover:scale-110"
             />
-            <span className="font-heading font-bold text-base md:text-lg lg:text-xl text-foreground group-hover:text-accent transition-street">
-              UrbanSpace
-            </span>
+            <AnimatedLogoText />
           </Link>
 
           {/* Desktop Navigation */}

@@ -142,42 +142,45 @@ const SaleProductCard = ({ product, index }) => {
             </h3>
           </div>
 
-          {/* Pricing */}
-          <div className="flex items-baseline space-x-2 mb-2">
-            <div>
-              <div className="text-lg font-bold text-accent">
-                {product?.salePrice?.toFixed(3)}
+          {/* Pricing, Stock, and Rating */}
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 mb-2">
+            {/* Pricing */}
+            <div className="flex items-baseline space-x-2">
+              <div>
+                <div className="text-lg font-bold text-accent">
+                  {product?.salePrice?.toFixed(3)}
+                </div>
+                <div className="text-accent text-sm font-medium">TND</div>
               </div>
-              <div className="text-accent text-sm font-medium">TND</div>
-            </div>
-            <div>
-              <div className="text-sm text-muted-foreground line-through">
-                {product?.originalPrice?.toFixed(3)}
+              <div>
+                <div className="text-sm text-muted-foreground line-through">
+                  {product?.originalPrice?.toFixed(3)}
+                </div>
+                <div className="text-xs text-muted-foreground line-through">TND</div>
               </div>
-              <div className="text-xs text-muted-foreground line-through">TND</div>
             </div>
-          </div>
 
-          {/* Stock Status */}
-          <div className="flex items-center space-x-1 mb-1">
-            <Icon 
-              name="Package" 
-              size={14} 
-              className={urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'} 
-            />
-            <span className={`text-xs font-medium ${
-              urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'
-            }`}>
-              {product?.stock > 0 ? `${product?.stock} restant(s)` : 'Rupture de stock'}
-            </span>
-          </div>
+            {/* Stock Status */}
+            <div className="flex items-center space-x-1">
+              <Icon 
+                name="Package" 
+                size={14} 
+                className={urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'} 
+              />
+              <span className={`text-xs font-medium ${
+                urgencyLevel === 'critical' ? 'text-error' : urgencyLevel === 'low' ? 'text-warning' : 'text-success'
+              }`}>
+                {product?.stock > 0 ? `${product?.stock} restant(s)` : 'Rupture de stock'}
+              </span>
+            </div>
 
-          {/* Rating */}
-          <div className="flex items-center space-x-1 mb-2">
-            <Icon name="Star" size={12} className="text-warning fill-current" />
-            <span className="text-xs text-muted-foreground">
-              {product?.rating} ({product?.reviews})
-            </span>
+            {/* Rating */}
+            <div className="flex items-center space-x-1">
+              <Icon name="Star" size={12} className="text-warning fill-current" />
+              <span className="text-xs text-muted-foreground">
+                {product?.rating} ({product?.reviews})
+              </span>
+            </div>
           </div>
 
           {/* Bouton Ajouter au panier - Version mobile/visible par défaut */}

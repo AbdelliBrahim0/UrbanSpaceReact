@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import CountdownTimer from './components/CountdownTimer';
-import UltraLimitedProduct from './components/UltraLimitedProduct';
+import SaleProductCard from '../sale/components/SaleProductCard';
 import LiveActivityFeed from './components/LiveActivityFeed';
 import UrgencyBanner from './components/UrgencyBanner';
 import Icon from '../../components/AppIcon';
@@ -35,15 +35,21 @@ const BlackHourContent = () => {
           const formattedProducts = response.data.map(product => ({
             id: product.id,
             name: product.name,
-            brand: product.categories?.[0]?.name || 'Brand',
+            brand: product.brand || 'Urban Space',
             originalPrice: product.price,
             salePrice: product.promotion?.discountedPrice || product.price,
-            initialStock: product.stock,
             image: product.urlImage,
             imageHover: product.urlImageHover || product.urlImage,
-            sizes: product.size ? product.size.split(',') : ['S', 'M', 'L', 'XL'],
-            isExclusive: true,
-            description: product.description,
+            rating: 4.5, // Default rating
+            reviews: Math.floor(Math.random() * 100), // Random reviews for demo
+            stock: product.stock,
+            availableSizes: product.size ? product.size.split(',').map(s => s.trim()) : ['S', 'M', 'L', 'XL'],
+            isFlashSale: true, // All sale items are considered flash sales
+            flashSaleEnds: product.promotion?.timeRemaining?.isActive 
+              ? `${product.promotion.timeRemaining.hours}h ${product.promotion.timeRemaining.minutes}m`
+              : '24h',
+            isWishlisted: false,
+            categories: product.categories,
             promotion: product.promotion
           }));
           
@@ -183,7 +189,7 @@ const BlackHourContent = () => {
 
               <div className="px-4 sm:px-6 lg:px-8 py-12">
                 {loading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {[...Array(6)].map((_, index) => (
                       <div key={index} className="bg-card border border-street rounded-lg overflow-hidden h-[500px] animate-pulse">
                         <div className="bg-muted h-3/4 w-full"></div>
@@ -211,13 +217,12 @@ const BlackHourContent = () => {
                     <div className="text-muted-foreground text-lg">Aucun produit disponible pour le moment</div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {ultraLimitedProducts.map((product, index) => (
-                      <UltraLimitedProduct
+                      <SaleProductCard
                         key={product.id}
                         product={product}
                         index={index}
-                        onSelect={() => handleProductSelect(product)}
                       />
                     ))}
                   </div>

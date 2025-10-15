@@ -179,7 +179,7 @@ const CallToAction = () => {
           <Icon name="Zap" size={24} className="text-error animate-pulse" />
         </div>
         <p className="text-text-secondary font-body">
-          La Black Hour se termine bientôt. Ne laissez pas passer ces offres exceptionnelles !
+          La Black Hour se commence bientôt. Ne laissez pas passer ces offres exceptionnelles !
         </p>
       </motion.div>
     </div>

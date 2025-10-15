@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../styles/Welcome.css';
@@ -88,15 +88,8 @@ const AnimatedWords = ({ text, delay = 0, className = '' }) => {
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const [showVideo, setShowVideo] = useState(false);
-  const videoRef = useRef(null);
 
   const handleShopAccess = () => {
-    setShowVideo(true);
-  };
-
-  const handleVideoEnd = () => {
-    setShowVideo(false);
     navigate('/homepage');
   };
 
@@ -154,51 +147,22 @@ const Welcome = () => {
 
   return (
     <div className="welcome-container relative overflow-hidden">
-      {/* Vidéo en arrière-plan */}
-      <AnimatePresence>
-        {showVideo && (
-          <motion.div 
-            className="fixed inset-0 z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <video
-              ref={videoRef}
-              src="/walkSceneMP.webm"
-              autoPlay
-              muted
-              className="w-full h-full object-cover"
-              onPlay={(e) => {
-                // Accélérer la lecture de la vidéo à 4x la vitesse normale
-                e.target.playbackRate = 4.0;
-              }}
-              onEnded={handleVideoEnd}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Couche semi-transparente sombre pendant la lecture vidéo */}
-      {showVideo && (
-        <div className="fixed inset-0 bg-black/40 z-30"></div>
-      )}
       
       <FloatingParticles />
       
       {/* Contenu principal (toujours visible) */}
-      <div className={`absolute bottom-8 right-8 z-50 text-right space-y-6 ${showVideo ? 'text-white' : ''}`}>
+      <div className={`absolute bottom-48 md:bottom-8 left-4 right-4 md:left-auto md:right-8 z-50 text-center md:text-right space-y-6 `}>
         <div className="inline-block">
-          <div className="font-heading font-black text-3xl md:text-5xl lg:text-6xl">
+          <div className="font-heading font-black text-3xl sm:text-4xl md:text-6xl lg:text-7xl">
             {/* BIENVENUE SUR (caractère par caractère) */}
             {showWelcome && (
-              <div className="flex items-center">
+              <div className="flex flex-wrap justify-center md:justify-start items-center">
                 <span className="relative inline-block">
-                  <span className={`absolute inset-0 ${showVideo ? 'bg-black/60' : 'bg-black/40'} backdrop-blur-sm -z-10 rounded transform scale-x-100 h-[0.9em] top-1/2 -translate-y-1/2`}></span>
+                  <span className={`absolute inset-0 bg-black/40 backdrop-blur-sm -z-10 rounded transform scale-x-100 h-[0.9em] top-1/2 -translate-y-1/2`}></span>
                   <span className="relative px-2 leading-tight">
                     <AnimatedText 
                       text="BIENVENUE SUR" 
-                      className={`inline-block ${showVideo ? 'text-white' : ''}`} 
+                      className={`inline-block `} 
                     />
                   </span>
                 </span>
@@ -226,22 +190,22 @@ const Welcome = () => {
         {showAccess && (
           <motion.button 
             onClick={handleShopAccess} 
-            className={`font-heading font-black text-3xl md:text-5xl lg:text-6xl transition-all duration-300 flex items-baseline gap-2 group ml-auto ${showVideo ? 'text-white' : ''}`}
+            className={`font-heading font-black text-3xl sm:text-4xl md:text-6xl lg:text-7xl transition-all duration-300 flex items-baseline gap-2 group mx-auto md:ml-auto md:mr-0 `}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <span className="relative inline-block">
-              <span className={`absolute inset-0 ${showVideo ? 'bg-black/60' : 'bg-black/40'} backdrop-blur-sm -z-10 rounded transform scale-x-100 h-[0.9em] top-1/2 -translate-y-1/2`}></span>
+              <span className={`absolute inset-0 bg-black/40 backdrop-blur-sm -z-10 rounded transform scale-x-100 h-[0.9em] top-1/2 -translate-y-1/2`}></span>
               <span className="relative px-2 leading-tight">
-                <span className={`group-hover:hidden ${showVideo ? 'text-white' : 'text-[#00ffc3]'}`}>ACCÉDER À LA BOUTIQUE</span>
-                <span className={`hidden group-hover:inline-block ${showVideo ? 'text-white' : 'text-[#00ffc3]'}`}>PAGE D'ACCUEIL</span>
+                <span className={`group-hover:hidden text-[#00ffc3] text-outline`}>ACCÉDER À LA BOUTIQUE</span>
+                <span className={`hidden group-hover:inline-block text-[#00ffc3] text-outline`}>PAGE D'ACCUEIL</span>
               </span>
             </span>
             <span className="relative inline-block">
-              <span className={`absolute inset-0 ${showVideo ? 'bg-black/60' : 'bg-black/40'} backdrop-blur-sm -z-10 rounded transform scale-x-100 h-[0.9em] top-1/2 -translate-y-1/2`}></span>
+              <span className={`absolute inset-0 bg-black/40 backdrop-blur-sm -z-10 rounded transform scale-x-100 h-[0.9em] top-1/2 -translate-y-1/2`}></span>
               <motion.span 
-                className={`relative px-2 leading-tight ${showVideo ? 'text-white' : 'text-[#00ffc3]'} group-hover:translate-x-2 transition-transform duration-300`}
+                className={`relative px-2 leading-tight text-[#00ffc3] group-hover:translate-x-2 transition-transform duration-300`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 0.5 }}

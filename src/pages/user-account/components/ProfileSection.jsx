@@ -8,7 +8,7 @@ import { userApi } from '../../../api';
 import { useAuth } from '../../../contexts/AuthContext';
 
 const ProfileSection = () => {
-  const { user: authUser } = useAuth();
+  const { user: authUser, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -93,8 +93,7 @@ const ProfileSection = () => {
 
         // Mettre à jour également le contexte d'authentification si nécessaire
         if (authUser) {
-          // Vous pourriez vouloir mettre à jour le contexte d'authentification ici
-          // Cela dépend de comment vous gérez l'état d'authentification
+          updateUser(response.user);
         }
 
         setIsEditing(false);

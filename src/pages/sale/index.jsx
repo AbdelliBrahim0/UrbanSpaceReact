@@ -10,6 +10,11 @@ import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import { salesApi } from '../../api';
 import { formatPrice } from '../../utils/formatters';
+import { useDialog } from '../../contexts/DialogContext';
+import { useCart } from '../../contexts/CartContext';
+import { toast } from 'react-hot-toast';
+import Dialog from '../../components/ui/Dialog';
+import Image from '../../components/AppImage';
 
 const Sale = () => {
   const [activeFilters, setActiveFilters] = useState({
@@ -24,6 +29,55 @@ const Sale = () => {
   const [error, setError] = useState(null);
   const [saleProducts, setSaleProducts] = useState([]);
   const productsPerPage = 12;
+
+  const [addingProductId, setAddingProductId] = useState(null);
+  const { addToCart } = useCart();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { isDialogOpen, setIsDialogOpen } = useDialog();
+
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleAddToCart = async (product, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    setAddingProductId(product.id);
+    
+    try {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.salePrice,
+        image: product.image,
+        size: product.size || 'Unique',
+        color: product.color || 'Standard',
+      });
+      
+      toast.success('Produit ajouté au panier', {
+        position: 'bottom-center',
+        duration: 2000,
+        style: {
+          background: '#10B981',
+          color: '#fff',
+        }
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error("Erreur lors de l'ajout au panier");
+    } finally {
+      setAddingProductId(null);
+    }
+  };
 
   // Fetch sale products from API
   useEffect(() => {
@@ -40,11 +94,16 @@ const Sale = () => {
             brand: product.brand || 'Urban Space',
             originalPrice: product.sale?.originalPrice || product.price,
             salePrice: product.sale?.discountedPrice || product.price,
+            price: product.sale?.discountedPrice || product.price, // for dialog
             image: product.urlImage,
             imageHover: product.urlImageHover || product.urlImage,
             rating: 4.5, // Default rating
             reviews: Math.floor(Math.random() * 100), // Random reviews for demo
             stock: product.stock,
+            stockCount: product.stock,
+            inStock: product.stock > 0,
+            description: product.description || "Aucune description disponible.",
+            category: product.categories?.[0]?.name || "Non classé",
             availableSizes: product.size ? product.size.split(',').map(s => s.trim()) : ['S', 'M', 'L', 'XL'],
             isFlashSale: true, // All sale items are considered flash sales
             flashSaleEnds: product.sale?.timeRemaining?.isActive 
@@ -216,7 +275,8 @@ const Sale = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className={viewMode === 'grid' ? '' : 'flex'}
+                      className={`${viewMode === 'grid' ? '' : 'flex'} cursor-pointer`}
+                      onClick={() => handleProductClick(product)}
                     >
                       <SaleProductCard
                         product={{
@@ -310,6 +370,83 @@ const Sale = () => {
           </div>
         </footer>
       </div>
+
+      {/* Product Detail Dialog */}
+      {selectedProduct && (
+        <Dialog
+          isOpen={isDialogOpen}
+          onClose={handleCloseDialog}
+          title={selectedProduct.name}
+          showCancel={false}
+          showConfirm={false}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Product Image */}
+            <div className="aspect-[3/4] overflow-hidden rounded-lg md:rounded-lg w-1/2 mx-auto md:w-full md:mx-0">
+              <Image
+                src={selectedProduct.image}
+                alt={selectedProduct.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Product Details */}
+            <div className="flex flex-col p-4 md:p-0">
+              <div className="flex-grow">
+                <p className="text-sm text-muted-foreground mb-1">{selectedProduct.category}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-3">{selectedProduct.name}</h3>
+                
+                <p className="text-md text-foreground mb-4">{selectedProduct.description}</p>
+
+                <div className="flex items-baseline mb-4">
+                  <p className="text-3xl text-accent font-extrabold">
+                    {formatPrice(selectedProduct.price)}
+                  </p>
+                  {selectedProduct.originalPrice && (
+                    <span className="ml-3 text-lg text-muted-foreground line-through">
+                      {formatPrice(selectedProduct.originalPrice)}
+                    </span>
+                  )}
+                </div>
+
+                {selectedProduct.inStock ? (
+                  <p className="text-md font-semibold text-success mb-4">
+                    <Icon name="CheckCircle" className="inline-block mr-2" />
+                    En stock ({selectedProduct.stockCount} restants)
+                  </p>
+                ) : (
+                  <p className="text-md font-semibold text-error mb-4">
+                    <Icon name="XCircle" className="inline-block mr-2" />
+                    Rupture de stock
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-auto">
+                <Button 
+                  variant="solid" 
+                  size="lg"
+                  className="w-full bg-accent text-white hover:bg-accent/90 transition-colors py-4"
+                  onClick={(e) => handleAddToCart(selectedProduct, e)}
+                  disabled={!selectedProduct.inStock || addingProductId === selectedProduct.id}
+                >
+                  {addingProductId === selectedProduct.id ? (
+                    <span className="flex items-center justify-center text-lg">
+                      <Icon name="Loader" className="h-6 w-6 animate-spin mr-3" />
+                      Ajout...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center text-lg">
+                      <Icon name="ShoppingBag" className="mr-3 h-6 w-6" />
+                      Ajouter au panier
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </>
   );
 };

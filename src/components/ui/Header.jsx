@@ -18,9 +18,9 @@ const Header = () => {
   const { cartItems, isCartOpen, setIsCartOpen, getTotalItems } = useCart();
 
   const navigationItems = [
-    { label: 'Home', path: '/homepage', icon: 'Home' },
+    { label: 'Accueil', path: '/homepage', icon: 'Home' },
     { label: 'Collections', path: '/collections', icon: 'Grid3X3' },
-    { label: 'Sale', path: '/sale', icon: 'Tag' },
+    { label: 'Remise', path: '/sale', icon: 'Tag' },
     { label: 'Black Friday', path: '/black-friday', icon: 'Zap' },
     { label: 'Black Hour', path: '/black-hour', icon: 'Clock' },
   ];

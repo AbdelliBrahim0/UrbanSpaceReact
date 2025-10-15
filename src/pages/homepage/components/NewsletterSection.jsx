@@ -24,9 +24,9 @@ const NewsletterSection = () => {
   };
 
   const socialLinks = [
-    { name: 'Instagram', icon: 'Instagram', url: '#', followers: '1K' },
-    { name: 'Facebook', icon: 'Facebook', url: '#', followers: '2K' },
-    { name: 'TikTok', icon: 'Music', url: '#', followers: '203K' },
+    { name: 'Instagram', icon: 'Instagram', url: 'https://www.instagram.com/urbanspace717', },
+    { name: 'Facebook', icon: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61568055260818' },
+    { name: 'TikTok', icon: 'Music', url: 'https://www.tiktok.com/@urbanspacetunisia'  }
   ];
 
   const benefits = [

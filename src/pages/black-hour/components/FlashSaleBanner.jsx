@@ -13,9 +13,9 @@ const FlashSaleBanner = () => {
       id: 1,
       title: 'FOLIE DE MINUIT',
       subtitle: '20% de réduction supplémentaire sur tout',
-      discount: '-80%',
-      originalPrice: '299 TND',
-      salePrice: '59 TND',
+      discount: '-20%',
+      originalPrice: '',
+      salePrice: '',
       productName: 'Hoodie Gang Boss',
       endTime: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes from now
       bgGradient: 'from-error/20 via-background to-background',
@@ -25,9 +25,9 @@ const FlashSaleBanner = () => {
       id: 2,
       title: 'OFFRES ÉCLAIRS',
       subtitle: 'Vente flash à durée limitée',
-      discount: '-75%',
-      originalPrice: '199 TND',
-      salePrice: '49 TND',
+      discount: '-25%',
+      originalPrice: '',
+      salePrice: '',
       productName: 'Veste Street Warrior',
       endTime: new Date(Date.now() + 12 * 60 * 1000), // 12 minutes from now
       bgGradient: 'from-warning/20 via-background to-background',
@@ -37,9 +37,9 @@ const FlashSaleBanner = () => {
       id: 3,
       title: 'DERNIÈRES HEURES',
       subtitle: 'Dernière chance pour économiser',
-      discount: '-70%',
-      originalPrice: '149 TND',
-      salePrice: '44 TND',
+      discount: '-30%',
+      originalPrice: '',
+      salePrice: '',
       productName: 'T-shirt Urban Legend',
       endTime: new Date(Date.now() + 8 * 60 * 1000), // 8 minutes from now
       bgGradient: 'from-accent/20 via-background to-background',
@@ -181,7 +181,7 @@ const FlashSaleBanner = () => {
                   </div>
 
                   {/* CTA Button */}
-                  <Link to="/black-hour-flash-sale">
+                  <Link to="/sale">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -202,7 +202,7 @@ const FlashSaleBanner = () => {
                 <div className="flex-shrink-0">
                   <div className="text-center">
                     <h3 className="font-heading font-bold text-lg text-muted-foreground mb-4">
-                      DEAL ENDS IN
+                      L'OFFRE SE TERMINE DANS
                     </h3>
                     
                     <div className="flex items-center space-x-4">

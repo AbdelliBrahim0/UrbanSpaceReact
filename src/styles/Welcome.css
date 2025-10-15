@@ -68,3 +68,8 @@
   transform: translateY(1px);
   box-shadow: 0 0 10px rgba(0, 255, 195, 0.6);
 }
+
+.text-outline {
+  -webkit-text-stroke: 1px rgb(0, 0, 0);
+  text-stroke: 1px white;
+}

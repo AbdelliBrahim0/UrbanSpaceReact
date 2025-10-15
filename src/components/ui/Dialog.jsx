@@ -14,7 +14,7 @@ const Dialog = ({
   showConfirm = true,
   isLoading = false
 }) => {
-  // Empêcher le défilement du fond lorsque la boîte de dialogue est ouverte
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -27,7 +27,6 @@ const Dialog = ({
     };
   }, [isOpen]);
 
-  // Gestion de la touche Échap
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -39,6 +38,12 @@ const Dialog = ({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
+  const variants = {
+    initial: { opacity: 0, y: -50, scale: 0.9 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: 50, scale: 0.9 },
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -48,91 +53,85 @@ const Dialog = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 overflow-y-auto"
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm overflow-y-auto pt-10 pb-10"
           aria-labelledby="modal-title"
           role="dialog"
           aria-modal="true"
         >
-          {/* Overlay avec stopPropagation pour éviter la fermeture au clic */}
+          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
           />
 
-          {/* Conteneur principal */}
+          {/* Main container */}
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="w-full max-w-lg bg-card rounded-lg text-left overflow-hidden shadow-xl transform transition-all"
+              variants={variants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              transition={{ type: 'spring', damping: 30, stiffness: 250 }}
+              className="relative w-full max-w-3xl bg-surface rounded-lg shadow-xl border border-[#00ffc3]"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-card px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                    {/* En-tête */}
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg leading-6 font-medium text-foreground" id="modal-title">
-                        {title}
-                      </h3>
-                      <button
-                        type="button"
-                        className="text-muted-foreground hover:text-foreground focus:outline-none"
-                        onClick={onClose}
-                      >
-                        <Icon name="X" size={20} />
-                      </button>
-                    </div>
+              {/* Header */}
+              <div className="flex-shrink-0 px-4 sm:px-6 pt-4 pb-2 flex justify-between items-center border-b border-street">
+                <h3 className="text-xl font-bold text-foreground" id="modal-title">
+                  {title}
+                </h3>
+                <button
+                  type="button"
+                  className="p-2 -mr-2 text-muted-foreground hover:text-foreground focus:outline-none rounded-full hover:bg-surface transition-colors"
+                  onClick={onClose}
+                >
+                  <Icon name="X" size={24} />
+                </button>
+              </div>
 
-                    {/* Contenu */}
-                    <div className="mt-2">
-                      {children}
-                    </div>
-                  </div>
+              {/* Content */}
+              <div className="overflow-y-auto flex-grow px-4 sm:px-6 py-4">
+                {children}
+              </div>
+
+              {/* Footer with buttons */}
+              {(showConfirm || showCancel) && (
+                <div className="flex-shrink-0 bg-surface/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-street">
+                  {showConfirm && (
+                    <button
+                      type="button"
+                      className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-accent text-base font-medium text-accent-foreground hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent sm:ml-3 sm:w-auto sm:text-sm transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      onClick={onConfirm}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          {confirmText}
+                        </>
+                      ) : (
+                        confirmText
+                      )}
+                    </button>
+                  )}
+                  {showCancel && (
+                    <button
+                      type="button"
+                      className="mt-3 w-full inline-flex justify-center rounded-md border border-muted-foreground/20 shadow-sm px-4 py-2 bg-card text-base font-medium text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
+                      onClick={onClose}
+                      disabled={isLoading}
+                    >
+                      {cancelText}
+                    </button>
+                  )}
                 </div>
-              </div>
-
-              {/* Pied de page avec boutons */}
-              <div className="bg-muted/10 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                {showConfirm && (
-                  <button
-                    type="button"
-                    className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-accent text-base font-medium text-accent-foreground hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent sm:ml-3 sm:w-auto sm:text-sm transition-colors ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                    onClick={onConfirm}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        {confirmText}
-                      </>
-                    ) : (
-                      confirmText
-                    )}
-                  </button>
-                )}
-                {showCancel && (
-                  <button
-                    type="button"
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-muted-foreground/20 shadow-sm px-4 py-2 bg-card text-base font-medium text-foreground hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors"
-                    onClick={onClose}
-                    disabled={isLoading}
-                  >
-                    {cancelText}
-                  </button>
-                )}
-              </div>
+              )}
             </motion.div>
           </div>
         </motion.div>

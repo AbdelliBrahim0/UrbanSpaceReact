@@ -72,7 +72,7 @@ const BlackFridayContent = () => {
               className="space-y-6"
             >
               <h2 className="text-4xl md:text-5xl font-heading font-bold text-foreground">
-                DON'T MISS OUT!
+                À NE PAS MANQUER!
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Ces offres du Black Friday ne dureront pas éternellement. Rejoignez la révolution streetwear et profitez de vos articles préférés avant qu'ils ne disparaissent.
@@ -99,7 +99,7 @@ const BlackFridayContent = () => {
                 </span>
               </div>
               <p className="text-muted-foreground text-sm">
-                Premium streetwear for the urban culture. Authentic gear, unbeatable style.
+                Streetwear haut de gamme pour la culture urbaine. Des vêtements authentiques et un style incomparable.
               </p>
             </div>
 
@@ -129,7 +129,7 @@ const BlackFridayContent = () => {
             <div>
               <h3 className="font-heading font-bold text-foreground mb-4">Stay Updated</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Get exclusive deals and early access to new drops.
+                Bénéficiez d'offres exclusives et d'un accès anticipé aux nouvelles versions.
               </p>
               <div className="flex">
                 <input
@@ -138,7 +138,7 @@ const BlackFridayContent = () => {
                   className="flex-1 bg-surface border border-street rounded-l-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
                 />
                 <button className="bg-accent text-accent-foreground px-4 py-2 rounded-r-lg text-sm font-bold hover:bg-accent/90 transition-colors">
-                  Subscribe
+                  S'abonner'
                 </button>
               </div>
             </div>

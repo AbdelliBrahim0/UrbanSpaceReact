@@ -6,17 +6,17 @@ const TrustSignals = () => {
     {
       icon: 'Shield',
       title: 'Secure Authentication',
-      description: 'Your data is protected with enterprise-grade security'
+      description: 'Vos données sont protégées par une sécurité de niveau entreprise'
     },
     {
       icon: 'Lock',
       title: 'Privacy Protected',
-      description: 'We never share your personal information'
+      description: 'Nous ne partageons jamais vos informations personnelles'
     },
     {
       icon: 'Zap',
       title: 'Instant Access',
-      description: 'Get immediate access to exclusive streetwear drops'
+      description: 'Obtenez un accès immédiat à des nouveautés streetwear exclusives'
     }
   ];
 

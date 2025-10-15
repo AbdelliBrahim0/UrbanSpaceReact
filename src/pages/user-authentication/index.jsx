@@ -45,7 +45,7 @@ const UserAuthentication = () => {
               {activeTab === 'login' ? 'UrbanSpace' : 'UrbanSpace'}
             </h1>
             <p className="text-muted-foreground">
-              {activeTab === 'login' ?'Sign in to access exclusive streetwear drops' :'Create your account for premium streetwear access'
+              {activeTab === 'login' ?'Connectez-vous pour accéder aux nouveautés streetwear exclusives' :'créez votre compte pour un accès streetwear premium'
               }
             </p>
           </div>
@@ -71,7 +71,7 @@ const UserAuthentication = () => {
           {/* Additional Links */}
           <div className="text-center mt-6 animate-fade-in">
             <p className="text-sm text-muted-foreground">
-              {activeTab === 'login' ? "Don't have an account? " : "Already have an account? "}
+              {activeTab === 'login' ? "Vous n'avez pas de compte ? " : "Vous avez déjà un compte ? "}
               <button
                 onClick={() => setActiveTab(activeTab === 'login' ? 'register' : 'login')}
                 className="text-accent hover:text-accent/80 font-medium transition-colors"

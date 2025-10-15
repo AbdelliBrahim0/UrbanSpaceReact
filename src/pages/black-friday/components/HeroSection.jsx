@@ -83,7 +83,7 @@ const HeroSection = () => {
             transition={{ delay: 1.5, type: "spring" }}
             className="text-2xl md:text-4xl font-heading font-bold text-warning mb-6"
           >
-            UP TO 80% OFF
+            JUSQU'À 80% DE RÉDUCTION
           </motion.div>
         </motion.div>
 
@@ -94,7 +94,7 @@ const HeroSection = () => {
           transition={{ delay: 0.5, duration: 0.8 }}
           className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
         >
-          The biggest streetwear sale of the year is here. Exclusive drops, limited editions, and gang-approved styles at unbeatable prices.
+          Les plus grandes soldes streetwear de l'année sont là. Des exclusivités, des éditions limitées et des modèles cultes à des prix imbattables.
         </motion.div>
 
         {/* CTA Buttons */}

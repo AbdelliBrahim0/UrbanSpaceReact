@@ -57,12 +57,12 @@ const SaleHero = () => {
                 UP TO 70% OFF
               </p>
               <p className="text-muted-foreground text-lg mb-8">
-                Limited time deals on premium streetwear.\nDon't sleep on these prices.
+                Offres à durée limitée sur les vêtements streetwear haut de gamme. Ne négligez pas ces prix.
               </p>
 
               {/* Countdown Timer */}
               <div className="flex items-center justify-center lg:justify-start space-x-4 mb-8">
-                <span className="text-foreground font-body font-medium">Sale ends in:</span>
+                <span className="text-foreground font-body font-medium">Remise se termine dans :</span>
                 <div className="flex items-center space-x-2">
                   {[
                     { value: timeLeft?.hours, label: 'H' },
@@ -87,7 +87,7 @@ const SaleHero = () => {
                   variant="default"
                   className="bg-error text-error-foreground hover:bg-error/90 gang-hover-scale font-heading font-bold text-lg px-8 py-3"
                 >
-                  Shop Sale Now
+                  Consulter Les Remises
                   <Icon name="ArrowRight" size={20} className="ml-2" />
                 </Button>
                 
@@ -96,7 +96,7 @@ const SaleHero = () => {
                     variant="outline"
                     className="border-accent text-accent hover:bg-accent/10 gang-hover-scale font-heading font-semibold text-lg px-8 py-3"
                   >
-                    Black Friday Deals
+                    Black Friday 
                     <Icon name="Tag" size={20} className="ml-2" />
                   </Button>
                 </Link>
@@ -121,7 +121,7 @@ const SaleHero = () => {
                       MAX DISCOUNT
                     </div>
                     <div className="text-muted-foreground">
-                      On selected streetwear items
+                      Sur une sélection d'articles streetwear
                     </div>
                   </div>
                 </div>
@@ -133,7 +133,7 @@ const SaleHero = () => {
                 transition={{ duration: 3, repeat: Infinity }}
                 className="absolute -top-4 -right-4 bg-accent text-accent-foreground px-4 py-2 rounded-full font-data font-bold text-sm"
               >
-                LIMITED TIME
+                DURÉE LIMITÉE
               </motion.div>
 
               <motion.div
@@ -141,7 +141,7 @@ const SaleHero = () => {
                 transition={{ duration: 4, repeat: Infinity }}
                 className="absolute -bottom-4 -left-4 bg-warning text-warning-foreground px-4 py-2 rounded-full font-data font-bold text-sm"
               >
-                WHILE STOCKS LAST
+                JUSQU'À ÉPUISEMENT DES STOCKS
               </motion.div>
             </motion.div>
           </div>

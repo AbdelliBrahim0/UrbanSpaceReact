@@ -151,7 +151,7 @@ const CountdownTimer = () => {
           animate={isCritical ? { opacity: [0.7, 1, 0.7] } : {}}
           transition={{ duration: 1, repeat: Infinity }}
         >
-          {isCritical ? 'FINAL MINUTES - ACT NOW!' : isUrgent ?'Limited time remaining!': 'Ultra-exclusive deals ending soon'}
+          {isCritical ? 'FINAL MINUTES - ACT NOW!' : isUrgent ?'Limited time remaining!': 'Offres ultra-exclusives se terminant bientôt'}
         </motion.p>
       </motion.div>
     </div>

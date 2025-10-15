@@ -12,15 +12,69 @@ import Button from '../../components/ui/Button';
 import FlashSaleBanner from './components/FlashSaleBanner';
 import { blackhour } from '../../api';
 import EventWrapper from '../../components/EventWrapper';
+import { useDialog } from '../../contexts/DialogContext';
+import Dialog from '../../components/ui/Dialog';
+import Image from '../../components/AppImage';
+import { useCart } from '../../contexts/CartContext';
+import { toast } from 'react-hot-toast';
 
 const BlackHourContent = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [ultraLimitedProducts, setUltraLimitedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [endTime, setEndTime] = useState(null);
+  const [addingProductId, setAddingProductId] = useState(null);
+
+  const { isDialogOpen, setIsDialogOpen } = useDialog();
+  const { addToCart } = useCart();
+
+  // Handlers for the dialog
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleAddToCart = async (product, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    setAddingProductId(product.id);
+    
+    try {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.salePrice,
+        image: product.image,
+        size: product.availableSizes?.[0] || 'Unique',
+        color: 'Standard',
+        source: 'From Black Hour'
+      });
+      
+      toast.success('Produit ajouté au panier', {
+        position: 'bottom-center',
+        duration: 2000,
+        style: {
+          background: '#10B981',
+          color: '#fff',
+        }
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Erreur lors de l\'ajout au panier');
+    } finally {
+      setAddingProductId(null);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -50,12 +104,12 @@ const BlackHourContent = () => {
               : '24h',
             isWishlisted: false,
             categories: product.categories,
-            promotion: product.promotion
+            promotion: product.promotion,
+            description: product.description || `Découvrez ${product.name}, une pièce exclusive de notre collection. Stock limité!`
           }));
           
           setUltraLimitedProducts(formattedProducts);
           
-          // Trouver la date de fin de promotion la plus proche
           const activePromotions = response.data
             .filter(p => p.promotion?.endTime)
             .map(p => new Date(p.promotion.endTime).getTime());
@@ -82,11 +136,6 @@ const BlackHourContent = () => {
     };
   }, []);
 
-  const handleProductSelect = (product) => {
-    setSelectedProduct(product);
-    setIsCheckoutOpen(true);
-  };
-
   return (
     <>
       <Helmet>
@@ -106,7 +155,6 @@ const BlackHourContent = () => {
             }}
           />
           
-          {/* Floating Particles */}
           {[...Array(30)]?.map((_, i) => (
             <motion.div
               key={i}
@@ -132,10 +180,8 @@ const BlackHourContent = () => {
 
         {/* Main Content */}
         <main className="relative z-10 pt-16">
-          {/* Urgency Banner */}
           <UrgencyBanner />
 
-          {/* Hero Section with Countdown */}
           <section className="relative py-16 lg:py-24">
             <div className="container mx-auto px-4">
               <motion.div
@@ -168,9 +214,7 @@ const BlackHourContent = () => {
               </motion.div>
             </div>
           </section>
-          {/* Flash Sale Banner */}
           <FlashSaleBanner />
-          {/* Ultra Limited Products Section */}
           <section className="py-16 bg-surface/30">
             <div className="container mx-auto px-4">
               <motion.div
@@ -183,7 +227,7 @@ const BlackHourContent = () => {
                   ULTRA-EXCLUSIVE DROPS
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Limited quantities. Real-time availability. Once they're gone, they're gone forever.
+                  Quantités limitées. Disponibilité en temps réel. Une fois épuisés, ils le sont définitivement.
                 </p>
               </motion.div>
 
@@ -223,6 +267,7 @@ const BlackHourContent = () => {
                         key={product.id}
                         product={product}
                         index={index}
+                        onProductClick={handleProductClick}
                       />
                     ))}
                   </div>
@@ -231,9 +276,6 @@ const BlackHourContent = () => {
             </div>
           </section>
 
-          
-
-          {/* Final CTA Section */}
           <section className="py-16 bg-gradient-to-r from-accent/10 via-transparent to-accent/10">
             <div className="container mx-auto px-4 text-center">
               <motion.div
@@ -246,16 +288,11 @@ const BlackHourContent = () => {
                 <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
                   Les offres Black Hour se terminent bientôt. Rejoignez notre liste VIP pour un accès exclusif aux prochaines sorties.
                 </p>
-                
-                
               </motion.div>
             </div>
           </section>
         </main>
 
-        
-
-        {/* Footer */}
         <footer className="bg-surface border-t border-street py-8">
           <div className="container mx-auto px-4 text-center">
             <p className="text-muted-foreground text-sm">
@@ -264,6 +301,83 @@ const BlackHourContent = () => {
           </div>
         </footer>
       </div>
+
+      {/* Product Detail Dialog */}
+      {selectedProduct && (
+        <Dialog
+          isOpen={isDialogOpen}
+          onClose={handleCloseDialog}
+          title={selectedProduct.name}
+          showCancel={false}
+          showConfirm={false}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Product Image */}
+            <div className="aspect-[3/4] overflow-hidden rounded-lg md:rounded-lg w-1/2 mx-auto md:w-full md:mx-0">
+              <Image
+                src={selectedProduct.image}
+                alt={selectedProduct.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Product Details */}
+            <div className="flex flex-col p-4 md:p-0">
+              <div className="flex-grow">
+                <p className="text-sm text-muted-foreground mb-1">{selectedProduct.categories?.[0]?.name || 'Catégorie'}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-3">{selectedProduct.name}</h3>
+                
+                <p className="text-md text-foreground mb-4">{selectedProduct.description}</p>
+
+                <div className="flex items-baseline mb-4">
+                  <p className="text-3xl text-accent font-extrabold">
+                    {selectedProduct.salePrice.toFixed(3)} TND
+                  </p>
+                  {selectedProduct.originalPrice && (
+                    <span className="ml-3 text-lg text-muted-foreground line-through">
+                      {selectedProduct.originalPrice.toFixed(3)} TND
+                    </span>
+                  )}
+                </div>
+
+                {selectedProduct.stock > 0 ? (
+                  <p className="text-md font-semibold text-success mb-4">
+                    <Icon name="CheckCircle" className="inline-block mr-2" />
+                    En stock ({selectedProduct.stock} restants)
+                  </p>
+                ) : (
+                  <p className="text-md font-semibold text-error mb-4">
+                    <Icon name="XCircle" className="inline-block mr-2" />
+                    Rupture de stock
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-auto">
+                <Button 
+                  variant="solid" 
+                  size="lg"
+                  className="w-full bg-accent text-white hover:bg-accent/90 transition-colors py-4"
+                  onClick={(e) => handleAddToCart(selectedProduct, e)}
+                  disabled={!selectedProduct.stock > 0 || addingProductId === selectedProduct.id}
+                >
+                  {addingProductId === selectedProduct.id ? (
+                    <span className="flex items-center justify-center text-lg">
+                      <Icon name="Loader" className="h-6 w-6 animate-spin mr-3" />
+                      Ajout...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center text-lg">
+                      <Icon name="ShoppingBag" className="mr-3 h-6 w-6" />
+                      Ajouter au panier
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </>
   );
 };

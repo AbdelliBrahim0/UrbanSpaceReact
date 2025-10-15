@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import HeroSection from './components/HeroSection';
 import FeaturedCollections from './components/FeaturedCollections';
@@ -16,6 +17,11 @@ import ScrollVelocity from './components/ScrollVelocity';
 import StickerPeel from './components/StickerPeel';
 const Homepage = () => {
   useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
     // Smooth scroll behavior for the page
     document.documentElement.style.scrollBehavior = 'smooth';
     
@@ -147,8 +153,8 @@ const Homepage = () => {
               <DiscountCard 
                 discount="70"
                 category="Vêtements"
-                originalPrice="199"
-                discountedPrice="59"
+                originalPrice="299"
+                discountedPrice="199"
                 description="T-shirts, pulls et vestes à prix cassés"
                 isLimited={true}
                 onActionClick={() => console.log('Voir les vêtements')}
@@ -156,8 +162,8 @@ const Homepage = () => {
               <DiscountCard 
                 discount="60"
                 category="Chaussures"
-                originalPrice="249"
-                discountedPrice="99"
+                originalPrice="549"
+                discountedPrice="399"
                 description="Les meilleures paires aux meilleurs prix"
                 isLimited={true}
                 onActionClick={() => console.log('Voir les chaussures')}
@@ -165,8 +171,8 @@ const Homepage = () => {
               <DiscountCard 
                 discount="50"
                 category="Accessoires"
-                originalPrice="149"
-                discountedPrice="74"
+                originalPrice="200"
+                discountedPrice="149"
                 description="Sacs, casquettes et plus encore"
                 isLimited={true}
                 onActionClick={() => console.log('Voir les accessoires')}
@@ -185,7 +191,7 @@ const Homepage = () => {
         <TrustSignals />
 
       <GangStyleStrip 
-          text="LAST CHANCE"
+          text="DERNIERE CHANCE"
           iconName="AlertTriangle"
           direction="right"
         />
@@ -203,7 +209,9 @@ const Homepage = () => {
         <NewsletterSection />
 
         {/* Live Notifications */}
-        <LiveNotifications />
+        <div className="hidden md:block">
+          <LiveNotifications />
+        </div>
       </main>
       {/* Footer */}
       <footer className="bg-surface border-t border-street py-12 px-4 lg:px-6">
@@ -220,75 +228,64 @@ const Homepage = () => {
                 </span>
               </div>
               <p className="text-text-secondary text-sm leading-relaxed mb-4">
-                Authentic streetwear for the culture. Premium quality, limited drops, unlimited attitude.
+                Streetwear authentique pour la culture. Qualité premium, drops limités, attitude illimitée.
               </p>
-              <div className="flex space-x-4">
-                {['Instagram', 'Twitter', 'TikTok', 'YouTube']?.map((social) => (
-                  <div
-                    key={social}
-                    className="w-8 h-8 bg-background border border-street rounded-full flex items-center justify-center hover:border-accent transition-street cursor-pointer"
-                  >
-                    <span className="text-xs text-text-secondary hover:text-accent transition-street">
-                      {social?.[0]}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="font-heading font-bold text-foreground mb-4">SHOP</h4>
+              <h4 className="font-heading font-bold text-foreground mb-4">BOUTIQUE</h4>
               <ul className="space-y-2 text-sm">
-                {['New Arrivals', 'Collections', 'Sale', 'Black Friday', 'Accessories']?.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-text-secondary hover:text-accent transition-street">
-                      {link}
-                    </a>
-                  </li>
-                ))}
+                <li><Link to="/homepage" className="text-text-secondary hover:text-accent transition-street">Accueil</Link></li>
+                <li><Link to="/collections" className="text-text-secondary hover:text-accent transition-street">Collections</Link></li>
+                <li><Link to="/sale" className="text-text-secondary hover:text-accent transition-street">Remise</Link></li>
+                <li><Link to="/black-friday" className="text-text-secondary hover:text-accent transition-street">Black Friday</Link></li>
+                <li><Link to="/black-hour" className="text-text-secondary hover:text-accent transition-street">Black Hour</Link></li>
               </ul>
+              
             </div>
 
             {/* Support */}
             <div>
-              <h4 className="font-heading font-bold text-foreground mb-4">SUPPORT</h4>
-              <ul className="space-y-2 text-sm">
-                {['Size Guide', 'Shipping Info', 'Returns', 'Contact Us', 'FAQ']?.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-text-secondary hover:text-accent transition-street">
-                      {link}
-                    </a>
-                  </li>
-                ))}
+              <h3 className="font-heading font-bold text-foreground mb-4">Support</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-accent transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-accent transition-colors">Size Guide</a></li>
+                <li><a href="#" className="hover:text-accent transition-colors">Returns</a></li>
+                <li><a href="#" className="hover:text-accent transition-colors">FAQ</a></li>
               </ul>
             </div>
 
-            {/* Company */}
+            {/* Newsletter */}
             <div>
-              <h4 className="font-heading font-bold text-foreground mb-4">COMPANY</h4>
-              <ul className="space-y-2 text-sm">
-                {['About Us', 'Careers', 'Press', 'Privacy Policy', 'Terms']?.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-text-secondary hover:text-accent transition-street">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <h3 className="font-heading font-bold text-foreground mb-4">Stay Updated</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Bénéficiez d'offres exclusives et d'un accès anticipé aux nouvelles versions.
+              </p>
+              <div className="flex">
+                <input
+                  type="email"
+                  placeholder="Enter email"
+                  className="flex-1 bg-surface border border-street rounded-l-lg px-3 py-2 text-sm focus:outline-none focus:border-accent"
+                />
+                <button className="bg-accent text-accent-foreground px-4 py-2 rounded-r-lg text-sm font-bold hover:bg-accent/90 transition-colors">
+                  S'abonner'
+                </button>
+              </div>
             </div>
+
+            
           </div>
 
           {/* Bottom Bar */}
           <div className="border-t border-street pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-text-secondary text-sm mb-4 md:mb-0">
-              © {new Date()?.getFullYear()} UrbanSpace. All rights reserved. Built for the culture.
+            <p className="text-text-secondary text-sm order-2 md:order-1">
+              © {new Date()?.getFullYear()} UrbanSpace. Tous droits réservés.
             </p>
-            <div className="flex items-center space-x-6 text-sm">
-              <span className="text-text-secondary">Secure payments</span>
-              <span className="text-text-secondary">Free shipping over $100</span>
-              <span className="text-text-secondary">30-day returns</span>
-            </div>
+            <p style={{ fontFamily: 'Dancing Script, cursive', color: '#FFD700' }} className="text-sm order-1 md:order-2 mb-4 md:mb-0">
+              code by 3b2li || decode if you can.
+            </p>
           </div>
         </div>
       </footer>

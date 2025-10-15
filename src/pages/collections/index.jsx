@@ -10,6 +10,12 @@ import UrgencyBanner from "./components/UrgencyBanner";
 import PaginationControls from "./components/PaginationControls";
 import CombinedFilter from "./components/CombinedFilter";
 import { useDebounce } from "../../hooks/useDebounce";
+import { useDialog } from "../../contexts/DialogContext";
+import Dialog from "../../components/ui/Dialog";
+import Image from "../../components/AppImage";
+import Icon from "../../components/AppIcon";
+import { useCart } from "../../contexts/CartContext";
+import { toast } from "react-hot-toast";
 
 const Collections = () => {
   const navigate = useNavigate();
@@ -34,6 +40,69 @@ const Collections = () => {
   // Loading states
   const [loadingFilters, setLoadingFilters] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [addingProductId, setAddingProductId] = useState(null);
+
+  // Dialog state
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { isDialogOpen, setIsDialogOpen } = useDialog();
+  const { addToCart } = useCart();
+
+  const handleProductClick = (product) => {
+    const formattedProduct = {
+        id: product.id,
+        title: product.name,
+        description: product.description || "",
+        price: parseFloat(product.price) || 0,
+        originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
+        image: product.urlImage,
+        category: product.category?.name || "",
+        inStock: product.stock > 0,
+        stockCount: product.stock || 0
+    };
+    setSelectedProduct(formattedProduct);
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedProduct(null);
+  };
+
+  const handleAddToCart = async (product, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    setAddingProductId(product.id);
+    
+    try {
+      addToCart({
+        id: product.id,
+        name: product.title || product.name,
+        price: product.price,
+        image: product.image || product.urlImage,
+        size: product.size || 'Unique',
+        color: product.color || 'Standard',
+        source: 'From Collections Popup'
+      });
+      
+      toast.success('Produit ajouté au panier', {
+        position: 'bottom-center',
+        duration: 2000,
+        style: {
+          background: '#10B981',
+          color: '#fff',
+        }
+      });
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error("Erreur lors de l'ajout au panier");
+    } finally {
+      setAddingProductId(null);
+    }
+  };
+
 
   // Effect to fetch filter data (categories and subcategories)
   useEffect(() => {
@@ -75,7 +144,7 @@ const Collections = () => {
             return price > maxVal ? price : maxVal;
           }, 0);
           if (max > 0) {
-            setMaxPrice(max);
+            // setMaxPrice(max); // setMaxPrice is not defined
             setPriceRange({ min: 0, max: max });
           }
         }
@@ -274,7 +343,7 @@ const Collections = () => {
                         images: [product.urlImage, product.urlImageHover].filter(Boolean),
                         isNew: new Date(product.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
                       }}
-                      onProductClick={id => navigate(`/product/${id}`)}
+                      onProductClick={handleProductClick}
                       onAddToCart={prod => console.log("Add to cart", prod)}
                       onToggleWishlist={id => console.log("Toggle wishlist", id)}
                     />
@@ -311,10 +380,10 @@ const Collections = () => {
               viewport={{ once: true }}
             >
               <h2 className="font-heading font-bold text-3xl lg:text-4xl text-foreground mb-4">
-                Stay in the Loop
+                Restez informé
               </h2>
               <p className="text-muted-foreground text-lg mb-8">
-                Get exclusive access to new drops, limited releases, and street culture insights
+                Obtenez un accès exclusif aux nouvelles sorties, aux sorties limitées et aux informations sur la culture de la rue
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
@@ -324,15 +393,93 @@ const Collections = () => {
                   className="flex-1 px-4 py-3 bg-background border border-street rounded-lg focus:border-accent focus:outline-none text-foreground"
                 />
                 <Button variant="default" className="px-8">
-                  Subscribe
+                  S'abonner
                 </Button>
               </div>
             </motion.div>
           </div>
         </section>
       </main>
+
+      {/* Product Detail Dialog */}
+      {selectedProduct && (
+        <Dialog
+          isOpen={isDialogOpen}
+          onClose={handleCloseDialog}
+          title={selectedProduct.title}
+          showCancel={false}
+          showConfirm={false}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Product Image */}
+            <div className="aspect-[3/4] overflow-hidden rounded-lg md:rounded-lg w-1/2 mx-auto md:w-full md:mx-0">
+              <Image
+                src={selectedProduct.image}
+                alt={selectedProduct.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Product Details */}
+            <div className="flex flex-col p-4 md:p-0">
+              <div className="flex-grow">
+                <p className="text-sm text-muted-foreground mb-1">{selectedProduct.category}</p>
+                <h3 className="text-2xl font-bold text-foreground mb-3">{selectedProduct.title}</h3>
+                
+                <p className="text-md text-foreground mb-4">{selectedProduct.description}</p>
+
+                <div className="flex items-baseline mb-4">
+                  <p className="text-3xl text-accent font-extrabold">
+                    {selectedProduct.price.toFixed(3)} TND
+                  </p>
+                  {selectedProduct.originalPrice && (
+                    <span className="ml-3 text-lg text-muted-foreground line-through">
+                      {selectedProduct.originalPrice.toFixed(3)} TND
+                    </span>
+                  )}
+                </div>
+
+                {selectedProduct.inStock ? (
+                  <p className="text-md font-semibold text-success mb-4">
+                    <Icon name="CheckCircle" className="inline-block mr-2" />
+                    En stock ({selectedProduct.stockCount} restants)
+                  </p>
+                ) : (
+                  <p className="text-md font-semibold text-error mb-4">
+                    <Icon name="XCircle" className="inline-block mr-2" />
+                    Rupture de stock
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-auto">
+                <Button 
+                  variant="solid" 
+                  size="lg"
+                  className="w-full bg-accent text-white hover:bg-accent/90 transition-colors py-4"
+                  onClick={(e) => handleAddToCart(selectedProduct, e)}
+                  disabled={!selectedProduct.inStock || addingProductId === selectedProduct.id}
+                >
+                  {addingProductId === selectedProduct.id ? (
+                    <span className="flex items-center justify-center text-lg">
+                      <Icon name="Loader" className="h-6 w-6 animate-spin mr-3" />
+                      Ajout...
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center text-lg">
+                      <Icon name="ShoppingBag" className="mr-3 h-6 w-6" />
+                      Ajouter au panier
+                    </span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </Dialog>
+      )}
     </div>
   );
 };
+
 
 export default Collections;

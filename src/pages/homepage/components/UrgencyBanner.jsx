@@ -25,7 +25,7 @@ const UrgencyBanner = () => {
                 ALERTE BLACK HOUR
               </h3>
               <p className="text-text-secondary font-body">
-                Réductions exceptionnelles pendant 2 heures seulement
+                Réductions exceptionnelles pendant une heure seulement
               </p>
             </div>
           </div>

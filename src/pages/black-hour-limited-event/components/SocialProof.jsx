@@ -4,20 +4,15 @@ import Icon from '../../../components/AppIcon';
 
 const SocialProof = () => {
   const [liveStats, setLiveStats] = useState({
-    activeUsers: 1247,
-    itemsSold: 892,
-    timeLeft: '2h 47m'
+    activeUsers: 17,
+    itemsSold: 92,
+    timeLeft: 'x'
   });
 
   
 
   const liveActivities = [
-    "Emma vient de commander un Hoodie Gang (-70%)",
-    "Lucas a ajouté 3 articles à son panier",
-    "Chloé a rejoint le programme VIP",
-    "Thomas vient de finaliser sa commande (189€ économisés)",
-    "Léa a partagé sa commande sur Instagram",
-    "Maxime vient de s\'inscrire à UrbanSpace"
+    ""
   ];
 
   const [currentActivity, setCurrentActivity] = useState(0);

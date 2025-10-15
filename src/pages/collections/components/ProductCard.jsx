@@ -30,7 +30,7 @@ const ProductCard = ({ product, onProductClick }) => {
       className="bg-surface rounded-lg overflow-hidden border border-street cursor-pointer group flex flex-col h-full"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => onProductClick(product.id)}
+      onClick={() => onProductClick(product)}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
     >

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Icon from '../../../components/AppIcon';
+import { useDialog } from '../../../contexts/DialogContext';
 
 const LiveNotifications = () => {
+  const { isDialogOpen } = useDialog();
   const [notifications, setNotifications] = useState([]);
   const [currentNotification, setCurrentNotification] = useState(0);
 
@@ -110,8 +112,12 @@ const LiveNotifications = () => {
     return 'border-accent bg-accent/10 text-accent';
   };
 
+  if (isDialogOpen) {
+    return null;
+  }
+
   return (
-    <div className="fixed bottom-6 left-6 z-50 max-w-sm">
+    <div className="fixed bottom-8 left-4 md:bottom-6 md:left-6 z-50 max-w-xs md:max-w-sm">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentNotification}
@@ -124,19 +130,19 @@ const LiveNotifications = () => {
               allNotifications?.[currentNotification]?.type,
               allNotifications?.[currentNotification]?.priority
             )}
-            border rounded-lg p-4 backdrop-blur-sm shadow-lg
+            border rounded-lg p-3 md:p-4 backdrop-blur-sm shadow-lg
           `}
         >
-          <div className="flex items-start space-x-3">
+          <div className="flex items-start space-x-2 md:space-x-3">
             <div className="flex-shrink-0">
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="w-8 h-8 rounded-full bg-current/20 flex items-center justify-center"
+                className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-current/20 flex items-center justify-center"
               >
                 <Icon 
                   name={getNotificationIcon(allNotifications?.[currentNotification]?.type)} 
-                  size={16} 
+                  size={14} 
                   className="text-current"
                 />
               </motion.div>
@@ -146,25 +152,25 @@ const LiveNotifications = () => {
               {allNotifications?.[currentNotification]?.type === 'purchase' ? (
                 <div>
                   <div className="flex items-center space-x-2 mb-1">
-                    <span className="font-bold text-sm">
+                    <span className="font-bold text-xs md:text-sm">
                       {allNotifications?.[currentNotification]?.user}
                     </span>
-                    <span className="text-xs opacity-75">
+                    <span className="text-[10px] md:text-xs opacity-75">
                       from {allNotifications?.[currentNotification]?.location}
                     </span>
                   </div>
-                  <div className="text-sm opacity-90">
+                  <div className="text-xs md:text-sm opacity-90">
                     Just purchased{' '}
                     <span className="font-semibold">
                       {allNotifications?.[currentNotification]?.product}
                     </span>
                   </div>
-                  <div className="text-xs opacity-60 mt-1">
+                  <div className="text-[10px] md:text-xs opacity-60 mt-1">
                     {allNotifications?.[currentNotification]?.time}
                   </div>
                 </div>
               ) : (
-                <div className="text-sm font-medium">
+                <div className="text-xs md:text-sm font-medium">
                   {allNotifications?.[currentNotification]?.message}
                 </div>
               )}
@@ -174,12 +180,12 @@ const LiveNotifications = () => {
               onClick={() => setCurrentNotification(prev => (prev + 1) % allNotifications?.length)}
               className="flex-shrink-0 opacity-50 hover:opacity-100 transition-opacity"
             >
-              <Icon name="X" size={14} />
+              <Icon name="X" size={12} />
             </button>
           </div>
 
           {/* Progress Bar */}
-          <div className="mt-3 h-1 bg-current/20 rounded-full overflow-hidden">
+          <div className="mt-2 md:mt-3 h-1 bg-current/20 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-current rounded-full"
               initial={{ width: "0%" }}
@@ -195,9 +201,9 @@ const LiveNotifications = () => {
         animate={{ opacity: 1 }}
         className="mt-2 text-center"
       >
-        <div className="inline-flex items-center space-x-1 bg-surface/80 backdrop-blur-sm border border-street rounded-full px-3 py-1">
-          <Icon name="Users" size={12} className="text-accent" />
-          <span className="text-xs text-muted-foreground">
+        <div className="inline-flex items-center space-x-1 bg-surface/80 backdrop-blur-sm border border-street rounded-full px-2 py-1 md:px-3 md:py-1">
+          <Icon name="Users" size={10} className="text-accent" />
+          <span className="text-[10px] md:text-xs text-muted-foreground">
             {allNotifications?.length} live updates
           </span>
         </div>

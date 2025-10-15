@@ -157,7 +157,7 @@ const LoginForm = ({ onSuccess }) => {
           type="button"
           className="text-sm text-accent hover:text-accent/80 transition-colors"
         >
-          Mot de passe oublié ?
+          
         </button>
       </div>
       <Button

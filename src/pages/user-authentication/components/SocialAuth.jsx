@@ -48,39 +48,12 @@ const SocialAuth = ({ onSuccess }) => {
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="px-4 bg-background text-muted-foreground">
-            Or continue with
+            
           </span>
         </div>
       </div>
       {/* Social Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-fade-in">
-        {socialProviders?.map((provider) => (
-          <button
-            key={provider?.id}
-            onClick={() => handleSocialLogin(provider)}
-            disabled={loadingProvider !== null}
-            className={`
-              relative flex items-center justify-center space-x-2 py-3 px-4 rounded-lg
-              transition-all duration-200 transform hover:scale-105 active:scale-95
-              ${provider?.color} ${provider?.textColor}
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
-              shadow-elevation-1 hover:shadow-elevation-2
-            `}
-          >
-            {loadingProvider === provider?.id ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <Icon name={provider?.icon} size={18} />
-            )}
-            <span className="text-sm font-medium hidden sm:block">
-              {provider?.name}
-            </span>
-            <span className="text-sm font-medium sm:hidden">
-              {provider?.name?.[0]}
-            </span>
-          </button>
-        ))}
-      </div>
+      
       {/* Trust Signals */}
       <div className="flex items-center justify-center space-x-4 text-xs text-muted-foreground animate-fade-in">
         <div className="flex items-center space-x-1">

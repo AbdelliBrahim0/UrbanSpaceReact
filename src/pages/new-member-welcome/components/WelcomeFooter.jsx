@@ -34,8 +34,8 @@ const WelcomeFooter = () => {
   ];
 
   const socialLinks = [
-    { name: "Instagram", icon: "Instagram", url: "#" },
-    { name: "Facebook", icon: "Facebook", url: "#" },
+    { name: "Instagram", icon: "Instagram", url: "https://www.instagram.com/urbanspace717" },
+    { name: "Facebook", icon: "Facebook", url: "https://www.facebook.com/profile.php?id=61568055260818" },
   ];
 
   useEffect(() => {

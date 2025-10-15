@@ -14,7 +14,7 @@
     --color-foreground: #FFFFFF; /* white */
     --color-border: rgba(255, 255, 255, 0.1); /* white-10% */
     --color-input: #2A2A2A; /* gray-800 */
-    --color-ring: #00FF88; /* electric-green */
+    --color-ring: #00ffdd; /* gold */
     
     /* Card Colors */
     --color-card: #2A2A2A; /* gray-800 */
@@ -27,28 +27,28 @@
     --color-muted-foreground: #B0B0B0; /* gray-400 */
     
     /* Primary Colors */
-    --color-primary: #00d512; /* deep-black */
-    --color-primary-foreground: #FFFFFF; /* white */
+    --color-primary: #00ffc8; /* gold */
+    --color-primary-foreground: #1A1A1A; /* deep-black */
     
     /* Secondary Colors */
     --color-secondary: #1A1A1A; /* gray-900 */
     --color-secondary-foreground: #FFFFFF; /* white */
     
     /* Accent Colors */
-    --color-accent: #00ffc3; /* electric-green */
-    --color-accent-foreground: #0A0A0A; /* deep-black */
+    --color-accent: #00ffc3; /* gold */
+    --color-accent-foreground: #1A1A1A; /* deep-black */
     
     /* State Colors */
-    --color-success: #00FF44; /* bright-green */
-    --color-success-foreground: #0A0A0A; /* deep-black */
+    --color-success: #28a745; /* muted-green */
+    --color-success-foreground: #FFFFFF; /* white */
     
-    --color-warning: #FFB800; /* street-orange */
+    --color-warning: #00ffea; /* street-orange */
     --color-warning-foreground: #0A0A0A; /* deep-black */
     
-    --color-error: #FF0040; /* electric-red */
+    --color-error: #dc3545; /* muted-red */
     --color-error-foreground: #FFFFFF; /* white */
     
-    --color-destructive: #FF0040; /* electric-red */
+    --color-destructive: #dc3545; /* muted-red */
     --color-destructive-foreground: #FFFFFF; /* white */
     
     /* Surface Colors */
@@ -85,11 +85,11 @@
 
 @layer utilities {
   .text-shadow-glow {
-    text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
   }
   
   .box-shadow-street {
-    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.1);
   }
   
   .box-shadow-modal {

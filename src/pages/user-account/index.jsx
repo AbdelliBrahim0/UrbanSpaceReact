@@ -40,13 +40,8 @@ const UserAccount = () => {
   }, []);
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: 'User', component: ProfileSection },
-    { id: 'orders', label: 'Orders', icon: 'Package', component: OrderHistory },
-    { id: 'wishlist', label: 'Wishlist', icon: 'Heart', component: WishlistSection },
-    { id: 'addresses', label: 'Addresses', icon: 'MapPin', component: AddressBook },
-    { id: 'payments', label: 'Payment', icon: 'CreditCard', component: PaymentMethods },
-    { id: 'settings', label: 'Settings', icon: 'Settings', component: AccountSettings },
-    { id: 'activity', label: 'Activity', icon: 'Activity', component: ActivityFeed }
+    { id: 'profile', label: 'Profile', icon: 'User', component: ProfileSection }
+    
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || ProfileSection;
@@ -128,7 +123,7 @@ const UserAccount = () => {
                   className="w-full mt-4"
                   onClick={handleLogout}
                 >
-                  Log Out
+                  
                 </Button>
               </div>
             </div>

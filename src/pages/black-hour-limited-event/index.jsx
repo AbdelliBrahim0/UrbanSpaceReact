@@ -117,34 +117,7 @@ const BlackHourLimitedEventContent = () => {
           </motion.section>
         </div>
       </motion.main>
-      {/* Floating Action Button */}
-      <motion.div
-        className="fixed bottom-8 right-8 z-50"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 2, duration: 0.5 }}
-      >
-        <motion.button
-          className="w-16 h-16 bg-gradient-to-r from-accent to-error rounded-full flex items-center justify-center text-white shadow-2xl"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          animate={{ 
-            boxShadow: [
-              '0 0 20px rgba(229, 9, 20, 0.3)',
-              '0 0 40px rgba(229, 9, 20, 0.6)',
-              '0 0 20px rgba(229, 9, 20, 0.3)'
-            ]
-          }}
-          transition={{ 
-            boxShadow: { duration: 2, repeat: Infinity }
-          }}
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="m18 15-6-6-6 6"/>
-          </svg>
-        </motion.button>
-      </motion.div>
+
     </div>
   );
 };
